@@ -1,10 +1,10 @@
-package es.ucm.gdv.launcher.android;
+package es.ucm.gdv.ohno;
 
 import java.util.Random;
 
 public class Logic {
-    public Logic (){
-
+    public Logic (int tam){
+        init(tam);
     }
     //crear tablero inicial
     public void init(int tam){
@@ -34,6 +34,41 @@ public class Logic {
         for(int i = 0; i < tablero[0].length; ++i){
             cuentaFila(tablero,i);//cuenta los adyacentes azules que hay en esa fila
             cuentaCol(tablero,i);//cuenta los adyacentes azules que hay en esa columna
+        }
+
+        reveal(tablero);
+
+
+
+    }
+    public void print(){
+        for(int i = 0; i < 4 ; ++i){
+            for(int j = 0; j < 4 ; ++j){
+                System.out.print(tablero[i][j].estadoSolucion + " ");
+            }
+            System.out.println();
+        }
+        /*for(int i = 0; i < 4 ; ++i){
+            for(int j = 0; j < 4 ; ++j){
+                System.out.print(logic.tablero[i][j].estadoActual + " ");
+            }
+            System.out.println();
+        }*/
+        System.out.println();
+        for(int i = 0; i < 4 ; ++i){
+            for(int j = 0; j < 4 ; ++j){
+                System.out.print((tablero[i][j].fila + tablero[i][j].column) + " " );
+            }
+            System.out.println();
+        }
+        System.out.println();
+
+
+        for(int i = 0; i < 4 ; ++i){
+            for(int j = 0; j < 4 ; ++j){
+                System.out.print(tablero[i][j].lock+" " );
+            }
+            System.out.println();
         }
 
 
@@ -93,15 +128,17 @@ public class Logic {
         int j=0;
         if(tablero[i][j].estadoSolucion == Casilla.ColorCasilla.Azul /*&& !tablero[i][j].showInColumn*/){
             tablero[i][j].lock = true;
+            tablero[i][j].estadoActual= tablero[i][j].estadoSolucion;
         }
         j++;
         while(tablero[0].length != j){
             if(!tablero[i][j].lock  && tablero[i][j].estadoSolucion == Casilla.ColorCasilla.Azul ) {
-                if(tablero[i][j-1].showInRow  || tablero[i][j-1].lock  )
+                if(tablero[i][j-1].showInRow  || tablero[i][j-1].lock)//el anterior es azul
                     tablero[i][j].showInRow = true;
-                else{
+                else{//el anterior es rojo
                     tablero[i][j].lock = true;
                     tablero[i][j].showInRow = true;
+                    tablero[i][j].estadoActual= tablero[i][j].estadoSolucion;
                 }
             }
             j++;
@@ -112,44 +149,23 @@ public class Logic {
         int i=0;
         if(tablero[i][j].estadoSolucion == Casilla.ColorCasilla.Azul){
             tablero[i][j].lock = true;
+            tablero[i][j].estadoActual= tablero[i][j].estadoSolucion;
         }
         i++;
         while( tablero[0].length != i){
             if(!tablero[i][j].lock && tablero[i][j].estadoSolucion == Casilla.ColorCasilla.Azul ) {
-                if(tablero[i-1][j].showInRow  || tablero[i-1][j].lock  )
-                    tablero[i][j].showInRow = true;
-                else{
+                if(tablero[i-1][j].showInColumn  || tablero[i-1][j].lock )//el anterior es azul
+                    tablero[i][j].showInColumn = true;
+                else{//el anterior es rojo
                     tablero[i][j].lock = true;
-                    tablero[i][j].showInRow = true;
+                    tablero[i][j].showInColumn = true;
+                    tablero[i][j].estadoActual= tablero[i][j].estadoSolucion;
                 }
             }
             i++;
         }
     }
 
-   /* //recibe el tablero y la columna a calcular el numero de azules adyacentes
-    public void markShowInCol(Casilla[][] tablero, int j){
-        int i=0;
-        while(i != tablero[0].length){
-            if(tablero[i][j].column == 0 && tablero[i][j].estadoSolucion == Casilla.ColorCasilla.Azul)
-                markShowInColRec(tablero, i, j,0);
-            i++;
-        }
-    }
-    //recibe el tablero, la fila, la columna y el numero que ha contado de adyacentes en esa columna
-    //la condicion de parada es encontrar una casilla roja o el final
-    private int markShowInColRec(Casilla[][] tablero, int i, int j,int cont){
-        if(i == tablero[0].length-1) {//si llegamos al final
-            tablero[i][j].column = cont;
-            return cont;
-        }
-        if (tablero[i + 1][j].estadoSolucion == Casilla.ColorCasilla.Azul)//si el siguiente es azul, aumentar el contador de adyacentes
-            tablero[i][j].column = cuentaColRec(tablero, i+1, j, ++cont);
-        else//si el siguiente es rojo, dejo de aumentar adyacentes
-            tablero[i][j].column = cont;
-        //aqui se llega al encontrar un rojo.
-        return tablero[i][j].column;
-    }*/
 
     private void reveal(Casilla[][] tablero){
         int size = tablero[0].length;
@@ -162,13 +178,15 @@ public class Logic {
                 if((tablero[i][j].fila + tablero[i][j].column) == 0 && tablero[i][j].estadoSolucion == Casilla.ColorCasilla.Azul){
                     tablero[i][j].estadoSolucion = Casilla.ColorCasilla.Rojo;
                 }
-                // revelar
 
             }
-            System.out.println();
         }
 
-        //if(revCount < revLimit)
+        for(int i = 0; i < tablero[0].length; ++i){
+            markShowInRow(tablero,i);//revela los necesarios en filas
+            markShowInCol(tablero,i);//revela los nocesarios en columnas
+        }
+
     }
 
     public Casilla[][] tablero;

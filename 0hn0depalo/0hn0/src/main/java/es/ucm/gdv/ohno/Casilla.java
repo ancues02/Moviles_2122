@@ -1,4 +1,4 @@
-package es.ucm.gdv.launcher.android;
+package es.ucm.gdv.ohno;
 
 public class Casilla {
     public enum ColorCasilla{

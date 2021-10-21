@@ -1,10 +1,8 @@
 package es.ucm.gdv.launcher.android;
 
 import androidx.appcompat.app.AppCompatActivity;
-import es.ucm.gdv.launcher.android.Logic;
+import es.ucm.gdv.ohno.Logic;
 import android.os.Bundle;
-
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,7 +10,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Logic logic = new Logic();
+        Logic logic = new Logic(4);
         logic.init(4);
         for(int i = 0; i < 4 ; ++i){
             for(int j = 0; j < 4 ; ++j){
