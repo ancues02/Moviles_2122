@@ -17,4 +17,7 @@ public class Casilla {
     public int filaPlayer = 0;//adyacentes en esa fila
     public int columnPlayer = 0;//adyacentes en esa columna
     public ColorCasilla estadoActual;//el color que tiene en ese momento (rojo, azul o gris)
+
+    public boolean showInRow = false;
+    public boolean showInColumn = false;
 }
