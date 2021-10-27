@@ -1,8 +1,6 @@
 package es.ucm.gdv.engine;
 
 public interface Graphics {
-    float _windowX = 0, _windowY = 0;
-
     Image newImage(String name);
     Font newFont(String filename, float size, boolean isBold);
     void clear(int r, int g, int b, int a);
