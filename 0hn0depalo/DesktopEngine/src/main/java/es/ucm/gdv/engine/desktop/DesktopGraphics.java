@@ -12,26 +12,13 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class DesktopGraphics implements Graphics {
-    float _virtualX = 1080, _virtualY = 1920; // Dimensiones del canvas virtual
-    float _realX = 1080, _realY = 1920;   // Dimensiones del canvas ajustado a la ventana real
-    boolean _verticalCompensation = true;   // Hacia dónde tiene que compensar poniendo barras
-    float _scale = 1.0f;    // Multiplicador de tamaño del canvas virtual al real
+public class DesktopGraphics extends AbstractGraphics {
     public JFrame _window;
     private Color _currentColor;
 
-    private void adjustCanvasToSize(int x, int y){
-        if(y/x >= 16.0f/9.0f) {  // Hay que compensar por arriba
-            _realX = x;
-            _scale = _realX/_virtualX;
-            _realY = y * _scale;
-            _verticalCompensation = true;
-        }else {  // Hay que compensar por abajo
-            _realY = y;
-            _scale = _realY/_virtualY;
-            _realX = x * _scale;
-            _verticalCompensation = false;
-        }
+    @Override
+    protected void rescale() {
+        _window.setSize((int)_realX, (int)_realY);
     }
 
     @Override
