@@ -1,43 +1,51 @@
 package es.ucm.gdv.ohno;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+
 public class Logic {
     public Square[][] board; // Tablero con todas las casillas
-    List<Square> locked;       // Las casillas lockeadas
+    private List<Square> locked;     // Las casillas lockeadas
 
     public Logic (int tam){
+        locked = new ArrayList <Square>();
         init(tam);
     }
 
     //crear tablero inicial
     public void init(int tam){
-        board = new Square[tam][tam];
+        board = new Square[tam+2][tam+2];//tamaño +2 para bordear con rojos
         for(int i = 0; i < board[0].length; ++i){
-            for(int j = 0; j < board[0].length; ++j) {
+            for(int j = 0; j < board[1].length; ++j) {
                 board[i][j] = new Square();
             }
         }
         Random rnd = new Random();
         //rellenamos el tablero con azules y rojos de forma aleatoria
         for(int i = 0; i < board[0].length; ++i){
-            for(int j = 0; j < board[0].length; ++j){
-                if(rnd.nextFloat() < 0.5) {
-                    board[i][j].solutionState = Square.SquareColor.Blue;
-                    board[i][j].currentState = Square.SquareColor.Grey;
-                }
-                else {
+            for(int j = 0; j < board[1].length; ++j){
+                //bordeamos de rojos
+                if(i == 0 || i== board[0].length -1|| j == 0 || j== board[1].length -1) {
                     board[i][j].solutionState = Square.SquareColor.Red;
-                    board[i][j].currentState = Square.SquareColor.Grey;
+                    board[i][j].currentState = Square.SquareColor.Red;
+                }
+                else{
+                    if(rnd.nextFloat() < 0.5) {
+                        board[i][j].solutionState = Square.SquareColor.Blue;
+                        board[i][j].currentState = Square.SquareColor.Grey;
+                    }
+                    else {
+                        board[i][j].solutionState = Square.SquareColor.Red;
+                        board[i][j].currentState = Square.SquareColor.Grey;
+                    }
                 }
                 board[i][j].posX = i;
                 board[i][j].posY = j;
             }
         }
+
 
         //contar elementos adyacentes de la fila y columna
         //el tablero es cuadrado asi que se puede hacer asi
@@ -46,16 +54,27 @@ public class Logic {
             countCol(i);//cuenta los adyacentes azules que hay en esa columna
         }
 
+        for(int i = 0; i < board[0].length; ++i) {
+            for (int j = 0; j < board[0].length; ++j) {
+                board[i][j].total = board[i][j].row + board[i][j].column;
+            }
+        }
+
         reveal();
     }
 
     public String giveHint(){
+        for(Square s : locked){
+            if(hint3(s)){
+                System.out.println("Pista 3 aceptada en "+s.posX + " "+ s.posY);
+            }
+        }
         return "lamo";
     }
 
     //devuelve true si ve suficiente para cerrarlo.
     private boolean hint1(Square square){
-        boolean check = square.row + square.column == square.playerColumn + square.playerRow;
+        boolean check = square.total == square.playerColumn + square.playerRow;
         if(check) {
             for (Dirs d : Dirs.values()) {
                 int x = square.posX;
@@ -85,44 +104,68 @@ public class Logic {
                     board[x += d.getRow()][y += d.getCol()].currentState == Square.SquareColor.Blue){
                 if(d == Dirs.UP || d == Dirs.DOWN){ // Columna
                     if((board[x][y].playerColumn + (square.playerRow + square.playerColumn + 1))
-                            > (square.row + square.column)) return true;    // Más grande que la solución
+                            > (square.total)) return true;    // Más grande que la solución
                 }else{                              // Fila
                     if((board[x][y].playerRow + (square.playerRow + square.playerColumn + 1))
-                            > (square.row + square.column)) return true;    // Más grande que la solución
+                            > (square.total)) return true;    // Más grande que la solución
                 }
             }
         }
         return false;
     }
 
-    //TODO: devuelve true si veria demasiad pocos.
     private boolean hint3(Square square){
-        int[] posAdyCount = new int[4];
-        int i = 0;
-        int sum = 0;
-        for (Dirs d : Dirs.values()) {
-            int x = square.posX;
-            int y = square.posY;
-            int cont=0;
-            while (board[x][y].currentState != Square.SquareColor.Red) {
+        //guardamos los que puede ver y los que ya ve por cada direccion
+
+        Integer[][] posAdyCount = new Integer[4][2];
+        int i=0;
+        int posCount=0;
+        int blueCount=0;
+        for(Dirs d: Dirs.values()){
+            int x = square.posX + d.getRow();
+            int y = square.posY + d.getCol();
+            while(board[x][y].currentState != Square.SquareColor.Red){
+                if(board[x][y].currentState == Square.SquareColor.Blue)
+                    blueCount++;
+                posCount++;
                 x += d.getRow();
                 y += d.getCol();
-                if(board[x][y].currentState == Square.SquareColor.Grey) cont++;
             }
-            posAdyCount[i] = cont;
+
+            posAdyCount[i][0]=posCount;
+            posAdyCount[i][1]=blueCount;
+            posCount=blueCount=0;
             i++;
         }
-        Arrays.sort(posAdyCount);
+        //ordenamos de menor a mayor los posibles azules menos los que ya son azules
+        for( i = 0; i < posAdyCount[0].length -1; ++i){
+            for(int j = 0; j < posAdyCount[0].length -1; ++j){
+                int tmp = posAdyCount[j][0] - posAdyCount[j][1];
+                int aux = posAdyCount[j+1][0] - posAdyCount[j+1][1];
+                if(tmp > aux){
+                    tmp = posAdyCount[j][0];
+                    aux = posAdyCount[j][1];
+                    posAdyCount[j][0] = posAdyCount[j+1][0];
+                    posAdyCount[j][1] = posAdyCount[j+1][1];
 
-        for(i = 0; i < posAdyCount.length - 1; i++){
-            sum += posAdyCount[i];
+                    posAdyCount[j+1][0] = tmp;
+                    posAdyCount[j+1][1] = aux;
+                }
+            }
+        }//ya esta ordenado de menor a mayor
+
+        //sumamos los posibles en todas las direcciones menos
+        // la que estamos comprobando (tiene mas posibles)
+        int count=0;
+        for(i=0;i<3;++i){
+            count += posAdyCount[i][0];
         }
-        return sum < (square.row + square.column);
+        return count < square.total;
     }
 
     public void print(){
-        for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
+        for(int i = 0; i < board[0].length ; ++i){
+            for(int j = 0; j < board[1].length ; ++j){
                 System.out.print(board[i][j].solutionState + " ");
             }
             System.out.println();
@@ -134,17 +177,25 @@ public class Logic {
             System.out.println();
         }*/
         System.out.println();
-        for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print((board[i][j].row + board[i][j].column) + " " );
+        for(int i = 0; i < board[0].length ; ++i){
+            for(int j = 0; j < board[1].length ; ++j){
+                System.out.print((board[i][j].total) + " " );
             }
             System.out.println();
         }
         System.out.println();
 
-        for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print(board[i][j].lock+" " );
+        //muestra el estado del tablero
+        for(int i = 0; i < board[0].length ; ++i){
+            for(int j = 0; j < board[1].length ; ++j){
+                if(board[i][j].lock)
+                    System.out.print(board[i][j].total+" ");
+                else if(board[i][j].currentState == Square.SquareColor.Blue)
+                    System.out.print("A ");
+                else if(board[i][j].currentState == Square.SquareColor.Grey)
+                    System.out.print("0 ");
+                if(board[i][j].currentState == Square.SquareColor.Red)
+                    System.out.print("R ");
             }
             System.out.println();
         }
@@ -205,6 +256,7 @@ public class Logic {
         if(board[i][j].solutionState == Square.SquareColor.Blue /*&& !tablero[i][j].showInColumn*/){
             board[i][j].lock = true;
             locked.add(board[i][j]);
+            board[i][j].showInRow = true;
             board[i][j].currentState = board[i][j].solutionState;
         }
         j++;
@@ -228,6 +280,7 @@ public class Logic {
         if(board[i][j].solutionState == Square.SquareColor.Blue){
             board[i][j].lock = true;
             locked.add(board[i][j]);
+            board[i][j].showInColumn = true;
             board[i][j].currentState = board[i][j].solutionState;
         }
         i++;
@@ -254,7 +307,7 @@ public class Logic {
         for(int i = 0; i < size ; ++i){
             for(int j = 0; j < size ; ++j){
                 // comprobar que no se ha generado aislado
-                if((board[i][j].row + board[i][j].column) == 0 && board[i][j].solutionState == Square.SquareColor.Blue){
+                if((board[i][j].total) == 0 && board[i][j].solutionState == Square.SquareColor.Blue){
                     board[i][j].solutionState = Square.SquareColor.Red;
                 }
             }

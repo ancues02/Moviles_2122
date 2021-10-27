@@ -9,6 +9,7 @@ public class Square {
 
     public int row = 0;                 //adyacentes en esa fila
     public int column = 0;              //adyacentes en esa columna
+    public int total = 0;               //adyacentes totales (suma de row + column)
     public SquareColor solutionState;   //tiene que ser rojo para ganar
     public boolean lock = false;        //los que ve el jugador
 

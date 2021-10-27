@@ -12,10 +12,10 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/0hn0" />
             <option value="$PROJECT_DIR$/AndroidEngine" />
+            <option value="$PROJECT_DIR$/Androidlauncher" />
             <option value="$PROJECT_DIR$/DesktopEngine" />
             <option value="$PROJECT_DIR$/DesktopLauncher" />
             <option value="$PROJECT_DIR$/Engine" />
-            <option value="$PROJECT_DIR$/androidlauncher" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
