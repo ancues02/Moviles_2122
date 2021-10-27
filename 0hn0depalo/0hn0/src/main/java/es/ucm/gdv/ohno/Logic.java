@@ -46,6 +46,7 @@ public class Logic {
             }
         }
 
+        //pruebas();
 
         //contar elementos adyacentes de la fila y columna
         //el tablero es cuadrado asi que se puede hacer asi
@@ -62,6 +63,8 @@ public class Logic {
 
         reveal();
     }
+
+
 
     public String giveHint(){
         for(Square s : locked){
@@ -252,19 +255,24 @@ public class Logic {
 
     //recibe el tablero y la fila a calcular
     private void markShowInRow(int i){
-        int j=0;
-        if(board[i][j].solutionState == Square.SquareColor.Blue /*&& !tablero[i][j].showInColumn*/){
-            board[i][j].lock = true;
-            locked.add(board[i][j]);
+        int j=1;
+        /*if(board[i][j].solutionState == Square.SquareColor.Blue &&
+                board[i][j+1].solutionState != Square.SquareColor.Red*//*&& !board[i][j].showInColumn*//*){
             board[i][j].showInRow = true;
-            board[i][j].currentState = board[i][j].solutionState;
+            if(!board[i][j].lock) {
+                board[i][j].lock = true;
+                locked.add(board[i][j]);
+                board[i][j].currentState = board[i][j].solutionState;
+            }
         }
-        j++;
-        while(board[0].length != j){
+        j++;*/
+        while(board[0].length -1 != j){
             if(!board[i][j].lock  && board[i][j].solutionState == Square.SquareColor.Blue) {
                 if(board[i][j-1].showInRow  || board[i][j-1].lock)//el anterior es azul
                     board[i][j].showInRow = true;
-                else{//el anterior es rojo
+                //el de la izquierda es rojo y el de la derecha no
+                else if(board[i][j+1].solutionState != Square.SquareColor.Red)
+                {
                     board[i][j].lock = true;
                     locked.add(board[i][j]);
                     board[i][j].showInRow = true;
@@ -276,19 +284,23 @@ public class Logic {
     }
 
     private void markShowInCol(int j){
-        int i=0;
-        if(board[i][j].solutionState == Square.SquareColor.Blue){
-            board[i][j].lock = true;
-            locked.add(board[i][j]);
+        int i=1;
+       /* if(board[i][j].solutionState == Square.SquareColor.Blue *//*&& !board[i][j].showInRow*//*){
             board[i][j].showInColumn = true;
-            board[i][j].currentState = board[i][j].solutionState;
+            if(!board[i][j].lock) {
+                board[i][j].lock = true;
+                locked.add(board[i][j]);
+                board[i][j].currentState = board[i][j].solutionState;
+            }
         }
-        i++;
-        while( board[0].length != i){
+        i++;*/
+        while( board[0].length -1 != i){
             if(!board[i][j].lock && board[i][j].solutionState == Square.SquareColor.Blue) {
                 if(board[i-1][j].showInColumn  || board[i-1][j].lock )//el anterior es azul
                     board[i][j].showInColumn = true;
-                else{//el anterior es rojo
+                //el de arriba es rojo y el de abajo no
+                else if(board[i+1][j].solutionState != Square.SquareColor.Red)
+                {
                     board[i][j].lock = true;
                     locked.add(board[i][j]);
                     board[i][j].showInColumn = true;
@@ -302,10 +314,9 @@ public class Logic {
     private void reveal(){
         int size = board[0].length;
         Random r = new Random();
-        int revCount = 0;
 
-        for(int i = 0; i < size ; ++i){
-            for(int j = 0; j < size ; ++j){
+        for(int i = 1; i < size -1; ++i){
+            for(int j = 1; j < size -1; ++j){
                 // comprobar que no se ha generado aislado
                 if((board[i][j].total) == 0 && board[i][j].solutionState == Square.SquareColor.Blue){
                     board[i][j].solutionState = Square.SquareColor.Red;
@@ -313,11 +324,74 @@ public class Logic {
             }
         }
 
-        for(int i = 0; i < board[0].length; ++i){
+        for(int i = 1; i < board[0].length -1; ++i){
             markShowInRow(i);   //revela los necesarios en filas
             markShowInCol(i);   //revela los nocesarios en columnas
         }
 
+    }
+
+    private void pruebas(){
+        //para crear nuestro tablero si queremos, para hacer pruebas
+        for(int i = 0; i < board[0].length; ++i) {
+            for (int j = 0; j < board[1].length; ++j) {
+                //bordeamos de rojos
+                if (i == 0 || i == board[0].length - 1 || j == 0 || j == board[1].length - 1) {
+                    board[i][j].solutionState = Square.SquareColor.Red;
+                    board[i][j].currentState = Square.SquareColor.Red;
+                }
+                board[i][j].posX = i;
+                board[i][j].posY = j;
+            }
+        }
+        int x=1, y=1;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=1; y=2;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=1; y=3;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=1; y=4;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=2; y=1;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=2; y=2;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=2; y=3;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=2; y=4;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=3; y=1;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=3; y=2;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=3; y=3;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=3; y=4;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=4; y=1;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=4; y=2;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=4; y=3;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=4; y=4;
+        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
     }
 }
 
