@@ -1,6 +1,8 @@
 package es.ucm.gdv.engine.desktop;
 
 import es.ucm.gdv.engine.Image;
+import sun.security.krb5.internal.crypto.Des;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -9,12 +11,17 @@ import javax.imageio.ImageIO;
 
 public class DesktopImage implements Image {
     String _name = null;
-    float _width, _height;
+    BufferedImage _bufferedImage;
 
-    @Override
-    public void load(String path) {
-        _name = path;
+    public DesktopImage(String s){
+        try {
+            _bufferedImage = ImageIO.read(new File(s));
+        } catch (IOException e) {
+        }
+        _name = s;
     }
+
+    public BufferedImage get_bufferedImage() { return _bufferedImage; }
 
     @Override
     public String get_name() {
@@ -23,11 +30,11 @@ public class DesktopImage implements Image {
 
     @Override
     public float get_width() {
-        return _width;
+        return _bufferedImage.getWidth();
     }
 
     @Override
     public float get_height() {
-        return _height;
+        return _bufferedImage.getHeight();
     }
 }
