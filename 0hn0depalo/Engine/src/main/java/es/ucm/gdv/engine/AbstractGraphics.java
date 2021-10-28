@@ -11,12 +11,12 @@ public abstract class AbstractGraphics implements Graphics{
         if(x/y <= _aspectRatio) {  // Hay que compensar por arriba
             _realX = x;
             _scale = _realX/_virtualX;
-            _realY = y * _scale;
+            _realY = _virtualY * _scale;
             _verticalCompensation = true;
         }else {  // Hay que compensar por abajo
             _realY = y;
             _scale = _realY/_virtualY;
-            _realX = x * _scale;
+            _realX = _virtualX * _scale;
             _verticalCompensation = false;
         }
 

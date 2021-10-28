@@ -16,9 +16,13 @@ public class DesktopGraphics extends AbstractGraphics {
     public JFrame _window;
     private Color _currentColor;
 
+    public DesktopGraphics(int x, int y){
+        createWindow(x, y);
+    }
+
     @Override
     protected void rescale() {
-        _window.setSize((int)_realX, (int)_realY);
+        //_window.setSize((int)_realX, (int)_realY);  //TESTING: PARA VER EL CANVAS
     }
 
     @Override
