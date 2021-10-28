@@ -9,9 +9,9 @@ public class Logic {
     public Square[][] board; // Tablero con todas las casillas
     private List<Square> locked;     // Las casillas lockeadas
 
-    public Logic (int tam){
+    public Logic (){
         locked = new ArrayList <Square>();
-        init(tam);
+        //init(tam);
     }
 
     //crear tablero inicial
@@ -46,13 +46,13 @@ public class Logic {
             }
         }
 
-        //pruebas();
+        pruebas();
 
         //contar elementos adyacentes de la fila y columna
         //el tablero es cuadrado asi que se puede hacer asi
         for(int i = 0; i < board[0].length; ++i){
-            countRow(i);//cuenta los adyacentes azules que hay en esa fila
-            countCol(i);//cuenta los adyacentes azules que hay en esa columna
+            countRow(i,false);//cuenta los adyacentes azules que hay en esa fila
+            countCol(i,false);//cuenta los adyacentes azules que hay en esa columna
         }
 
         for(int i = 0; i < board[0].length; ++i) {
@@ -64,7 +64,16 @@ public class Logic {
         reveal();
     }
 
-
+    // Comprueba si se ha solucionado
+    public boolean check(){
+        for(int i = 1; i < board[0].length -1; ++i) {
+            for (int j = 1; j < board[1].length - 1; ++j) {
+                if(board[i][j].currentState != board[i][j].solutionState)
+                    return false;
+            }
+        }
+        return true;
+    }
 
     public String giveHint(){
         for(Square s : locked){
@@ -78,22 +87,32 @@ public class Logic {
         for(Square s : locked){
             if(hint1(s,true)){
                 System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return true;
             }
             else if(hint2(s,true)){
                 System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return true;
             }
             else if(hint3(s,true)){
                 System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return true;
             }
             else if(hint4(s)){
                 System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return true;
             }
             else if(hint5(s)){
                 System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return true;
             }
 
@@ -104,6 +123,8 @@ public class Logic {
                     if(hint6_7(board[i][j], true)) {
                         System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
                                 + " " + (board[i][j].posY - 1));
+                        countRow(board[i][j].posX,true);
+                        countCol(board[i][j].posY,true);
                         return true;
                     }
 
@@ -181,8 +202,11 @@ public class Logic {
         for(Dirs d: Dirs.values()){//recorrer en todas las direcciones
             int x = square.posX + d.getRow();
             int y = square.posY + d.getCol();
+            boolean countBlue = true;//cuentas los azules adyacentes
             while(board[x][y].currentState != Square.SquareColor.Red){
-                if(board[x][y].currentState == Square.SquareColor.Blue)//guardamos los azules en esa dir
+                if(board[x][y].currentState == Square.SquareColor.Grey )//guardamos los azules en esa dir
+                   countBlue = false;
+                else if(countBlue)
                     blueCount++;
                 posCount++;//guardamos todos los posibles azules
                 x += d.getRow();
@@ -236,14 +260,12 @@ public class Logic {
             }
             board[x][y].currentState = Square.SquareColor.Blue;
             //actualizar valores de los que ve en fila y columna
-            x += posAdyCount[3][2];
-            y += posAdyCount[3][3];
-            board[square.posX][square.posY].playerRow+=1+ board[x][y].playerRow;
-            board[square.posX][square.posY].playerColumn+=1+ board[x][y].playerColumn;
+
+
 
         }
 
-        return count < square.total;
+        return count < square.total - posAdyCount[3][1];
     }
 
     //Ve más de los que puede ver
@@ -311,7 +333,7 @@ public class Logic {
         //muestra el estado del tablero
         for(int i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j){
-                if(board[i][j].lock)
+                if(board[i][j].lock && board[i][j].currentState == Square.SquareColor.Blue)
                     System.out.print(board[i][j].total+" ");
                 else if(board[i][j].currentState == Square.SquareColor.Blue)
                     System.out.print("A ");
@@ -341,71 +363,110 @@ public class Logic {
 
     }*/
 
-    //recibe el tablero y la fila a calcular
-    private void countRow(int i){
+    //recibe el tablero y la fila a calcular.
+    // si player es true es que lo modifica el player
+    //sino es para la solucion incial
+    private void countRow(int i, boolean player){
         int j=0;
-        while(j != board[0].length){
-            if(board[i][j].row == 0 && board[i][j].solutionState == Square.SquareColor.Blue)
-                countRowRec(i, j,0);
-            j++;
+        if(!player){
+            while(j != board[0].length){
+                if(board[i][j].row == 0 && board[i][j].solutionState == Square.SquareColor.Blue)
+                    countRowRec(i, j,0, player);
+                j++;
+            }
+        }
+        else{
+            while(j != board[0].length){
+                if(board[i][j].playerRow == 0 && board[i][j].currentState == Square.SquareColor.Blue)
+                    countRowRec(i, j,0, player);
+                j++;
+            }
         }
     }
 
     //recibe el tablero, la fila, la columna y el numero que ha contado de adyacentes en esa fila
     //la condicion de parada es encontrar una casilla roja o el final
-    private int countRowRec(int i, int j, int cont){
-        if(j == board[0].length-1) {//si llegamos al final
-            board[i][j].row = cont;
-            return cont;
+    private int countRowRec(int i, int j, int cont, boolean player){
+        if(!player) {
+            if (j == board[0].length - 1) {//si llegamos al final
+                board[i][j].row = cont;
+                return cont;
+            }
+            if (board[i][j + 1].solutionState == Square.SquareColor.Blue)//si el siguiente es azul, aumentar el contador de adyacentes
+                board[i][j].row = countRowRec(i, j + 1, ++cont, player);
+            else//si el siguiente es rojo, dejo de aumentar adyacentes
+                board[i][j].row = cont;
+            //aqui se llega al encontrar un rojo.
+            return board[i][j].row;
         }
-        if (board[i][j + 1].solutionState == Square.SquareColor.Blue)//si el siguiente es azul, aumentar el contador de adyacentes
-            board[i][j].row = countRowRec(i, j+1, ++cont);
-        else//si el siguiente es rojo, dejo de aumentar adyacentes
-            board[i][j].row = cont;
-        //aqui se llega al encontrar un rojo.
-        return board[i][j].row;
+        else{
+            if (j == board[0].length - 1) {//si llegamos al final
+                board[i][j].playerRow = cont;
+                return cont;
+            }
+            if (board[i][j + 1].currentState == Square.SquareColor.Blue)//si el siguiente es azul, aumentar el contador de adyacentes
+                board[i][j].playerRow = countRowRec(i, j + 1, ++cont, player);
+            else//si el siguiente es rojo, dejo de aumentar adyacentes
+                board[i][j].playerRow = cont;
+            //aqui se llega al encontrar un rojo.
+            return board[i][j].playerRow;
+        }
     }
 
     //recibe el tablero y la columna a calcular el numero de azules adyacentes
-    private void countCol(int j){
+    private void countCol(int j,boolean player){
         int i=0;
-        while(i != board[0].length){
-            if(board[i][j].column == 0 && board[i][j].solutionState == Square.SquareColor.Blue)
-                countColRec(i, j,0);
-            i++;
+        if(!player) {
+            while (i != board[0].length) {
+                if (board[i][j].column == 0 && board[i][j].solutionState == Square.SquareColor.Blue)
+                    countColRec(i, j, 0, player);
+                i++;
+            }
+        }
+        else{
+            while (i != board[0].length) {
+                if (board[i][j].playerColumn == 0 && board[i][j].currentState == Square.SquareColor.Blue)
+                    countColRec(i, j, 0, player);
+                i++;
+            }
         }
     }
     //recibe el tablero, la fila, la columna y el numero que ha contado de adyacentes en esa columna
     //la condicion de parada es encontrar una casilla roja o el final
-    private int countColRec(int i, int j, int cont){
-        if(i == board[0].length-1) {//si llegamos al final
-            board[i][j].column = cont;
-            return cont;
+    private int countColRec(int i, int j, int cont,boolean player){
+        if(!player) {
+            if (i == board[0].length - 1) {//si llegamos al final
+                board[i][j].column = cont;
+                return cont;
+            }
+            if (board[i + 1][j].solutionState == Square.SquareColor.Blue)//si el siguiente es azul, aumentar el contador de adyacentes
+                board[i][j].column = countColRec(i + 1, j, ++cont, player);
+            else//si el siguiente es rojo, dejo de aumentar adyacentes
+                board[i][j].column = cont;
+            //aqui se llega al encontrar un rojo.
+            return board[i][j].column;
         }
-        if (board[i + 1][j].solutionState == Square.SquareColor.Blue)//si el siguiente es azul, aumentar el contador de adyacentes
-            board[i][j].column = countColRec(i+1, j, ++cont);
-        else//si el siguiente es rojo, dejo de aumentar adyacentes
-            board[i][j].column = cont;
-        //aqui se llega al encontrar un rojo.
-        return board[i][j].column;
+        else{
+            if(i == board[0].length-1) {//si llegamos al final
+                board[i][j].playerColumn = cont;
+                return cont;
+            }
+            if (board[i + 1][j].currentState == Square.SquareColor.Blue)//si el siguiente es azul, aumentar el contador de adyacentes
+                board[i][j].playerColumn = countColRec(i+1, j, ++cont,player);
+            else//si el siguiente es rojo, dejo de aumentar adyacentes
+                board[i][j].playerColumn = cont;
+            //aqui se llega al encontrar un rojo.
+            return board[i][j].playerColumn;
+        }
     }
 
     //recibe el tablero y la fila a calcular
     private void markShowInRow(int i){
         int j=1;
-        /*if(board[i][j].solutionState == Square.SquareColor.Blue &&
-                board[i][j+1].solutionState != Square.SquareColor.Red*//*&& !board[i][j].showInColumn*//*){
-            board[i][j].showInRow = true;
-            if(!board[i][j].lock) {
-                board[i][j].lock = true;
-                locked.add(board[i][j]);
-                board[i][j].currentState = board[i][j].solutionState;
-            }
-        }
-        j++;*/
         while(board[0].length -1 != j){
             if(!board[i][j].lock  && board[i][j].solutionState == Square.SquareColor.Blue) {
-                if(board[i][j-1].showInRow  || board[i][j-1].lock)//el anterior es azul
+                if(board[i][j-1].showInRow  || (board[i][j-1].lock &&
+                        board[i][j-1].currentState == Square.SquareColor.Blue))//el anterior es azul
                     board[i][j].showInRow = true;
                 //el de la izquierda es rojo y el de la derecha no
                 else if(board[i][j+1].solutionState != Square.SquareColor.Red)
@@ -422,18 +483,10 @@ public class Logic {
 
     private void markShowInCol(int j){
         int i=1;
-       /* if(board[i][j].solutionState == Square.SquareColor.Blue *//*&& !board[i][j].showInRow*//*){
-            board[i][j].showInColumn = true;
-            if(!board[i][j].lock) {
-                board[i][j].lock = true;
-                locked.add(board[i][j]);
-                board[i][j].currentState = board[i][j].solutionState;
-            }
-        }
-        i++;*/
         while( board[0].length -1 != i){
             if(!board[i][j].lock && board[i][j].solutionState == Square.SquareColor.Blue) {
-                if(board[i-1][j].showInColumn  || board[i-1][j].lock )//el anterior es azul
+                if(board[i-1][j].showInColumn  || (board[i-1][j].lock &&
+                        board[i-1][j].currentState == Square.SquareColor.Blue) )//el anterior es azul
                     board[i][j].showInColumn = true;
                 //el de arriba es rojo y el de abajo no
                 else if(board[i+1][j].solutionState != Square.SquareColor.Red)
@@ -457,6 +510,12 @@ public class Logic {
                 // comprobar que no se ha generado aislado
                 if((board[i][j].total) == 0 && board[i][j].solutionState == Square.SquareColor.Blue){
                     board[i][j].solutionState = Square.SquareColor.Red;
+                }
+                if(board[i][j].solutionState == Square.SquareColor.Red){
+                   // if(r.nextFloat() >=0.5f) {
+                        board[i][j].lock = true;
+                        board[i][j].currentState = Square.SquareColor.Red;
+                    //}
                 }
             }
         }
@@ -482,37 +541,37 @@ public class Logic {
             }
         }
         int x=1, y=1;
-        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=1; y=2;
         board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=1; y=3;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=1; y=4;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=2; y=1;
         board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
-        x=2; y=2;
+        x=1; y=4;
+        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=2; y=1;
         board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=2; y=2;
+        board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=2; y=3;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=2; y=4;
-        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=3; y=1;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=3; y=2;
-        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=3; y=3;
-        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=3; y=4;
         board[x][y].solutionState = Square.SquareColor.Blue;
@@ -521,7 +580,7 @@ public class Logic {
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=4; y=2;
-        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=4; y=3;
         board[x][y].solutionState = Square.SquareColor.Blue;
