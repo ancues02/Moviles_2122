@@ -16,16 +16,18 @@ public class DesktopGraphics extends AbstractGraphics {
     public JFrame _window;
     private Color _currentColor;
 
+    public DesktopGraphics(int x, int y){
+        createWindow(x, y);
+    }
+
     @Override
     protected void rescale() {
-        _window.setSize((int)_realX, (int)_realY);
+        //_window.setSize((int)_realX, (int)_realY);  //TESTING: PARA VER EL CANVAS
     }
 
     @Override
     public Image newImage(String name) {
-        Image img = new DesktopImage();
-        img.load(name);
-        return img;
+        return new DesktopImage(name);
     }
 
     @Override
@@ -63,22 +65,26 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void drawImage(Image image) {
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(new File(image.get_name()));
-        } catch (IOException e) {
-        }
-        _window.getGraphics().drawImage(img, 0, 0, null);
+        drawImage(image, 1, 1, 0, 0);
     }
 
     @Override
     public void drawImage(Image image, float scaleX, float scaleY) {
-
+        drawImage(image, scaleX, scaleY, 0, 0);
     }
 
     @Override
     public void drawImage(Image image, float scaleX, float scaleY, float transX, float transY){
+        BufferedImage bi = ((DesktopImage)image).get_bufferedImage();
 
+        float rX = transX * _scale, rY = transY * _scale;   // Se ajusta a la escala puesta al canvas
+        if(!_verticalCompensation) rX += (_window.getX() - _realX) / 2; // Que se salte la barra
+        else rY += (_window.getY() - _realY) / 2;
+
+        _window.getGraphics().drawImage(bi,
+                (int)rX, (int)rY,
+                (int)(bi.getWidth() * scaleX * _scale), (int)(bi.getHeight() * scaleY * _scale),
+                null);
     }
 
     @Override
@@ -104,9 +110,9 @@ public class DesktopGraphics extends AbstractGraphics {
     }
 
     public void createWindow(int x, int y) {
-        //_realX = x; _realY = y;
         _window = new JFrame("0hn0 de palo");
         _window.setSize(x, y);
+        _window.setVisible(true);
         adjustCanvasToSize(x, y);
     }
 
