@@ -13,10 +13,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class DesktopGraphics extends AbstractGraphics {
-    public JFrame _window;
+    private JFrame _window;
+    private JPanel _panel;
     private Color _currentColor;
 
-    public DesktopGraphics(int x, int y){
+    public DesktopGraphics(int x, int y, int virtualX, int virtualY){
+        super(virtualX, virtualY);
         createWindow(x, y);
     }
 
@@ -37,10 +39,10 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void clear(int r, int g, int b, int a){
-        _window.getContentPane().invalidate();
-        _window.getContentPane().validate();
-        _window.getContentPane().repaint();
-        _window.setBackground(new Color(r, g, b, a));
+        _panel.invalidate();
+        _panel.validate();
+        _panel.repaint();
+        _panel.setBackground(new Color(r, g, b, a));
     }
 
     @Override
@@ -89,19 +91,18 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void setColor(int r, int g, int b, int a){
-        _window.getGraphics().setColor(new Color(r, g, b, a));
+        _panel.getGraphics().setColor(new Color(r, g, b, a));
     }
 
     @Override
     public void fillCircle(float cx, float cy, float radius) {
-        float rX = cx * _scale, rY = cy * _scale;   // Se ajusta a la escala puesta al canvas
-        if(!_verticalCompensation) rX += (_window.getX() - _realX) / 2; // Que se salte la barra
-        else rY += (_window.getY() - _realY) / 2;
+        float rX = compensateX(cx, _window.getWidth());   // Se ajusta a la escala puesta al canvas
+        float rY = compensateY(cy, _window.getHeight()); // Que se salte la barra
         /*_window.getGraphics().drawOval((int)rX, (int)rY,
                 (int)radius * 2,(int)radius * 2); No necesario (sólo es circumferencia)*/
-        _window.getGraphics().fillOval((int)rX, (int)rY,
+        _panel.getGraphics().fillOval((int)rX, (int)rY,
                 (int)radius * 2,(int)radius * 2);
-        _window.getContentPane().paint(_window.getGraphics());  // Necesario para que se vea????
+        //_panel.paint(_window.getGraphics());  // Necesario para que se vea????
     }
 
     @Override
@@ -111,8 +112,11 @@ public class DesktopGraphics extends AbstractGraphics {
 
     public void createWindow(int x, int y) {
         _window = new JFrame("0hn0 de palo");
+        _panel = new JPanel();
+        _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         _window.setSize(x, y);
         _window.setVisible(true);
+        _window.add(_panel);
         adjustCanvasToSize(x, y);
     }
 
