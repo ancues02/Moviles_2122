@@ -6,12 +6,11 @@ import java.util.Random;
 
 
 public class Logic {
-    public Square[][] board; // Tablero con todas las casillas
-    private List<Square> locked;     // Las casillas lockeadas
+    public Square[][] board;     // Tablero con todas las casillas
+    private List<Square> locked; // Las casillas lockeadas
 
     public Logic (){
         locked = new ArrayList <Square>();
-        //init(tam);
     }
 
     //crear tablero inicial
@@ -23,45 +22,49 @@ public class Logic {
             }
         }
         Random rnd = new Random();
+
         //rellenamos el tablero con azules y rojos de forma aleatoria
-        for(int i = 0; i < board[0].length; ++i){
-            for(int j = 0; j < board[1].length; ++j){
-                //bordeamos de rojos
-                if(i == 0 || i== board[0].length -1|| j == 0 || j== board[1].length -1) {
-                    board[i][j].solutionState = Square.SquareColor.Red;
-                    board[i][j].currentState = Square.SquareColor.Red;
-                }
-                else{
-                    if(rnd.nextFloat() < 0.5) {
-                        board[i][j].solutionState = Square.SquareColor.Blue;
-                        board[i][j].currentState = Square.SquareColor.Grey;
-                    }
-                    else {
+        //minimo un rojo y un azul que no este rodeado por rojos
+        do {
+            for (int i = 0; i < board[0].length; ++i) {
+                for (int j = 0; j < board[1].length; ++j) {
+                    //bordeamos de rojos
+                    if (i == 0 || i == board[0].length - 1 || j == 0 || j == board[1].length - 1) {
                         board[i][j].solutionState = Square.SquareColor.Red;
-                        board[i][j].currentState = Square.SquareColor.Grey;
+                        board[i][j].currentState = Square.SquareColor.Red;
+                        board[i][j].lock = true;
+                    } else {// rellenar con aleatorios rojos y azules
+                        if (rnd.nextFloat() < 0.5) {
+                            board[i][j].solutionState = Square.SquareColor.Blue;
+                            board[i][j].currentState = Square.SquareColor.Grey;
+                        } else {
+                            board[i][j].solutionState = Square.SquareColor.Red;
+                            board[i][j].currentState = Square.SquareColor.Grey;
+                        }
                     }
+                    board[i][j].posX = i;
+                    board[i][j].posY = j;
                 }
-                board[i][j].posX = i;
-                board[i][j].posY = j;
             }
-        }
+            //TODO: quitar esto y el metodo
+            //pruebas();
 
-        pruebas();
-
-        //contar elementos adyacentes de la fila y columna
-        //el tablero es cuadrado asi que se puede hacer asi
-        for(int i = 0; i < board[0].length; ++i){
-            countRow(i,false);//cuenta los adyacentes azules que hay en esa fila
-            countCol(i,false);//cuenta los adyacentes azules que hay en esa columna
-        }
-
-        for(int i = 0; i < board[0].length; ++i) {
-            for (int j = 0; j < board[0].length; ++j) {
-                board[i][j].total = board[i][j].row + board[i][j].column;
+            //contar elementos adyacentes de la fila y columna
+            //el tablero es cuadrado asi que se puede hacer asi
+            for (int i = 1; i < board[0].length -1; ++i) {
+                countRow(i, false);//cuenta los adyacentes azules que hay en esa fila
+                countCol(i, false);//cuenta los adyacentes azules que hay en esa columna
             }
-        }
 
-        reveal();
+            for (int i = 1; i < board[0].length-1; ++i) {
+                for (int j = 1; j < board[0].length-1; ++j) {
+                    board[i][j].total = board[i][j].row + board[i][j].column;
+                }
+            }
+
+            reveal();
+        }while (locked.size() == 0);//tablero con al menos un rojo y azul
+
     }
 
     // Comprueba si se ha solucionado
@@ -75,14 +78,142 @@ public class Logic {
         return true;
     }
 
-    public String giveHint(){
-        for(Square s : locked){
-            if(hint3(s,false)){
-                System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+    // Metodo para reiniciar el nivel y dejarlo como al principio
+    // si canFinish es false, significa que el nivel no se puede completar
+    // y hay que añadir mas casillas visibles al empezar
+    public void reStart(Boolean canFinish){
+
+        //añadir un rojo si no es posible completar el nivel
+        if(!canFinish) {
+            Square sDif = null;
+            for(Square s : locked){
+                if(s.total != s.playerColumn + s.playerRow) {
+                    sDif = s;
+                    break;
+                }
+            }
+            Square s = mustBeRed(sDif);
+
+            //if(i < locked.size()) //TODO esto no deberia pasar, hacemos algo?
+            s.lock=true;
+            s.currentState = s.solutionState;
+            System.out.println("Añadido rojo lockeado en "+(s.posX -1) + " "+ (s.posY -1));
+
+        }//rojo añadido
+
+        //resetear valores
+        for(int i = 1; i < board[0].length -1; ++i) {
+            for (int j = 1; j < board[1].length - 1; ++j) {
+                if(!board[i][j].lock) {
+                    board[i][j].currentState= Square.SquareColor.Grey;
+                }
+                board[i][j].playerColumn = 0;
+                board[i][j].playerRow = 0;
+            }
+            countRow(i,false);//cuenta los adyacentes azules que hay en esa fila
+            countCol(i,false);//cuenta los adyacentes azules que hay en esa columna
+        }
+
+    }
+
+    // Devuelve un rojo adyacente al square dado no lockeado
+    // Devuelve board[0][0] en caso de no encontrar ninguno.
+    /*private Square giveRedAdyacent(Square square){
+        for(Dirs d: Dirs.values()) {//recorrer en todas las direcciones
+            int x = square.posX + d.getRow();
+            int y = square.posY + d.getCol();
+            //buscar un rojo adyacente no lockeado
+            while(x != 0 && x != board[0].length -1 && y != 0 && y != board[1].length -1 )//hasta encontrar un rojo no lockeado
+            {
+                if(board[x][y].solutionState == Square.SquareColor.Red ) {//encontramos un rojo
+                    if( !board[x][y].lock)//si no esta lockeado es el que queremos
+                        return board[x][y];
+                    else break;//si esta lockeado no nos sirve
+                }
+                x += d.getRow();
+                y += d.getCol();
             }
         }
-        return "lamo";
+        return board[0][0];
+    }*/
+
+    //encontrar un gris adyacente a square y cambiarlo a rojo
+    private Square mustBeRed(Square square){
+        for(Dirs d: Dirs.values()) {//recorrer en todas las direcciones
+            int x = square.posX + d.getRow();
+            int y = square.posY + d.getCol();
+            //buscar un gris adyacente sin pasar por rojo
+            while(x != 0 && x != board[0].length -1 && y != 0 && y != board[1].length -1 )
+            {
+                //encontramos un gris que en la solucion es rojo
+                if(board[x][y].currentState == Square.SquareColor.Grey  &&
+                        board[x][y].solutionState == Square.SquareColor.Red) {
+                    return board[x][y];
+                }
+                else if(board[x][y].solutionState == Square.SquareColor.Red ) {//encontramos un rojo
+                    break;
+                }
+                x += d.getRow();
+                y += d.getCol();
+            }
+        }
+        return board[0][0];//no se ha encontrado ninguno (el square pasado por parametro no era el correcto)
     }
+
+
+    //Devuelve una pista
+    public String giveHint(){
+        for(Square s : locked){
+            if(hint1(s,false)){
+                System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                return Hint.CanClose.name();
+            }
+            else if(hint2(s,false)){
+                System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                return Hint.WouldSeeTooMuch.name();
+
+            }
+            else if(hint3(s,false)){
+                System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                return Hint.WouldSeeTooLittle.name();
+
+            }
+            else if(hint4(s)){
+                System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                return Hint.SeesTooMuch.name();
+
+            }
+            else if(hint5(s)){
+                System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                return Hint.SeesToLittle.name();
+
+            }
+            else{
+                //si entra aqui es que se cumple todas pistas en ese square, mover al final de los locked
+                //para no revisar de nuevo al pedir pista al principio porque probablemente
+                //siga sin cumplir ninguna pista. No hay que eliminarlo por si el jugador se equivoca
+                int ind = locked.indexOf(s);
+                locked.add(locked.size(),s);
+                locked.remove(ind);
+            }
+        }
+        for(int i = 1; i < board[0].length -1; ++i){
+            for(int j = 1; j < board[1].length -1; ++j) {
+                if(!board[i][j].lock)
+                    if(hint6_7(board[i][j], false)) {
+                        System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
+                                + " " + (board[i][j].posY - 1));
+                        if(board[i][j].currentState == Square.SquareColor.Blue)
+                            return Hint.MustBeRedBlue.name();
+                        return Hint.MustBeRedGrey.name();
+                    }
+
+            }
+        }
+        return "todo perfecto";
+    }
+
+    // Aplica pistas. Se usa para terminar de generar un nivel soluble
     public boolean doHint(){
         for(Square s : locked){
             if(hint1(s,true)){
@@ -115,8 +246,16 @@ public class Logic {
                 countCol(s.posY,true);
                 return true;
             }
-
         }
+
+        //si alguno de los locked no estan completos, no se puede completar el nivel
+        for(Square s : locked) {
+            if (s.total != s.playerColumn + s.playerRow) {
+                return false;
+                //break;
+            }
+        }
+
         for(int i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j) {
                 if(!board[i][j].lock)
@@ -140,9 +279,13 @@ public class Logic {
             for (Dirs d : Dirs.values()) {
                 int x = square.posX;
                 int y = square.posY;
+                if(x >= board[0].length || y >= board[0].length )
+                    System.out.println("F");
                 while (board[x][y].currentState == Square.SquareColor.Blue) {
                     x += d.getRow();
                     y += d.getCol();
+                    if(x >= board[0].length || y >= board[0].length )
+                        System.out.println("F");
                 }
                 if(board[x][y].currentState == Square.SquareColor.Grey){
                     if(modify)
@@ -164,8 +307,8 @@ public class Logic {
                 y += d.getCol();
             }
             if(board[x][y].currentState == Square.SquareColor.Grey &&   // Hay un gris seguido de un azul
-                    board[x += d.getRow()][y += d.getCol()].currentState == Square.SquareColor.Blue){
-                x += d.getRow();y += d.getCol();
+                    board[x + d.getRow()][y + d.getCol()].currentState == Square.SquareColor.Blue){
+                //x += d.getRow();y += d.getCol();
                 if(d == Dirs.UP || d == Dirs.DOWN){ // Columna
                     if((board[x][y].playerColumn + (square.playerRow + square.playerColumn + 1))
                             > (square.total)) {
@@ -258,7 +401,8 @@ public class Logic {
                 x += posAdyCount[3][2];
                 y += posAdyCount[3][3];
             }
-            board[x][y].currentState = Square.SquareColor.Blue;
+            if(board[x][y].currentState != Square.SquareColor.Red)
+                board[x][y].currentState = Square.SquareColor.Blue;
             //actualizar valores de los que ve en fila y columna
 
 
@@ -298,29 +442,25 @@ public class Logic {
     //le tienen que llegar square azules o grises
     private boolean hint6_7(Square square, boolean modify){
         if(square.currentState == Square.SquareColor.Red ) return false;
-        int x= square.posX, y=square.posY;
-        boolean check = board[x+1][y].currentState == Square.SquareColor.Red &&//arriba rojo
-                board[x-1][y].currentState == Square.SquareColor.Red &&//abajo rojo
-                board[x][y+1].currentState == Square.SquareColor.Red &&//derecha rojo
-                board[x][y-1].currentState == Square.SquareColor.Red;//izquierda rojo
-        if(modify && check)
+        for(Dirs d: Dirs.values()){//buscar en todas direcciones que no haya un azul
+            int x = square.posX + d.getRow();
+            int y = square.posY + d.getCol();
+            while(board[x][y].currentState == Square.SquareColor.Grey ||
+                    (board[x][y].currentState == Square.SquareColor.Blue && !board[x][y].lock)){
+                x += d.getRow();
+                y += d.getCol();
+            }
+            //Si el que encuentra es azul no esta rodeado por rojos
+            if(board[x][y].currentState == Square.SquareColor.Blue && board[x][y].lock)
+                return false;
+        }//deja de buscar. Rodeado por rojos
+
+        if(modify )
             square.currentState = Square.SquareColor.Red;
-        return check;
+        return true;
     }
 
-    public void print(){
-        /*for(int i = 1; i < board[0].length -1; ++i){
-            for(int j = 1; j < board[1].length -1; ++j){
-                System.out.print(board[i][j].solutionState + " ");
-            }
-            System.out.println();
-        }*/
-        /*for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print(logic.tablero[i][j].estadoActual + " ");
-            }
-            System.out.println();
-        }*/
+    public void printSolution(){
         System.out.println();
         for(int i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j){
@@ -328,6 +468,10 @@ public class Logic {
             }
             System.out.println();
         }
+    }
+    public void print(){
+
+
         System.out.println();
 
         //muestra el estado del tablero
@@ -346,28 +490,11 @@ public class Logic {
         }
     }
 
-    /*private void countRowSquare(Square square){
-        int count = 0;
-        int x=square.posX + 1, y = square.posY;
-        //check derecha
-        while(board[x][y].currentState == Square.SquareColor.Blue){
-            count++;
-            x++;
-        }
-        //check izquierda
-        x=square.posX-1;
-        while(board[x][y].currentState == Square.SquareColor.Blue){
-            count++;
-            x--;
-        }
-
-    }*/
-
     //recibe el tablero y la fila a calcular.
     // si player es true es que lo modifica el player
     //sino es para la solucion incial
     private void countRow(int i, boolean player){
-        int j=0;
+        int j=1;
         if(!player){
             while(j != board[0].length){
                 if(board[i][j].row == 0 && board[i][j].solutionState == Square.SquareColor.Blue)
@@ -377,7 +504,7 @@ public class Logic {
         }
         else{
             while(j != board[0].length){
-                if(board[i][j].playerRow == 0 && board[i][j].currentState == Square.SquareColor.Blue)
+                if( board[i][j].currentState == Square.SquareColor.Blue && board[i][j-1].currentState != Square.SquareColor.Blue)
                     countRowRec(i, j,0, player);
                 j++;
             }
@@ -415,7 +542,7 @@ public class Logic {
 
     //recibe el tablero y la columna a calcular el numero de azules adyacentes
     private void countCol(int j,boolean player){
-        int i=0;
+        int i=1;
         if(!player) {
             while (i != board[0].length) {
                 if (board[i][j].column == 0 && board[i][j].solutionState == Square.SquareColor.Blue)
@@ -425,7 +552,7 @@ public class Logic {
         }
         else{
             while (i != board[0].length) {
-                if (board[i][j].playerColumn == 0 && board[i][j].currentState == Square.SquareColor.Blue)
+                if (board[i][j].currentState == Square.SquareColor.Blue && board[i-1][j].currentState != Square.SquareColor.Blue)
                     countColRec(i, j, 0, player);
                 i++;
             }
@@ -512,10 +639,10 @@ public class Logic {
                     board[i][j].solutionState = Square.SquareColor.Red;
                 }
                 if(board[i][j].solutionState == Square.SquareColor.Red){
-                   // if(r.nextFloat() >=0.5f) {
+                    if(r.nextFloat() >=0.5f) {
                         board[i][j].lock = true;
                         board[i][j].currentState = Square.SquareColor.Red;
-                    //}
+                    }
                 }
             }
         }
@@ -543,6 +670,7 @@ public class Logic {
         int x=1, y=1;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
+        //board[x][y].lock = true;
         x=1; y=2;
         board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
@@ -561,18 +689,22 @@ public class Logic {
         x=2; y=3;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
+        //board[x][y].lock = true;
         x=2; y=4;
         board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=3; y=1;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
+        //board[x][y].lock = true;
         x=3; y=2;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
+        //board[x][y].lock = true;
         x=3; y=3;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
+        //board[x][y].lock = true;
         x=3; y=4;
         board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
@@ -588,6 +720,7 @@ public class Logic {
         x=4; y=4;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
+        //board[x][y].lock = true;
     }
 }
 

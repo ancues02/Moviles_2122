@@ -7,22 +7,24 @@ public class Main {
     public static void main(String[] args) {
         //DesktopGraphics degra = new DesktopGraphics(400, 1080);
         Logic loc = new Logic();
-        loc.init(4);
+        loc.init(9);
+        loc.printSolution();
         loc.print();
-        while(!loc.check() && loc.doHint() ) {
-            loc.print();
-            //if(!loc.doHint())
-              //  loc.init(4);
-            /*try {
-
-                Thread.sleep(1000);
-
-            } catch (InterruptedException e) {
-
-
+        int i = 0;
+        int resetCount= 0;
+        while(!loc.check() &&  i < 1000) {
+            if(!loc.doHint()){
+                System.out.println("REINICIAR");
+                loc.reStart(false);
+                loc.printSolution();
+                resetCount++;
             }
-            System.out.flush();*/
+            loc.print();
+            ++i;
 
         }
+        //loc.printSolution();
+
+        System.out.println("He necesitado " + i +" iteraciones\nMe he reiniciado "+ resetCount +" veces");
     }
 }
