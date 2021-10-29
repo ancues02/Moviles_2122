@@ -8,7 +8,7 @@ java {
 }
 
 dependencies {
-    implementation project(path: ':0hn0')
     implementation project(path: ':Engine')
     implementation project(path: ':DesktopEngine')
+    implementation project(path: ':OhnO')
 }
