@@ -5,25 +5,26 @@ import es.ucm.gdv.ohno.*;
 import  java.lang.Thread;
 public class Main {
     public static void main(String[] args) {
-        DesktopGraphics degra = new DesktopGraphics(1920, 1080, 720, 1280);
-        //degra.clear(255, 0, 0, 255);
-        degra.fillCircle(400.0f, 400.0f, 50);
-        Logic loc = new Logic(4);
-        //loc.print();
-        while(loc.doHint()) {
-            loc.print();
-            //if(!loc.doHint())
-                //loc.init(4);
-            /*try {
-
-                Thread.sleep(1000);
-
-            } catch (InterruptedException e) {
-
-
+        //DesktopGraphics degra = new DesktopGraphics(400, 1080);
+        Logic loc = new Logic();
+        loc.init(9);
+        loc.printSolution();
+        loc.print();
+        int i = 0;
+        int resetCount= 0;
+        while(!loc.check() &&  i < 1000) {
+            if(!loc.doHint()){
+                System.out.println("REINICIAR");
+                loc.reStart(false);
+                loc.printSolution();
+                resetCount++;
             }
-            System.out.flush();*/
+            loc.print();
+            ++i;
 
         }
+        //loc.printSolution();
+
+        System.out.println("He necesitado " + i +" iteraciones\nMe he reiniciado "+ resetCount +" veces");
     }
 }
