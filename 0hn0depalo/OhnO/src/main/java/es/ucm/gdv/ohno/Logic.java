@@ -6,7 +6,7 @@ import java.util.Random;
 
 
 public class Logic {
-    public Square[][] board;     // Tablero con todas las casillas
+    private Square[][] board;     // Tablero con todas las casillas
     private List<Square> locked; // Las casillas lockeadas
 
     public Logic (){

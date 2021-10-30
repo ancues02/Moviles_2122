@@ -10,7 +10,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Logic logic = new Logic();
+        /*Logic logic = new Logic();
         logic.init(4);
         for(int i = 0; i < 4 ; ++i){
             for(int j = 0; j < 4 ; ++j){
@@ -18,12 +18,7 @@ public class MainActivity extends AppCompatActivity {
             }
             System.out.println();
         }
-        /*for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print(logic.tablero[i][j].estadoActual + " ");
-            }
-            System.out.println();
-        }*/
+
         System.out.println();
         for(int i = 0; i < 4 ; ++i){
             for(int j = 0; j < 4 ; ++j){
@@ -31,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
             }
             System.out.println();
         }
-        System.out.println();
+        System.out.println();*/
 
     }
 }
