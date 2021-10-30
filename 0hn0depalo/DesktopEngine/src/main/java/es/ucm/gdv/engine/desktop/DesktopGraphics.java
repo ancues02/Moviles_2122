@@ -12,8 +12,9 @@ import javax.swing.JPanel;
 public class DesktopGraphics extends AbstractGraphics {
     private JFrame _window;
     private BufferStrategy _strategy;
-    private Application _app;
     private java.awt.Graphics _graphics;
+
+    private Application _app;
 
     public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
         super(virtualX, virtualY);
@@ -46,7 +47,7 @@ public class DesktopGraphics extends AbstractGraphics {
             do {
                 _graphics = _strategy.getDrawGraphics();
                 try {
-                    //_app.;
+                    //_app.render(this);
                     fillCircle(0,0, 100);
                     fillCircle(200,200, 100);
                 } finally {

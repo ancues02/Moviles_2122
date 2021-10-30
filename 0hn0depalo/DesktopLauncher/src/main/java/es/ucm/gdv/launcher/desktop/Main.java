@@ -1,11 +1,13 @@
 package es.ucm.gdv.launcher.desktop;
+import es.ucm.gdv.engine.desktop.DesktopEngine;
 import es.ucm.gdv.engine.desktop.DesktopGraphics;
 import es.ucm.gdv.engine.desktop.DesktopImage;
 import es.ucm.gdv.ohno.*;
 import  java.lang.Thread;
 public class Main {
     public static void main(String[] args) {
-        DesktopGraphics degra = new DesktopGraphics(1920, 1080, 600, 900);
+        //DesktopGraphics degra = new DesktopGraphics(1920, 1080, 600, 900);
+        DesktopEngine e = new DesktopEngine();
         /*
             Engine e = new es.ucm.gdv.engine.desktop.Engine();//es lo mismo que PCEngine
 
@@ -23,7 +25,7 @@ public class Main {
             //degra.clear(255, 0, 0, 255);
             //degra.setColor(255, 0, 0, 255);
             //degra.fillCircle(300, 500, 100);
-            degra.render();
+
         }
 
         /*Logic loc = new Logic();
