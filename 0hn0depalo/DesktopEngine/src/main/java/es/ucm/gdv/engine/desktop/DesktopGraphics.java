@@ -12,7 +12,8 @@ import javax.swing.JPanel;
 public class DesktopGraphics extends AbstractGraphics {
     private JFrame _window;
     private BufferStrategy _strategy;
-    private Color _currentColor;
+    private Application _app;
+    private java.awt.Graphics _graphics;
 
     public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
         super(virtualX, virtualY);
@@ -38,16 +39,18 @@ public class DesktopGraphics extends AbstractGraphics {
     public void clear(int r, int g, int b, int a) {
         _strategy.getDrawGraphics().setColor(new Color(r, g, b, a));
         _strategy.getDrawGraphics().fillRect(0, 0, _window.getWidth(), _window.getHeight());
-        _strategy.dispose();
     }
 
-    public void present() {
+    public void render() {
         do {
             do {
+                _graphics = _strategy.getDrawGraphics();
                 try {
-                    fillCircle(300, 500, 100);
+                    //_app.;
+                    fillCircle(0,0, 100);
+                    fillCircle(200,200, 100);
                 } finally {
-                    _strategy.getDrawGraphics().dispose();
+                    _graphics.dispose();
                 }
             } while (_strategy.contentsRestored());
             _strategy.show();
@@ -88,11 +91,10 @@ public class DesktopGraphics extends AbstractGraphics {
     public void drawImage(Image image, float scaleX, float scaleY, float transX, float transY){
         BufferedImage bi = ((DesktopImage)image).get_bufferedImage();
 
-        float rX = transX * _scale, rY = transY * _scale;   // Se ajusta a la escala puesta al canvas
-        if(!_verticalCompensation) rX += (_window.getX() - _realX) / 2; // Que se salte la barra
-        else rY += (_window.getY() - _realY) / 2;
+        float rX = compensateX(transX, _window.getWidth());     // Se ajusta a la escala puesta al canvas
+        float rY = compensateY(transY, _window.getHeight());
 
-        _strategy.getDrawGraphics().drawImage(bi,
+        _graphics.drawImage(bi,
                 (int)rX, (int)rY,
                 (int)(bi.getWidth() * scaleX * _scale), (int)(bi.getHeight() * scaleY * _scale),
                 null);
@@ -100,16 +102,16 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void setColor(int r, int g, int b, int a){
-        _strategy.getDrawGraphics().setColor(Color.RED);
+        _graphics.setColor(Color.RED);
     }
 
     @Override
     public void fillCircle(float cx, float cy, float radius) {
+        setColor(255, 0, 0, 255);
         float rX = compensateX(cx, _window.getWidth());     // Se ajusta a la escala puesta al canvas
         float rY = compensateY(cy, _window.getHeight());
-        _strategy.getDrawGraphics().fillOval((int)rX, (int)rY,
-                (int)radius * 2,(int)radius * 2);
-        _strategy.dispose();
+        _graphics.fillOval((int)(rX - radius), (int)(rY - radius),
+                (int)(radius * 2 * _scale),(int)(radius * 2 * _scale));
     }
 
     @Override
@@ -122,6 +124,8 @@ public class DesktopGraphics extends AbstractGraphics {
 
         _window.setSize(x, y);
         _window.setIgnoreRepaint(true);
+        //_window.setExtendedState(JFrame.MAXIMIZED_BOTH);  // FULLSCREEN
+        //_window.setUndecorated(true);
         _window.setVisible(true);
         _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

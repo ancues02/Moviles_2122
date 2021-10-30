@@ -5,11 +5,26 @@ import es.ucm.gdv.ohno.*;
 import  java.lang.Thread;
 public class Main {
     public static void main(String[] args) {
-        DesktopGraphics degra = new DesktopGraphics(1920, 1080, 1080, 1920);
-        //degra.clear(255, 255, 255, 255);
-        degra.setColor(255, 0, 0, 255);
-        //degra.fillCircle(300, 500, 100);
-        degra.present();
+        DesktopGraphics degra = new DesktopGraphics(1920, 1080, 600, 900);
+        /*
+            Engine e = new es.ucm.gdv.engine.desktop.Engine();//es lo mismo que PCEngine
+
+            Aplicacion a =new Ohno();
+
+            e.setAplicaion(a);//esto tiene que estar implementado en PC/AEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
+
+            //No tiene sentido que este en la interfaz Engine porque en movil no se va a cambiar el tamaño de la ventana(no hay opcion xd).
+            e.setSize(1024,720);//esto tiene que estar implementado en PCEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
+
+            e.run;
+         */
+
+        while(true) {
+            //degra.clear(255, 0, 0, 255);
+            //degra.setColor(255, 0, 0, 255);
+            //degra.fillCircle(300, 500, 100);
+            degra.render();
+        }
 
         /*Logic loc = new Logic();
         loc.init(9);
