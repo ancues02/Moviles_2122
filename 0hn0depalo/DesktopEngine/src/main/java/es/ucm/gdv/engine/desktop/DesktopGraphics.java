@@ -2,22 +2,19 @@ package es.ucm.gdv.engine.desktop;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.BufferStrategy;
 
 import es.ucm.gdv.engine.*;
-import es.ucm.gdv.engine.desktop.*;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class DesktopGraphics extends AbstractGraphics {
     private JFrame _window;
-    private JPanel _panel;
+    private BufferStrategy _strategy;
     private Color _currentColor;
 
-    public DesktopGraphics(int x, int y, int virtualX, int virtualY){
+    public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
         super(virtualX, virtualY);
         createWindow(x, y);
     }
@@ -38,11 +35,23 @@ public class DesktopGraphics extends AbstractGraphics {
     }
 
     @Override
-    public void clear(int r, int g, int b, int a){
-        _panel.invalidate();
-        _panel.validate();
-        _panel.repaint();
-        _panel.setBackground(new Color(r, g, b, a));
+    public void clear(int r, int g, int b, int a) {
+        _strategy.getDrawGraphics().setColor(new Color(r, g, b, a));
+        _strategy.getDrawGraphics().fillRect(0, 0, _window.getWidth(), _window.getHeight());
+        _strategy.dispose();
+    }
+
+    public void present() {
+        do {
+            do {
+                try {
+                    fillCircle(300, 500, 100);
+                } finally {
+                    _strategy.getDrawGraphics().dispose();
+                }
+            } while (_strategy.contentsRestored());
+            _strategy.show();
+        } while (_strategy.contentsLost());
     }
 
     @Override
@@ -83,7 +92,7 @@ public class DesktopGraphics extends AbstractGraphics {
         if(!_verticalCompensation) rX += (_window.getX() - _realX) / 2; // Que se salte la barra
         else rY += (_window.getY() - _realY) / 2;
 
-        _window.getGraphics().drawImage(bi,
+        _strategy.getDrawGraphics().drawImage(bi,
                 (int)rX, (int)rY,
                 (int)(bi.getWidth() * scaleX * _scale), (int)(bi.getHeight() * scaleY * _scale),
                 null);
@@ -91,18 +100,16 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void setColor(int r, int g, int b, int a){
-        _panel.getGraphics().setColor(new Color(r, g, b, a));
+        _strategy.getDrawGraphics().setColor(Color.RED);
     }
 
     @Override
     public void fillCircle(float cx, float cy, float radius) {
-        float rX = compensateX(cx, _window.getWidth());   // Se ajusta a la escala puesta al canvas
-        float rY = compensateY(cy, _window.getHeight()); // Que se salte la barra
-        /*_window.getGraphics().drawOval((int)rX, (int)rY,
-                (int)radius * 2,(int)radius * 2); No necesario (sólo es circumferencia)*/
-        _panel.getGraphics().fillOval((int)rX, (int)rY,
+        float rX = compensateX(cx, _window.getWidth());     // Se ajusta a la escala puesta al canvas
+        float rY = compensateY(cy, _window.getHeight());
+        _strategy.getDrawGraphics().fillOval((int)rX, (int)rY,
                 (int)radius * 2,(int)radius * 2);
-        //_panel.paint(_window.getGraphics());  // Necesario para que se vea????
+        _strategy.dispose();
     }
 
     @Override
@@ -112,11 +119,28 @@ public class DesktopGraphics extends AbstractGraphics {
 
     public void createWindow(int x, int y) {
         _window = new JFrame("0hn0 de palo");
-        _panel = new JPanel();
-        _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         _window.setSize(x, y);
+        _window.setIgnoreRepaint(true);
         _window.setVisible(true);
-        _window.add(_panel);
+        _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        int intentos = 100;
+        while(intentos-- > 0) {
+            try {
+                _window.createBufferStrategy(2);
+                break;
+            }
+            catch(Exception e) {
+            }
+        } // while pidiendo la creación de la buffeStrategy
+        if (intentos == 0) {
+            System.err.println("No pude crear la BufferStrategy");
+            return;
+        }
+
+        _strategy = _window.getBufferStrategy();
+
         adjustCanvasToSize(x, y);
     }
 

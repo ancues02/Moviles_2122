@@ -5,8 +5,13 @@ import es.ucm.gdv.ohno.*;
 import  java.lang.Thread;
 public class Main {
     public static void main(String[] args) {
-        //DesktopGraphics degra = new DesktopGraphics(400, 1080);
-        Logic loc = new Logic();
+        DesktopGraphics degra = new DesktopGraphics(1920, 1080, 1080, 1920);
+        //degra.clear(255, 255, 255, 255);
+        degra.setColor(255, 0, 0, 255);
+        degra.fillCircle(300, 500, 100);
+        degra.present();
+
+        /*Logic loc = new Logic();
         loc.init(9);
         loc.printSolution();
         loc.print();
@@ -25,6 +30,6 @@ public class Main {
         }
         //loc.printSolution();
 
-        System.out.println("He necesitado " + i +" iteraciones\nMe he reiniciado "+ resetCount +" veces");
+        System.out.println("He necesitado " + i +" iteraciones\nMe he reiniciado "+ resetCount +" veces");*/
     }
 }
