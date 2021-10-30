@@ -8,7 +8,7 @@ public class Main {
         DesktopGraphics degra = new DesktopGraphics(1920, 1080, 1080, 1920);
         //degra.clear(255, 255, 255, 255);
         degra.setColor(255, 0, 0, 255);
-        degra.fillCircle(300, 500, 100);
+        //degra.fillCircle(300, 500, 100);
         degra.present();
 
         /*Logic loc = new Logic();
