@@ -90,28 +90,34 @@ public class DesktopGraphics extends AbstractGraphics {
     // Dibuja una imagen escalada en la posicion dada
     @Override
     public void drawImage(Image image, float scaleX, float scaleY, float transX, float transY){
+        if(image == null) return;
+
         DesktopImage bi = (DesktopImage)image;
 
         float rX = compensateX(transX, _window.getWidth());     // Se ajusta a la escala puesta al canvas
         float rY = compensateY(transY, _window.getHeight());
 
+        float sX = (bi.getWidth() * scaleX * _scale);
+        float sY = (bi.getHeight() * scaleY * _scale);
         _graphics.drawImage(bi.get_bufferedImage(),
-                (int)rX, (int)rY,
-                (int)(bi.getWidth() * scaleX * _scale),
-                (int)(bi.getHeight() * scaleY * _scale),
+                (int)(rX  - (sX/2)), (int)(rY - (sY/2)),
+                (int)(sX),
+                (int)(sY),
                 null);
     }
 
     // Dibuja una imagen del tamaño dado en la posicion dada
     @Override
     public void drawImage(Image image, int sizeX, int sizeY, float transX, float transY){
+        if(image == null) return;
+
         DesktopImage bi = (DesktopImage)image;
 
         float rX = compensateX(transX, _window.getWidth());     // Se ajusta a la escala puesta al canvas
         float rY = compensateY(transY, _window.getHeight());
 
         _graphics.drawImage(bi.get_bufferedImage(),
-                (int)rX, (int)rY,
+                (int)(rX - (sizeX * _scale)/2), (int)(rY - (sizeY * _scale)),
                 (int)(sizeX * _scale), (int)(sizeY * _scale),
                 null);
     }
@@ -121,6 +127,7 @@ public class DesktopGraphics extends AbstractGraphics {
     // Metodo factoria que crea una font, devuelve null si no ha podido crearla
     @Override
     public Font newFont(String filename, int size, boolean isBold) {
+
         DesktopFont df = new DesktopFont();
         if(!df.load(filename)){
             return null;
@@ -133,18 +140,22 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void setFont(Font font){
+        if(font == null) return;
+
         DesktopFont df = (DesktopFont)font;
         _graphics.setFont(df.get_font());
     }
 
     @Override
     public void drawText(String text, int x, int y) {
-        _graphics.drawString(text, x, y);
+        int rX = (int)compensateX(x, _window.getWidth());     // Se ajusta a la escala puesta al canvas
+        int rY = (int)compensateY(y, _window.getHeight());
+        _graphics.drawString(text, rX, rY);
     }
 
     @Override
     public void setColor(int r, int g, int b, int a){
-        _graphics.setColor(Color.RED);
+        _graphics.setColor(new Color(r, g, b, a));
     }
 
     @Override

@@ -4,6 +4,6 @@ public interface Font {
     String getFilename();
 
     void setBold(boolean bold);
-    void setSize(int size);
+    void setSize(float size);
 
 }

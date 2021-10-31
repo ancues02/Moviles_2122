@@ -37,15 +37,19 @@ public class DesktopFont implements Font {
 
     @Override
     public void setBold(boolean bold){
-        if(bold)
+        if(bold){
+            java.awt.Font aux = _font.deriveFont(java.awt.Font.BOLD);
             _font = _font.deriveFont(java.awt.Font.BOLD);
+
+        }
         else
             _font = _font.deriveFont(java.awt.Font.PLAIN);
     }
 
     @Override
-    public void setSize(int size){
+    public void setSize(float size){
         _font = _font.deriveFont(size);
+        //_font = _font.derive
     }
 
 }

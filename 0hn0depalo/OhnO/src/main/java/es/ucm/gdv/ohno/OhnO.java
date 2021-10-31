@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import es.ucm.gdv.engine.Application;
-import es.ucm.gdv.engine.Graphics;
-import es.ucm.gdv.engine.TouchEvent;
+import es.ucm.gdv.engine.*;
 
 
 public class OhnO implements Application {
@@ -36,7 +34,12 @@ public class OhnO implements Application {
                 g.fillCircle(i*rad*2, j* rad*2, rad);
             }
         }
-
+        //Image i = g.newImage("checker.png");
+        //g.drawImage(i, 2.0f,2.0f,300, 450);
+        Font f = g.newFont("Bangers-Regular.ttf", 22, true);
+        g.setColor(0,0,255,255);
+        g.setFont(f);
+        g.drawText("HolA que tal", 300, 450);
     }
 
     //crear tablero inicial
