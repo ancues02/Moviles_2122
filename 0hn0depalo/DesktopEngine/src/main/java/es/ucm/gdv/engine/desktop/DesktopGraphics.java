@@ -21,7 +21,8 @@ public class DesktopGraphics extends AbstractGraphics {
 
     public void setSize(int width, int height){
         _window.setSize(width, height);
-        _window.setResizable(true);
+        adjustCanvasToSize(width, height);
+        //_window.setResizable(true);
         //_window.getContentPane().addComponentListener(_window);
     }
     @Override
@@ -41,13 +42,40 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void clear(int r, int g, int b, int a) {
-        _strategy.getDrawGraphics().setColor(new Color(r, g, b, a));
-        _strategy.getDrawGraphics().fillRect(0, 0, _window.getWidth(), _window.getHeight());
+        _graphics.setColor(new Color(r, g, b, a));
+        _graphics.fillRect(0, 0, _window.getWidth(), _window.getHeight());
 
         float rX = compensateX(0, _window.getWidth());     // Se ajusta a la escala puesta al canvas
         float rY = compensateY(0, _window.getHeight());
-        _strategy.getDrawGraphics().setColor(new Color(180, 0, 0, 255));
-        _strategy.getDrawGraphics().fillRect((int)rX, (int)rY, (int)_virtualX, (int)_virtualY);
+        _graphics.setColor(new Color(180, 180, 180, 255));
+        _graphics.fillRect((int) rX, (int) rY,
+                (int) _realX, (int) _realY);
+    }
+
+    private void fillOffsets(){ // TODO: Hacer la parte de compensacion vertical
+        if(_verticalCompensation)
+            fillVerticalOffsets();
+        else
+            fillHorizontalOffsets();
+    }
+    //Rellena de blanco por los lados
+    private void fillHorizontalOffsets(){
+        _graphics.setColor(new Color(255, 255, 255, 255));
+        _graphics.fillRect(0, 0,
+                (int)compensateX(0, _window.getWidth()),
+                _window.getHeight());
+        _graphics.fillRect((int)(_window.getWidth() - _realX) / 2 + (int)_realX, 0,
+                _window.getWidth(), _window.getHeight());
+    }
+
+    private void fillVerticalOffsets(){
+        _graphics.setColor(new Color(255, 255, 255, 255));
+        _graphics.fillRect(0, 0,
+                _window.getWidth(),
+                (int)compensateY(0, _window.getHeight()));
+
+        _graphics.fillRect(0, (int)(_window.getHeight() - _realY) / 2 + (int)_realY,
+                _window.getWidth(), _window.getHeight());
     }
 
     public void render(Application app) {
@@ -56,9 +84,9 @@ public class DesktopGraphics extends AbstractGraphics {
                 _graphics = _strategy.getDrawGraphics();
                 try {
                     //System.out.println(_window.getX() + " ahora height " + get_windowY());
+                    clear(255, 255, 255, 255);
                     app.render(this);
-                    //fillCircle(0,0, 100);
-                    //fillCircle(200,200, 100);
+                    fillOffsets();
                 } finally {
                     _graphics.dispose();
                 }
@@ -118,10 +146,11 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void fillCircle(float cx, float cy, float radius) {
-        setColor(255, 0, 0, 255);
+        //setColor(255, 0, 0, 255);
         float rX = compensateX(cx, _window.getWidth());     // Se ajusta a la escala puesta al canvas
         float rY = compensateY(cy, _window.getHeight());
-        _graphics.fillOval((int)(rX - radius), (int)(rY - radius),
+        _graphics.fillOval((int)(rX - (radius * _scale)),
+                (int)(rY - (radius * _scale)),
                 (int)(radius * 2 * _scale),(int)(radius * 2 * _scale));
     }
 

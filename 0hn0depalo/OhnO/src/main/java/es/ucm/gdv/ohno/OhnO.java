@@ -29,12 +29,14 @@ public class OhnO implements Application {
     }
     public void render(Graphics g){
         int numCir = board[0].length -2;
-        float rad = g.getWidth() / (numCir*2);
+        g.setColor(255, 0, 0, 255);
+        float rad = 50;
         for (int i = 0; i < numCir; ++i) {
             for (int j = 0; j < numCir; ++j) {
                 g.fillCircle(i*rad*2, j* rad*2, rad);
             }
         }
+
     }
 
     //crear tablero inicial

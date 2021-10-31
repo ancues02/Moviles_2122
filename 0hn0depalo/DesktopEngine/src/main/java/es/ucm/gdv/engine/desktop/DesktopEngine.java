@@ -28,7 +28,7 @@ public class DesktopEngine implements Engine {
     };
 
     public void setSize(int width, int height) {
-        _graphics.setSize(width,height);
+        _graphics.setSize(width, height);
     }
         //bucle ppal del motor
     public void run(){
