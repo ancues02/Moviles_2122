@@ -14,13 +14,16 @@ public class DesktopGraphics extends AbstractGraphics {
     private BufferStrategy _strategy;
     private java.awt.Graphics _graphics;
 
-    private Application _app;
-
     public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
         super(virtualX, virtualY);
         createWindow(x, y);
     }
 
+    public void setSize(int width, int height){
+        _window.setSize(width, height);
+        _window.setResizable(true);
+        //_window.getContentPane().addComponentListener(_window);
+    }
     @Override
     protected void rescale() {
         //_window.setSize((int)_realX, (int)_realY);  //TESTING: PARA VER EL CANVAS
@@ -40,22 +43,29 @@ public class DesktopGraphics extends AbstractGraphics {
     public void clear(int r, int g, int b, int a) {
         _strategy.getDrawGraphics().setColor(new Color(r, g, b, a));
         _strategy.getDrawGraphics().fillRect(0, 0, _window.getWidth(), _window.getHeight());
+
+        float rX = compensateX(0, _window.getWidth());     // Se ajusta a la escala puesta al canvas
+        float rY = compensateY(0, _window.getHeight());
+        _strategy.getDrawGraphics().setColor(new Color(180, 0, 0, 255));
+        _strategy.getDrawGraphics().fillRect((int)rX, (int)rY, (int)_virtualX, (int)_virtualY);
     }
 
-    public void render() {
+    public void render(Application app) {
         do {
             do {
                 _graphics = _strategy.getDrawGraphics();
                 try {
-                    //_app.render(this);
-                    fillCircle(0,0, 100);
-                    fillCircle(200,200, 100);
+                    //System.out.println(_window.getX() + " ahora height " + get_windowY());
+                    app.render(this);
+                    //fillCircle(0,0, 100);
+                    //fillCircle(200,200, 100);
                 } finally {
                     _graphics.dispose();
                 }
             } while (_strategy.contentsRestored());
             _strategy.show();
         } while (_strategy.contentsLost());
+
     }
 
     @Override
@@ -150,12 +160,12 @@ public class DesktopGraphics extends AbstractGraphics {
     }
 
     @Override
-    public float get_windowX(){
-        return _window.getX();
+    public float getWidth(){
+        return _virtualX;
     };
 
     @Override
-    public float get_windowY(){
-        return _window.getY();
+    public float getHeight(){
+        return _virtualY;
     }
 }

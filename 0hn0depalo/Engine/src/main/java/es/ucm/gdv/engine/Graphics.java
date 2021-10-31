@@ -20,7 +20,7 @@ public interface Graphics {
 
     void drawText(String text, float x, float y);
 
-    float get_windowX();
+    float getWidth();
 
-    float get_windowY();
+    float getHeight();
 }

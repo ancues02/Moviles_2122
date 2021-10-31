@@ -4,13 +4,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import es.ucm.gdv.engine.Application;
+import es.ucm.gdv.engine.Graphics;
+import es.ucm.gdv.engine.TouchEvent;
 
-public class Logic {
+
+public class OhnO implements Application {
     private Square[][] board;     // Tablero con todas las casillas
     private List<Square> locked; // Las casillas lockeadas
 
-    public Logic (){
+    public OhnO(int tam){
         locked = new ArrayList <Square>();
+        init(tam);
+
+    }
+
+
+    public void handleInput(TouchEvent e) {
+
+    }
+
+    public void update(float deltaTime){
+
+    }
+    public void render(Graphics g){
+        int numCir = board[0].length -2;
+        float rad = g.getWidth() / (numCir*2);
+        for (int i = 0; i < numCir; ++i) {
+            for (int j = 0; j < numCir; ++j) {
+                g.fillCircle(i*rad*2, j* rad*2, rad);
+            }
+        }
     }
 
     //crear tablero inicial

@@ -1,7 +1,7 @@
 package es.ucm.gdv.launcher.android;
 
 import androidx.appcompat.app.AppCompatActivity;
-import es.ucm.gdv.ohno.Logic;
+
 import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {

@@ -1,8 +1,7 @@
 package es.ucm.gdv.engine.desktop;
 
-
-import es.ucm.gdv.engine.Application;
 import es.ucm.gdv.engine.Engine;
+import es.ucm.gdv.engine.Application;
 import es.ucm.gdv.engine.Graphics;
 import es.ucm.gdv.engine.Input;
 
@@ -10,7 +9,7 @@ public class DesktopEngine implements Engine {
     private DesktopGraphics _graphics;
     private DesktopInput _input;
     private Application _app;
-    private long startTime;
+    private long _lastFrameTime;
 
     public DesktopEngine(){
         _graphics = new DesktopGraphics(1920, 1080, 600, 900);
@@ -28,38 +27,34 @@ public class DesktopEngine implements Engine {
         return _input;
     };
 
-    public void render(){
-        //_graphics.render(); -- le puede llegar el app como parametro
+    public void setSize(int width, int height) {
+        _graphics.setSize(width,height);
+    }
+        //bucle ppal del motor
+    public void run(){
+        _lastFrameTime = System.nanoTime();
+        while(true) {
+            handleInput();
+            update();
+            render();
+        }
+    }
+
+    private void handleInput(){
+        //_app.handleInput();
     };
 
-    public void update(){
-        lastFrameTime = System.nanoTime();
-
-        //long informePrevio = lastFrameTime; // Informes de FPS
-        //int frames = 0;
-        // Bucle principal
-        //while(true) {
-
+    // Calcula el deltaTime y se lo pasa al update de la aplicacion
+    private void update(){
         long currentTime = System.nanoTime();
-        long nanoElapsedTime = currentTime - lastFrameTime;
-        lastFrameTime = currentTime;
-        double elapsedTime = (double) nanoElapsedTime / 1.0E9;
+        long nanoElapsedTime = currentTime - _lastFrameTime;
+        _lastFrameTime = currentTime;
+        float elapsedTime = (float) (nanoElapsedTime / 1.0E9);
 
-            //ventana.update(elapsedTime);
-            // Informe de FPS
-           /* if (currentTime - informePrevio > 1000000000l) {
-                long fps = frames * 1000000000l / (currentTime - informePrevio);
-                System.out.println("" + fps + " fps");
-                frames = 0;
-                informePrevio = currentTime;
-            }
-            ++frames;
-            */
-        //}
+        _app.update(elapsedTime);
     };
 
-    public void handleInput(){
-
+    private void render(){
+        _graphics.render(_app);
     };
-
 }

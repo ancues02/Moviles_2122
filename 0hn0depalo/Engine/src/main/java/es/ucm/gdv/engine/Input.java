@@ -3,7 +3,5 @@ package es.ucm.gdv.engine;
 import java.util.List;
 
 public interface Input {
-    //List<TouchEvents> getTouchEvents();
+    //List<TouchEvent> getTouchEvents();
 }
-
-class TouchEvents{};

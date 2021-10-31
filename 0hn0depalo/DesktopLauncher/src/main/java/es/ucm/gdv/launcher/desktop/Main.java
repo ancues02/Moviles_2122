@@ -1,32 +1,33 @@
 package es.ucm.gdv.launcher.desktop;
+import es.ucm.gdv.engine.Application;
 import es.ucm.gdv.engine.desktop.DesktopEngine;
 import es.ucm.gdv.engine.desktop.DesktopGraphics;
 import es.ucm.gdv.engine.desktop.DesktopImage;
 import es.ucm.gdv.ohno.*;
-import  java.lang.Thread;
 public class Main {
     public static void main(String[] args) {
         //DesktopGraphics degra = new DesktopGraphics(1920, 1080, 600, 900);
         DesktopEngine e = new DesktopEngine();
-        /*
-            Engine e = new es.ucm.gdv.engine.desktop.Engine();//es lo mismo que PCEngine
 
-            Aplicacion a =new Ohno();
+            //Engine e = new es.ucm.gdv.engine.desktop.Engine();//es lo mismo que PCEngine
 
-            e.setAplicaion(a);//esto tiene que estar implementado en PC/AEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
+        Application a =new OhnO(4);
 
-            //No tiene sentido que este en la interfaz Engine porque en movil no se va a cambiar el tamaño de la ventana(no hay opcion xd).
-            e.setSize(1024,720);//esto tiene que estar implementado en PCEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
 
-            e.run;
-         */
+        e.setApplication(a);//esto tiene que estar implementado en PC/AEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
 
-        while(true) {
+        //No tiene sentido que este en la interfaz Engine porque en movil no se va a cambiar el tamaño de la ventana(no hay opcion xd).
+        //e.setSize(1024,720);//esto tiene que estar implementado en PCEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
+
+        e.run();
+
+
+        //while(true) {
             //degra.clear(255, 0, 0, 255);
             //degra.setColor(255, 0, 0, 255);
             //degra.fillCircle(300, 500, 100);
 
-        }
+       // }
 
         /*Logic loc = new Logic();
         loc.init(9);
