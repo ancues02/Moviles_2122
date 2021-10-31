@@ -1,6 +1,8 @@
 package es.ucm.gdv.engine.desktop;
 
 import java.awt.Color;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferStrategy;
 
@@ -17,6 +19,7 @@ public class DesktopGraphics extends AbstractGraphics {
     public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
         super(virtualX, virtualY);
         createWindow(x, y);
+
     }
 
     public void setSize(int width, int height){
@@ -184,8 +187,23 @@ public class DesktopGraphics extends AbstractGraphics {
         }
 
         _strategy = _window.getBufferStrategy();
-
         adjustCanvasToSize(x, y);
+
+        _window.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentMoved(ComponentEvent componentEvent) {}
+            @Override
+            public void componentShown(ComponentEvent componentEvent){}
+            @Override
+            public void componentHidden(ComponentEvent componentEvent) {}
+            @Override
+            public void componentResized(ComponentEvent componentEvent) {
+                int nWidth = componentEvent.getComponent().getWidth();
+                int nHeight = componentEvent.getComponent().getHeight();
+                adjustCanvasToSize(nWidth, nHeight);
+            }
+
+        });
     }
 
     @Override

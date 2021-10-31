@@ -14,7 +14,7 @@ public abstract class AbstractGraphics implements Graphics{
     }
 
     protected void adjustCanvasToSize(int x, int y){
-        if(x/y <= _aspectRatio) {  // Hay que compensar por arriba
+        if((float)x/(float)y <= _aspectRatio) {  // Hay que compensar por arriba
             _realX = x;
             _scale = _realX/_virtualX;
             _realY = _virtualY * _scale;
