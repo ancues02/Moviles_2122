@@ -13,12 +13,17 @@ public class DesktopImage implements Image {
     String _name = null;
     BufferedImage _bufferedImage;
 
-    public DesktopImage(String s){
+    public DesktopImage(){ }
+
+    public boolean load(String s){
         try {
             _bufferedImage = ImageIO.read(new File(s));
         } catch (IOException e) {
+            System.err.println("Error cargando la imagen: " + e);
+            return false;
         }
         _name = s;
+        return true;
     }
 
     public BufferedImage get_bufferedImage() { return _bufferedImage; }
@@ -29,12 +34,12 @@ public class DesktopImage implements Image {
     }
 
     @Override
-    public float get_width() {
+    public float getWidth() {
         return _bufferedImage.getWidth();
     }
 
     @Override
-    public float get_height() {
+    public float getHeight() {
         return _bufferedImage.getHeight();
     }
 }

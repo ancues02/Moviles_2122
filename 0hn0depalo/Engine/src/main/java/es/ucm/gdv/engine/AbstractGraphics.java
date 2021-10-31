@@ -25,8 +25,6 @@ public abstract class AbstractGraphics implements Graphics{
             _realX = _virtualX * _scale;
             _verticalCompensation = false;
         }
-
-        rescale();
     }
 
     protected float compensateX(float targetX, float windowW){
@@ -40,6 +38,4 @@ public abstract class AbstractGraphics implements Graphics{
         if(_verticalCompensation) rY += (windowH - _realY) / 2;
         return rY;
     }
-
-    protected abstract void rescale();
 }

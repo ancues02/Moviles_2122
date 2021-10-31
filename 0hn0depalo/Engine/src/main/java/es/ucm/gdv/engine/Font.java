@@ -1,13 +1,9 @@
 package es.ucm.gdv.engine;
 
 public interface Font {
-    String _filename = null;
-    float _size = 0;
-    boolean _isBold = false;
+    String getFilename();
 
-    String get_filename();
-    boolean IsBold();
-    float get_size();
+    void setBold(boolean bold);
+    void setSize(int size);
 
-    //filename, size, isBold
 }

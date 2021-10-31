@@ -3,13 +3,11 @@ package es.ucm.gdv.engine.desktop;
 import java.awt.Color;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.image.BufferedImage;
 import java.awt.image.BufferStrategy;
 
 import es.ucm.gdv.engine.*;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class DesktopGraphics extends AbstractGraphics {
     private JFrame _window;
@@ -19,28 +17,18 @@ public class DesktopGraphics extends AbstractGraphics {
     public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
         super(virtualX, virtualY);
         createWindow(x, y);
-
     }
 
-    public void setSize(int width, int height){
-        _window.setSize(width, height);
-        adjustCanvasToSize(width, height);
-        //_window.setResizable(true);
-        //_window.getContentPane().addComponentListener(_window);
-    }
-    @Override
-    protected void rescale() {
-        //_window.setSize((int)_realX, (int)_realY);  //TESTING: PARA VER EL CANVAS
-    }
+    // Metodos de la interfaz Graphics
 
     @Override
-    public Image newImage(String name) {
-        return new DesktopImage(name);
-    }
+    public float getWidth(){
+        return _window.getWidth();
+    };
 
     @Override
-    public Font newFont(String filename, float size, boolean isBold) {
-        return null;
+    public float getHeight(){
+        return _window.getHeight();
     }
 
     @Override
@@ -48,55 +36,12 @@ public class DesktopGraphics extends AbstractGraphics {
         _graphics.setColor(new Color(r, g, b, a));
         _graphics.fillRect(0, 0, _window.getWidth(), _window.getHeight());
 
+        // TODO: Quitar esto para no ver el canvas virtual
         float rX = compensateX(0, _window.getWidth());     // Se ajusta a la escala puesta al canvas
         float rY = compensateY(0, _window.getHeight());
         _graphics.setColor(new Color(180, 180, 180, 255));
         _graphics.fillRect((int) rX, (int) rY,
                 (int) _realX, (int) _realY);
-    }
-
-    private void fillOffsets(){ // TODO: Hacer la parte de compensacion vertical
-        if(_verticalCompensation)
-            fillVerticalOffsets();
-        else
-            fillHorizontalOffsets();
-    }
-    //Rellena de blanco por los lados
-    private void fillHorizontalOffsets(){
-        _graphics.setColor(new Color(255, 255, 255, 255));
-        _graphics.fillRect(0, 0,
-                (int)compensateX(0, _window.getWidth()),
-                _window.getHeight());
-        _graphics.fillRect((int)(_window.getWidth() - _realX) / 2 + (int)_realX, 0,
-                _window.getWidth(), _window.getHeight());
-    }
-
-    private void fillVerticalOffsets(){
-        _graphics.setColor(new Color(255, 255, 255, 255));
-        _graphics.fillRect(0, 0,
-                _window.getWidth(),
-                (int)compensateY(0, _window.getHeight()));
-
-        _graphics.fillRect(0, (int)(_window.getHeight() - _realY) / 2 + (int)_realY,
-                _window.getWidth(), _window.getHeight());
-    }
-
-    public void render(Application app) {
-        do {
-            do {
-                _graphics = _strategy.getDrawGraphics();
-                try {
-                    //System.out.println(_window.getX() + " ahora height " + get_windowY());
-                    clear(255, 255, 255, 255);
-                    app.render(this);
-                    fillOffsets();
-                } finally {
-                    _graphics.dispose();
-                }
-            } while (_strategy.contentsRestored());
-            _strategy.show();
-        } while (_strategy.contentsLost());
-
     }
 
     @Override
@@ -119,6 +64,19 @@ public class DesktopGraphics extends AbstractGraphics {
 
     }
 
+    // Metodos sobre imagenes
+
+    // Metodo factoria que crea una imagen, devuelve null si no ha podido crearla
+    @Override
+    public Image newImage(String filename) {
+        DesktopImage di = new DesktopImage();
+        if(!di.load(filename)){
+            return null;
+        }
+
+        return di;
+    }
+
     @Override
     public void drawImage(Image image) {
         drawImage(image, 1, 1, 0, 0);
@@ -129,17 +87,59 @@ public class DesktopGraphics extends AbstractGraphics {
         drawImage(image, scaleX, scaleY, 0, 0);
     }
 
+    // Dibuja una imagen escalada en la posicion dada
     @Override
     public void drawImage(Image image, float scaleX, float scaleY, float transX, float transY){
-        BufferedImage bi = ((DesktopImage)image).get_bufferedImage();
+        DesktopImage bi = (DesktopImage)image;
 
         float rX = compensateX(transX, _window.getWidth());     // Se ajusta a la escala puesta al canvas
         float rY = compensateY(transY, _window.getHeight());
 
-        _graphics.drawImage(bi,
+        _graphics.drawImage(bi.get_bufferedImage(),
                 (int)rX, (int)rY,
-                (int)(bi.getWidth() * scaleX * _scale), (int)(bi.getHeight() * scaleY * _scale),
+                (int)(bi.getWidth() * scaleX * _scale),
+                (int)(bi.getHeight() * scaleY * _scale),
                 null);
+    }
+
+    // Dibuja una imagen del tamaño dado en la posicion dada
+    @Override
+    public void drawImage(Image image, int sizeX, int sizeY, float transX, float transY){
+        DesktopImage bi = (DesktopImage)image;
+
+        float rX = compensateX(transX, _window.getWidth());     // Se ajusta a la escala puesta al canvas
+        float rY = compensateY(transY, _window.getHeight());
+
+        _graphics.drawImage(bi.get_bufferedImage(),
+                (int)rX, (int)rY,
+                (int)(sizeX * _scale), (int)(sizeY * _scale),
+                null);
+    }
+
+    // Metodos sobre fonts
+
+    // Metodo factoria que crea una font, devuelve null si no ha podido crearla
+    @Override
+    public Font newFont(String filename, int size, boolean isBold) {
+        DesktopFont df = new DesktopFont();
+        if(!df.load(filename)){
+            return null;
+        }
+
+        df.setBold(isBold);
+        df.setSize(size);
+        return df;
+    }
+
+    @Override
+    public void setFont(Font font){
+        DesktopFont df = (DesktopFont)font;
+        _graphics.setFont(df.get_font());
+    }
+
+    @Override
+    public void drawText(String text, int x, int y) {
+        _graphics.drawString(text, x, y);
     }
 
     @Override
@@ -157,10 +157,7 @@ public class DesktopGraphics extends AbstractGraphics {
                 (int)(radius * 2 * _scale),(int)(radius * 2 * _scale));
     }
 
-    @Override
-    public void drawText(String text, float x, float y) {
-
-    }
+    // Metodos propios de la clase
 
     public void createWindow(int x, int y) {
         _window = new JFrame("0hn0 de palo");
@@ -189,6 +186,7 @@ public class DesktopGraphics extends AbstractGraphics {
         _strategy = _window.getBufferStrategy();
         adjustCanvasToSize(x, y);
 
+        // Clase anonima para detectar los eventos de reescalado
         _window.addComponentListener(new ComponentListener() {
             @Override
             public void componentMoved(ComponentEvent componentEvent) {}
@@ -202,17 +200,62 @@ public class DesktopGraphics extends AbstractGraphics {
                 int nHeight = componentEvent.getComponent().getHeight();
                 adjustCanvasToSize(nWidth, nHeight);
             }
-
         });
     }
 
-    @Override
-    public float getWidth(){
-        return _virtualX;
-    };
+    /**
+     * Cambia el tamaño de la ventana
+     *
+     * @param width ancho de la ventana
+     * @param height alto de la ventana
+     */
+    public void setSize(int width, int height){
+        _window.setSize(width, height);
+        adjustCanvasToSize(width, height);
+    }
 
-    @Override
-    public float getHeight(){
-        return _virtualY;
+    public void render(Application app) {
+        do {
+            do {
+                _graphics = _strategy.getDrawGraphics();
+                try {
+                    //System.out.println(_window.getX() + " ahora height " + get_windowY());
+                    clear(255, 255, 255, 255);
+                    app.render(this);
+                    fillOffsets();
+                } finally {
+                    _graphics.dispose();
+                }
+            } while (_strategy.contentsRestored());
+            _strategy.show();
+        } while (_strategy.contentsLost());
+
+    }
+
+    private void fillOffsets(){
+        if(_verticalCompensation)
+            fillVerticalOffsets();
+        else
+            fillHorizontalOffsets();
+    }
+
+    //Rellena de blanco por los lados
+    private void fillHorizontalOffsets(){
+        _graphics.setColor(new Color(255, 255, 255, 255));
+        _graphics.fillRect(0, 0,
+                (int)compensateX(0, _window.getWidth()),
+                _window.getHeight());
+        _graphics.fillRect((int)(_window.getWidth() - _realX) / 2 + (int)_realX, 0,
+                _window.getWidth(), _window.getHeight());
+    }
+
+    private void fillVerticalOffsets(){
+        _graphics.setColor(new Color(255, 255, 255, 255));
+        _graphics.fillRect(0, 0,
+                _window.getWidth(),
+                (int)compensateY(0, _window.getHeight()));
+
+        _graphics.fillRect(0, (int)(_window.getHeight() - _realY) / 2 + (int)_realY,
+                _window.getWidth(), _window.getHeight());
     }
 }
