@@ -13,8 +13,8 @@ public interface Graphics {
     Image newImage(String name);
     void drawImage(Image image);
     void drawImage(Image image, float scaleX, float scaleY);
-    void drawImage(Image image, float scaleX, float scaleY, float transX, float transY);
-    void drawImage(Image image, int sizeX, int sizeY, float transX, float transY);
+    void drawImage(Image image, float scaleX, float scaleY, float posX, float posY);
+    void drawImage(Image image, int sizeX, int sizeY, float posX, float posY);
 
     Font newFont(String filename, int size, boolean isBold);
     void setFont(Font font);

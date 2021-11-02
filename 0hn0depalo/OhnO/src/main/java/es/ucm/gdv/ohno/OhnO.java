@@ -10,10 +10,12 @@ import es.ucm.gdv.engine.*;
 public class OhnO implements Application {
     private Square[][] board;     // Tablero con todas las casillas
     private List<Square> locked; // Las casillas lockeadas
-
+    private int numGreys, startNumGrey;       //numero de casillas grises, para hacer el porcentaje
+    private boolean showLock;   //booleano para mostrar o no el candado en los rojos
     public OhnO(int tam){
         locked = new ArrayList <Square>();
-        init(tam);
+        initGame(tam);
+        showLock = true;
 
     }
 
@@ -26,30 +28,86 @@ public class OhnO implements Application {
 
     }
     public void render(Graphics g){
-        int numCir = board[0].length -2;
-        g.setColor(255, 0, 0, 255);
-        float rad = 50;
+        int numCir = board[0].length - 2;
+        float width = g.getWidth(), height = g.getHeight();
+
+        int fontSize= (int)width / 15;
+        //tamaño tablero
+        Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
+        g.setColor(0,0,0,255);
+        g.setFont(f);
+        String tam = numCir + "   x   "+numCir;
+        g.drawText(tam, 600/3, 900/6);
+
+        //tablero
+        float yOffset=900/5;//donde empieza a pintarse el tablero
+        float rad = 600 / ((numCir +1 )*2);
+        //hay un diametro a distribuir de offsets
+        float totalOffsetCircles =  2*rad ;
+        float offsetCircles = totalOffsetCircles / (numCir +3);
+        Image im;
         for (int i = 0; i < numCir; ++i) {
             for (int j = 0; j < numCir; ++j) {
-                g.fillCircle(i*rad*2, j* rad*2, rad);
-            }
-        }
-        //Image i = g.newImage("checker.png");
-        //g.drawImage(i, 2.0f,2.0f,300, 450);
-        Font f = g.newFont("Bangers-Regular.ttf", 22, true);
-        g.setColor(0,0,255,255);
-        g.setFont(f);
-        g.drawText("HolA que tal", 300, 450);
-    }
+                if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
+                    g.setColor(0, 0, 255, 255);
+                else if(board[i+1][j+1].currentState == Square.SquareColor.Red) {
+                    g.setColor(255, 0, 0, 255);
 
+                }
+                else
+                    g.setColor(150, 150, 150, 255);
+                g.fillCircle(2 * offsetCircles + (offsetCircles*i) + i*rad * 2 + rad , j* rad*2 + rad + offsetCircles*(j+1) + yOffset, rad );
+
+                if(showLock && board[i+1][j+1].currentState == Square.SquareColor.Red){
+                    //
+                    im = g.newImage("lock.png");
+                    g.drawImage(im, 1.0f,1.0f, (int)(2 * offsetCircles + (offsetCircles*i) + i*rad*2  + rad ),
+                            (int)(j* rad*2 + rad + offsetCircles*(j+1) + yOffset ));
+                }
+                //numeros en los azules lockeados
+                g.setColor(255,255,255,255);
+                if(board[i+1][j+1].lock && board[i+1][j+1].solutionState == Square.SquareColor.Blue){
+                    f.setSize(fontSize/1.5f);
+                    g.setFont(f);
+                    String num = ""+board[i+1][j+1].total;
+                    g.drawText(num, (int)(2 * offsetCircles + (offsetCircles*i) + i*rad*2  + rad - rad/5),
+                            (int)(j* rad*2 + rad + offsetCircles*(j+1) + yOffset + rad/5));
+                }
+            }
+        }//fin tablero
+
+        //porcentaje
+        yOffset =5.2f * 900/6;
+        f.setSize(fontSize/1.5f);
+        g.setFont(f);
+        g.setColor(150,150,150,255);
+        float percent =1 -( (float)numGreys / startNumGrey);
+        percent*=100;
+        String num = (int)Math.ceil(percent) + "%";
+        g.drawText(num, (int)(600/2),(int)(yOffset));
+
+
+        //imagenes abajo, un tercio de la pantalla
+        yOffset =5.5f * 900/6;
+        float xOffset = 600/6;
+        im = g.newImage("close.png");
+        g.drawImage(im, 1.0f,1.0f, 2*xOffset, yOffset);
+         im = g.newImage("history.png");
+        g.drawImage(im, 1.0f,1.0f,3*xOffset, yOffset);
+         im = g.newImage("eye.png");
+        g.drawImage(im, 1.0f,1.0f,4*xOffset, yOffset);
+
+    }
+    
     //crear tablero inicial
-    public void init(int tam){
+    public void initGame(int tam){
         board = new Square[tam+2][tam+2];//tamaño +2 para bordear con rojos
         for(int i = 0; i < board[0].length; ++i){
             for(int j = 0; j < board[1].length; ++j) {
                 board[i][j] = new Square();
             }
         }
+        numGreys = tam*tam;
         Random rnd = new Random();
 
         //rellenamos el tablero con azules y rojos de forma aleatoria
@@ -93,7 +151,7 @@ public class OhnO implements Application {
 
             reveal();
         }while (locked.size() == 0);//tablero con al menos un rojo y azul
-
+        startNumGrey = numGreys;
     }
 
     // Comprueba si se ha solucionado
@@ -489,6 +547,9 @@ public class OhnO implements Application {
         return true;
     }
 
+    /**
+     * Metodo para mostrar por consola el tablero solucion
+     */
     public void printSolution(){
         System.out.println();
         for(int i = 1; i < board[0].length -1; ++i){
@@ -498,6 +559,10 @@ public class OhnO implements Application {
             System.out.println();
         }
     }
+
+    /**
+     * Metodo para mostrar por consola el tablero
+     */
     public void print(){
 
 
@@ -519,9 +584,12 @@ public class OhnO implements Application {
         }
     }
 
-    //recibe el tablero y la fila a calcular.
-    // si player es true es que lo modifica el player
-    //sino es para la solucion incial
+
+    /**
+     *  Cuenta el numero de azules en una fila
+     * @param i la fila a calcular
+     * @param player si es true es sobre el tablero que ve el jugador. false sobre la solucion
+     */
     private void countRow(int i, boolean player){
         int j=1;
         if(!player){
@@ -540,8 +608,16 @@ public class OhnO implements Application {
         }
     }
 
-    //recibe el tablero, la fila, la columna y el numero que ha contado de adyacentes en esa fila
-    //la condicion de parada es encontrar una casilla roja o el final
+
+    /**
+     * Calcula de manera recursiva el numero de azules en esa fila
+     * la condicion de parada es encontrar una casilla roja o el final
+     * @param i la fila
+     * @param j la columna
+     * @param cont el numero que ha contado de adyacentes en esa fila
+     * @param player true se calcula en funcion al tablero que ve el jugador. false con el tablero solucion
+     * @return devuelve el numero de adyacentes encontrados (cont)
+     */
     private int countRowRec(int i, int j, int cont, boolean player){
         if(!player) {
             if (j == board[0].length - 1) {//si llegamos al final
@@ -569,7 +645,12 @@ public class OhnO implements Application {
         }
     }
 
-    //recibe el tablero y la columna a calcular el numero de azules adyacentes
+
+    /**
+     *  Cuenta el numero de azules en una columna
+     * @param j la columna a calcular
+     * @param player si es true es sobre el tablero que ve el jugador. false sobre la solucion
+     */
     private void countCol(int j,boolean player){
         int i=1;
         if(!player) {
@@ -587,10 +668,19 @@ public class OhnO implements Application {
             }
         }
     }
-    //recibe el tablero, la fila, la columna y el numero que ha contado de adyacentes en esa columna
-    //la condicion de parada es encontrar una casilla roja o el final
-    private int countColRec(int i, int j, int cont,boolean player){
-        if(!player) {
+
+
+    /**
+     * Calcula de manera recursiva el numero de azules en esa columna
+     * la condicion de parada es encontrar una casilla roja o el final
+     * @param i la fila
+     * @param j la columna
+     * @param cont el numero que ha contado de adyacentes en esa columna
+     * @param player true se calcula en funcion al tablero que ve el jugador. false con el tablero solucion
+     * @return devuelve el numero de adyacentes encontrados (cont)
+     */
+    private int countColRec(int i, int j, int cont,boolean player) {
+        if (!player) {
             if (i == board[0].length - 1) {//si llegamos al final
                 board[i][j].column = cont;
                 return cont;
@@ -601,14 +691,13 @@ public class OhnO implements Application {
                 board[i][j].column = cont;
             //aqui se llega al encontrar un rojo.
             return board[i][j].column;
-        }
-        else{
-            if(i == board[0].length-1) {//si llegamos al final
+        } else {
+            if (i == board[0].length - 1) {//si llegamos al final
                 board[i][j].playerColumn = cont;
                 return cont;
             }
             if (board[i + 1][j].currentState == Square.SquareColor.Blue)//si el siguiente es azul, aumentar el contador de adyacentes
-                board[i][j].playerColumn = countColRec(i+1, j, ++cont,player);
+                board[i][j].playerColumn = countColRec(i + 1, j, ++cont, player);
             else//si el siguiente es rojo, dejo de aumentar adyacentes
                 board[i][j].playerColumn = cont;
             //aqui se llega al encontrar un rojo.
@@ -616,7 +705,10 @@ public class OhnO implements Application {
         }
     }
 
-    //recibe el tablero y la fila a calcular
+    /**
+     * //revela a los que no son visibles por otro azul en esa fila
+     * @param i es la fila a calcular
+     */
     private void markShowInRow(int i){
         int j=1;
         while(board[0].length -1 != j){
@@ -631,12 +723,18 @@ public class OhnO implements Application {
                     locked.add(board[i][j]);
                     board[i][j].showInRow = true;
                     board[i][j].currentState = board[i][j].solutionState;
+                    numGreys--;
                 }
             }
             j++;
         }
     }
 
+
+    /**
+     *  revela a los que no son visibles por otro azul en esa columna
+     * @param j es la columna a calcular
+     */
     private void markShowInCol(int j){
         int i=1;
         while( board[0].length -1 != i){
@@ -651,6 +749,7 @@ public class OhnO implements Application {
                     locked.add(board[i][j]);
                     board[i][j].showInColumn = true;
                     board[i][j].currentState = board[i][j].solutionState;
+                    numGreys--;
                 }
             }
             i++;
@@ -671,6 +770,7 @@ public class OhnO implements Application {
                     if(r.nextFloat() >=0.5f) {
                         board[i][j].lock = true;
                         board[i][j].currentState = Square.SquareColor.Red;
+                        numGreys--;
                     }
                 }
             }
