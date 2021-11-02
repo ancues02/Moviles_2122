@@ -35,15 +35,14 @@ public class OhnO implements Application {
      */
     public void render(Graphics g){
         //renderizar el selector de tamaño de nivel
-        //renderSelectSize(g);
+        renderSelectSize(g);
 
         //renderizar el nivel
-        renderLevel(g);
+        //renderLevel(g);
     }
     private void renderSelectSize(Graphics g) {
-        float width = g.getWidth(), height = g.getHeight();
 
-        int fontSize = (int) width / 10;
+        int fontSize= (int)g.getCanvasWidth() / 5;
         //tamaño tablero
         Font f = g.newFont("Molle-Regular.ttf", fontSize, true);
         g.setColor(0, 0, 0, 255);
@@ -79,7 +78,7 @@ public class OhnO implements Application {
                 f.setSize(fontSize);
                 g.setFont(f);
                 String num = ""+(cont++);
-                g.drawText(num, (int)(startOffset + (offsetCircles*(j)) + j*rad*2  + rad ),
+                g.drawText(num, (int)(startOffset + (offsetCircles*(j)) + j*rad*2  + rad - rad/5),
                         (int)(i* rad*2 + rad + offsetCircles*(i+1) + yOffset + rad/5));
 
             }
@@ -96,7 +95,7 @@ public class OhnO implements Application {
         int numCir = board[0].length - 2;
         float width = g.getWidth(), height = g.getHeight();
 
-        int fontSize= (int)width / 15;
+        int fontSize= (int)g.getCanvasWidth() / 8;
         //tamaño tablero
         Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
         g.setColor(0,0,0,255);
@@ -106,7 +105,7 @@ public class OhnO implements Application {
 
         //tablero
         float yOffset=900f/5;//donde empieza a pintarse el tablero
-        float rad = 600f / ((numCir +1 )*2);
+        float rad = 600 / ((numCir +1 )*2);
         //hay un diametro a distribuir de offsets
         float totalOffsetCircles =  2*rad ;
         float offsetCircles = totalOffsetCircles / (numCir + 3);
@@ -226,16 +225,16 @@ public class OhnO implements Application {
             }
 
         } while (locked.size() == 0);//tablero con al menos dos azules juntos
-        printSolution();
-        print();
+        //printSolution();
+        //print();
 
         do {//terminar de crear una solucion valida
             if (!doHint()) {//si no se ha completado el nivel y no se pueden aplicar mas pistas
                 System.out.println("REINICIAR");
                 reStart(false); //añade un rojo y resetea el nivel al principio
-                printSolution();
+                //printSolution();
             }
-            print();
+            //print();
 
         } while (!check());
 
@@ -273,7 +272,7 @@ public class OhnO implements Application {
             Square s = mustBeRed(sDif);
             s.lock=true;
             s.currentState = s.solutionState;
-            System.out.println("Añadido rojo lockeado en "+(s.posX -1) + " "+ (s.posY -1));
+            //System.out.println("Añadido rojo lockeado en "+(s.posX -1) + " "+ (s.posY -1));
 
         }//rojo añadido
 
@@ -385,31 +384,31 @@ public class OhnO implements Application {
 
         for(Square s : locked){
             if(hint1(s,true)){
-                System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                //System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint2(s,true)){
-                System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                //System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint3(s,true)){
-                System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                //System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint4(s)){
-                System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                //System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint5(s)){
-                System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                //System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
@@ -428,8 +427,8 @@ public class OhnO implements Application {
             for(int j = 1; j < board[1].length -1; ++j) {
                 if(!board[i][j].lock)
                     if(hint6_7(board[i][j], true)) {
-                        System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
-                                + " " + (board[i][j].posY - 1));
+                        //System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
+                                //+ " " + (board[i][j].posY - 1));
                         countRow(board[i][j].posX,true);
                         countCol(board[i][j].posY,true);
                         return true;

@@ -30,6 +30,15 @@ public class DesktopGraphics extends AbstractGraphics {
     public float getHeight(){
         return _window.getHeight();
     }
+    @Override
+    public float getCanvasWidth(){
+        return _realX;
+    }
+
+    @Override
+    public float getCanvasHeight(){
+        return _realY;
+    }
 
     @Override
     public void clear(int r, int g, int b, int a) {

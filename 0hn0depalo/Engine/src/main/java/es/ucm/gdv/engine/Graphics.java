@@ -3,6 +3,8 @@ package es.ucm.gdv.engine;
 public interface Graphics {
     float getWidth();
     float getHeight();
+    float getCanvasWidth();
+    float getCanvasHeight();
     void clear(int r, int g, int b, int a);
 
     void translate(float x, int y);
