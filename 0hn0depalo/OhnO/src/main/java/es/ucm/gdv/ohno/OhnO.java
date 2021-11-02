@@ -13,7 +13,7 @@ public class OhnO implements Application {
     private int numGreys, startNumGrey;       //numero de casillas grises, para hacer el porcentaje
     private boolean showLock;   //booleano para mostrar o no el candado en los rojos
     public OhnO(int tam){
-        locked = new ArrayList <Square>();
+
         initGame(tam);
         showLock = true;
 
@@ -27,7 +27,71 @@ public class OhnO implements Application {
     public void update(float deltaTime){
 
     }
+
+    /**
+     * Metodo para renderizar. Dependiendo en que estado estemos del juego
+     * renderiza el inicio, el selector de tamaño o el nivel
+     * @param g Graphics
+     */
     public void render(Graphics g){
+        //renderizar el selector de tamaño de nivel
+        renderSelectSize(g);
+        //renderizar el nivel
+        //renderLevel(g);
+    }
+    private void renderSelectSize(Graphics g) {
+        float width = g.getWidth(), height = g.getHeight();
+
+        int fontSize = (int) width / 10;
+        //tamaño tablero
+        Font f = g.newFont("Molle-Regular.ttf", fontSize, true);
+        g.setColor(0, 0, 0, 255);
+        g.setFont(f);
+        String name = "Oh no";
+        g.drawText(name, 600 / 5, 900 / 4);
+
+        fontSize /= 4;
+        f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
+        //g.setColor(0,0,0,255);
+        g.setFont(f);
+        String tam = "Elige el tamaño a jugar";
+        g.drawText(tam, 600 / 4, 900 / 3);
+
+        //---------------------pintar los circulos----------------------------
+        float yOffset=900/2.5f;//donde empieza a pintarse el tablero
+        int numCir = 5;
+        float rad = 600 / ((numCir +1 )*2);
+        //hay un diametro a distribuir de offsets
+        float totalOffsetCircles =  2*rad ;
+        float offsetCircles = totalOffsetCircles / (numCir + 3);
+        float startOffset = 2*offsetCircles + 2* rad + offsetCircles;
+        int cont = 4;
+        for (int i = 0; i < 2; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                if((j + i) % 2 == 0)
+                    g.setColor(255, 0, 0, 255);
+                else
+                    g.setColor(0, 0, 255, 255);
+                g.fillCircle(startOffset + j*rad * 2 + rad + offsetCircles*(j ) , i* rad*2 + rad + offsetCircles*(i+1) + yOffset, rad );
+                g.setColor(255,255,255,255);
+
+                f.setSize(fontSize);
+                g.setFont(f);
+                String num = ""+(cont++);
+                g.drawText(num, (int)(startOffset + (offsetCircles*(j)) + j*rad*2  + rad ),
+                        (int)(i* rad*2 + rad + offsetCircles*(i+1) + yOffset + rad/5));
+
+            }
+        }//circulos pintados
+
+        //
+        yOffset =5f * 900/6;
+        float xOffset = 600/2;
+        Image im = g.newImage("close.png");
+        g.drawImage(im, 1.0f,1.0f, xOffset, yOffset);
+    }
+
+    private void renderLevel(Graphics g){
         int numCir = board[0].length - 2;
         float width = g.getWidth(), height = g.getHeight();
 
@@ -44,7 +108,7 @@ public class OhnO implements Application {
         float rad = 600 / ((numCir +1 )*2);
         //hay un diametro a distribuir de offsets
         float totalOffsetCircles =  2*rad ;
-        float offsetCircles = totalOffsetCircles / (numCir +3);
+        float offsetCircles = totalOffsetCircles / (numCir + 3);
         Image im;
         for (int i = 0; i < numCir; ++i) {
             for (int j = 0; j < numCir; ++j) {
@@ -56,7 +120,7 @@ public class OhnO implements Application {
                 }
                 else
                     g.setColor(150, 150, 150, 255);
-                g.fillCircle(2 * offsetCircles + (offsetCircles*i) + i*rad * 2 + rad , j* rad*2 + rad + offsetCircles*(j+1) + yOffset, rad );
+                g.fillCircle(2 * offsetCircles + (offsetCircles*j) + j*rad * 2 + rad , i* rad*2 + rad + offsetCircles*(i+1) + yOffset, rad );
 
                 if(showLock && board[i+1][j+1].currentState == Square.SquareColor.Red){
                     //
@@ -92,65 +156,80 @@ public class OhnO implements Application {
         float xOffset = 600/6;
         im = g.newImage("close.png");
         g.drawImage(im, 1.0f,1.0f, 2*xOffset, yOffset);
-         im = g.newImage("history.png");
+        im = g.newImage("history.png");
         g.drawImage(im, 1.0f,1.0f,3*xOffset, yOffset);
-         im = g.newImage("eye.png");
+        im = g.newImage("eye.png");
         g.drawImage(im, 1.0f,1.0f,4*xOffset, yOffset);
-
     }
     
     //crear tablero inicial
     public void initGame(int tam){
-        board = new Square[tam+2][tam+2];//tamaño +2 para bordear con rojos
-        for(int i = 0; i < board[0].length; ++i){
-            for(int j = 0; j < board[1].length; ++j) {
-                board[i][j] = new Square();
-            }
-        }
-        numGreys = tam*tam;
-        Random rnd = new Random();
-
-        //rellenamos el tablero con azules y rojos de forma aleatoria
-        //minimo un rojo y un azul que no este rodeado por rojos
-        do {
+       // int f=0;
+        //while(f<100) {
+            locked = new ArrayList <Square>();
+            board = new Square[tam + 2][tam + 2];//tamaño +2 para bordear con rojos
             for (int i = 0; i < board[0].length; ++i) {
                 for (int j = 0; j < board[1].length; ++j) {
-                    //bordeamos de rojos
-                    if (i == 0 || i == board[0].length - 1 || j == 0 || j == board[1].length - 1) {
-                        board[i][j].solutionState = Square.SquareColor.Red;
-                        board[i][j].currentState = Square.SquareColor.Red;
-                        board[i][j].lock = true;
-                    } else {// rellenar con aleatorios rojos y azules
-                        if (rnd.nextFloat() < 0.5) {
-                            board[i][j].solutionState = Square.SquareColor.Blue;
-                            board[i][j].currentState = Square.SquareColor.Grey;
-                        } else {
+                    board[i][j] = new Square();
+                }
+            }
+            numGreys = tam * tam;
+            Random rnd = new Random();
+
+            //rellenamos el tablero con azules y rojos de forma aleatoria
+            //minimo un rojo y un azul que no este rodeado por rojos
+            do {
+                for (int i = 0; i < board[0].length; ++i) {
+                    for (int j = 0; j < board[1].length; ++j) {
+                        //bordeamos de rojos
+                        if (i == 0 || i == board[0].length - 1 || j == 0 || j == board[1].length - 1) {
                             board[i][j].solutionState = Square.SquareColor.Red;
-                            board[i][j].currentState = Square.SquareColor.Grey;
+                            board[i][j].currentState = Square.SquareColor.Red;
+                            board[i][j].lock = true;
+                        } else {// rellenar con aleatorios rojos y azules
+                            if (rnd.nextFloat() < 0.5) {
+                                board[i][j].solutionState = Square.SquareColor.Blue;
+                                board[i][j].currentState = Square.SquareColor.Grey;
+                            } else {
+                                board[i][j].solutionState = Square.SquareColor.Red;
+                                board[i][j].currentState = Square.SquareColor.Grey;
+                            }
                         }
+                        board[i][j].posX = i;
+                        board[i][j].posY = j;
                     }
-                    board[i][j].posX = i;
-                    board[i][j].posY = j;
                 }
-            }
-            //TODO: quitar esto y el metodo
-            //pruebas();
+                //TODO: quitar esto y el metodo
+                //pruebas();
 
-            //contar elementos adyacentes de la fila y columna
-            //el tablero es cuadrado asi que se puede hacer asi
-            for (int i = 1; i < board[0].length -1; ++i) {
-                countRow(i, false);//cuenta los adyacentes azules que hay en esa fila
-                countCol(i, false);//cuenta los adyacentes azules que hay en esa columna
-            }
-
-            for (int i = 1; i < board[0].length-1; ++i) {
-                for (int j = 1; j < board[0].length-1; ++j) {
-                    board[i][j].total = board[i][j].row + board[i][j].column;
+                //contar elementos adyacentes de la fila y columna
+                //el tablero es cuadrado asi que se puede hacer asi
+                for (int i = 1; i < board[0].length - 1; ++i) {
+                    countRow(i, false);//cuenta los adyacentes azules que hay en esa fila
+                    countCol(i, false);//cuenta los adyacentes azules que hay en esa columna
                 }
-            }
 
-            reveal();
-        }while (locked.size() == 0);//tablero con al menos un rojo y azul
+                for (int i = 1; i < board[0].length - 1; ++i) {
+                    for (int j = 1; j < board[0].length - 1; ++j) {
+                        board[i][j].total = board[i][j].row + board[i][j].column;
+                    }
+                }
+
+                reveal();
+            } while (locked.size() == 0);//tablero con al menos dos azules juntos
+
+            do {//terminar de crear una solucion valida
+                if (!doHint()) {//si no se ha completado el nivel y no se pueden aplicar mas pistas
+                    System.out.println("REINICIAR");
+                    reStart(false); //añade un rojo y resetea el nivel al principio
+                    printSolution();
+                }
+                print();
+
+            } while (!check());
+           // f++;
+        //}
+        reStart(true);
         startNumGrey = numGreys;
     }
 
@@ -203,27 +282,6 @@ public class OhnO implements Application {
 
     }
 
-    // Devuelve un rojo adyacente al square dado no lockeado
-    // Devuelve board[0][0] en caso de no encontrar ninguno.
-    /*private Square giveRedAdyacent(Square square){
-        for(Dirs d: Dirs.values()) {//recorrer en todas las direcciones
-            int x = square.posX + d.getRow();
-            int y = square.posY + d.getCol();
-            //buscar un rojo adyacente no lockeado
-            while(x != 0 && x != board[0].length -1 && y != 0 && y != board[1].length -1 )//hasta encontrar un rojo no lockeado
-            {
-                if(board[x][y].solutionState == Square.SquareColor.Red ) {//encontramos un rojo
-                    if( !board[x][y].lock)//si no esta lockeado es el que queremos
-                        return board[x][y];
-                    else break;//si esta lockeado no nos sirve
-                }
-                x += d.getRow();
-                y += d.getCol();
-            }
-        }
-        return board[0][0];
-    }*/
-
     //encontrar un gris adyacente a square y cambiarlo a rojo
     private Square mustBeRed(Square square){
         for(Dirs d: Dirs.values()) {//recorrer en todas las direcciones
@@ -250,7 +308,12 @@ public class OhnO implements Application {
 
     //Devuelve una pista
     public String giveHint(){
-        for(Square s : locked){
+        Random rnd = new Random();
+        //para poder generar pistas en diferentes casillas cada vez que
+        // se llame al metodo (cuando el jugador quiere una pista)
+        int pos = rnd.nextInt(locked.size());
+        for(int i = pos; i >= 0 && i != pos - 1 ; i++){
+            Square s = locked.get(i);
             if(hint1(s,false)){
                 System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 return Hint.CanClose.name();
@@ -275,14 +338,7 @@ public class OhnO implements Application {
                 return Hint.SeesToLittle.name();
 
             }
-            else{
-                //si entra aqui es que se cumple todas pistas en ese square, mover al final de los locked
-                //para no revisar de nuevo al pedir pista al principio porque probablemente
-                //siga sin cumplir ninguna pista. No hay que eliminarlo por si el jugador se equivoca
-                int ind = locked.indexOf(s);
-                locked.add(locked.size(),s);
-                locked.remove(ind);
-            }
+            i %= locked.size();
         }
         for(int i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j) {
@@ -767,7 +823,7 @@ public class OhnO implements Application {
                     board[i][j].solutionState = Square.SquareColor.Red;
                 }
                 if(board[i][j].solutionState == Square.SquareColor.Red){
-                    if(r.nextFloat() >=0.5f) {
+                    if(r.nextFloat() >=0.6f) {
                         board[i][j].lock = true;
                         board[i][j].currentState = Square.SquareColor.Red;
                         numGreys--;
@@ -797,37 +853,37 @@ public class OhnO implements Application {
             }
         }
         int x=1, y=1;
-        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         //board[x][y].lock = true;
         x=1; y=2;
-        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=1; y=3;
         board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=1; y=4;
-        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=2; y=1;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=2; y=2;
         board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
-        x=2; y=3;
+        x=2; y=2;
         board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].currentState = Square.SquareColor.Grey;
+        x=2; y=3;
+        board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         //board[x][y].lock = true;
         x=2; y=4;
-        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=3; y=1;
         board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         //board[x][y].lock = true;
         x=3; y=2;
-        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         //board[x][y].lock = true;
         x=3; y=3;
@@ -835,10 +891,10 @@ public class OhnO implements Application {
         board[x][y].currentState = Square.SquareColor.Grey;
         //board[x][y].lock = true;
         x=3; y=4;
-        board[x][y].solutionState = Square.SquareColor.Blue;
+        board[x][y].solutionState = Square.SquareColor.Red;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=4; y=1;
-        board[x][y].solutionState = Square.SquareColor.Red;
+        board[x][y].solutionState = Square.SquareColor.Blue;
         board[x][y].currentState = Square.SquareColor.Grey;
         x=4; y=2;
         board[x][y].solutionState = Square.SquareColor.Blue;

@@ -240,8 +240,15 @@ public class DesktopGraphics extends AbstractGraphics {
             } while (_strategy.contentsRestored());
             _strategy.show();
         } while (_strategy.contentsLost());
-
     }
+
+    /*public float getRealX(){
+        return _realX;
+    }
+
+    public float getRealY(){
+        return _realY;
+    }*/
 
     private void fillOffsets(){
         if(_verticalCompensation)
