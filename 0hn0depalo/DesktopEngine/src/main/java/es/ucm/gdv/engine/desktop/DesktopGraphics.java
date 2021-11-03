@@ -3,11 +3,14 @@ package es.ucm.gdv.engine.desktop;
 import java.awt.Color;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 
 import es.ucm.gdv.engine.*;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class DesktopGraphics extends AbstractGraphics {
     private JFrame _window;
@@ -202,6 +205,38 @@ public class DesktopGraphics extends AbstractGraphics {
             System.err.println("No pude crear la BufferStrategy");
             return;
         }
+
+        _window.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                int posX = mouseEvent.getX(); int posY = mouseEvent.getY();
+                if(posX >= (_window.getWidth() - _realX) / 2 &&
+                        posX <= ((_window.getWidth() - _realX) / 2) + _realX &&
+                        posY >= (_window.getHeight() - _realY) / 2 &&
+                        posY <= ((_window.getHeight() - _realY) / 2) + _realY)
+                    System.out.println("Input on canvas");
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+
+            }
+        });
 
         _strategy = _window.getBufferStrategy();
         adjustCanvasToSize(x, y);
