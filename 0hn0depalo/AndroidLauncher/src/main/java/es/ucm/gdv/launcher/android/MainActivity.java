@@ -4,29 +4,27 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import es.ucm.gdv.engine.android.AndroidEngine;
+
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Método llamado por Android como parte del ciclo de vida de
+     * la actividad. Se llama en el momento de lanzarla.
+     *
+     * @param savedInstanceState Información de estado de la actividad
+     *                           previamente serializada por ella misma
+     *                           para reconstruirse en el mismo estado
+     *                           tras un reinicio. Será null la primera
+     *                           vez.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        /*Logic logic = new Logic();
-        logic.init(4);
-        for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print(logic.board[i][j].solutionState + " ");
-            }
-            System.out.println();
-        }
+        /*
+        AndroidEngine e = new AndroidEngine();
+        setContentView(e.getSurfaceView());*/
 
-        System.out.println();
-        for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print((logic.board[i][j].row + logic.board[i][j].column) + " " );
-            }
-            System.out.println();
-        }
-        System.out.println();*/
 
     }
 }
