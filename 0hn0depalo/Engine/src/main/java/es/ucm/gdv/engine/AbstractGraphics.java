@@ -27,15 +27,33 @@ public abstract class AbstractGraphics implements Graphics{
         }
     }
 
-    protected float compensateX(float targetX, float windowW){
+    protected float virtualToRealX(float targetX){
         float rX = targetX * _scale;
+        float windowW = getWidth();
         if(!_verticalCompensation) rX += (windowW - _realX) / 2;
         return rX;
     }
 
-    protected float compensateY(float targetY, float windowH){
+    protected float virtualToRealY(float targetY){
         float rY = targetY * _scale;
+        float windowH = getHeight();
         if(_verticalCompensation) rY += (windowH - _realY) / 2;
+        return rY;
+    }
+
+    public float realToVirtualX(float targetX){
+        float rX = targetX;
+        float windowW = getWidth();
+        if(!_verticalCompensation) rX -= (windowW - _realX) / 2;
+        rX /= _scale;
+        return rX;
+    }
+
+    public float realToVirtualY(float targetY){
+        float rY = targetY;
+        float windowH = getHeight();
+        if(_verticalCompensation) rY -= (windowH - _realY) / 2;
+        rY /= _scale;
         return rY;
     }
 }

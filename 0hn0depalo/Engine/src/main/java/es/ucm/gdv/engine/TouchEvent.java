@@ -1,4 +1,9 @@
 package es.ucm.gdv.engine;
 
-public interface TouchEvent {
+enum TouchType { Press, Release, Drag }
+
+public class TouchEvent {
+    TouchType typeOf;
+    int x, y;
+    int senderId;
 }

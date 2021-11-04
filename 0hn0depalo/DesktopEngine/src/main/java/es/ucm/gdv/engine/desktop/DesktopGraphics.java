@@ -3,14 +3,11 @@ package es.ucm.gdv.engine.desktop;
 import java.awt.Color;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 
 import es.ucm.gdv.engine.*;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class DesktopGraphics extends AbstractGraphics {
     private JFrame _window;
@@ -49,8 +46,8 @@ public class DesktopGraphics extends AbstractGraphics {
         _graphics.fillRect(0, 0, _window.getWidth(), _window.getHeight());
 
         // TODO: Quitar esto para no ver el canvas virtual
-        float rX = compensateX(0, _window.getWidth());     // Se ajusta a la escala puesta al canvas
-        float rY = compensateY(0, _window.getHeight());
+        float rX = virtualToRealX(0);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(0);
         _graphics.setColor(new Color(180, 180, 180, 255));
         _graphics.fillRect((int) rX, (int) rY,
                 (int) _realX, (int) _realY);
@@ -106,8 +103,8 @@ public class DesktopGraphics extends AbstractGraphics {
 
         DesktopImage bi = (DesktopImage)image;
 
-        float rX = compensateX(transX, _window.getWidth());     // Se ajusta a la escala puesta al canvas
-        float rY = compensateY(transY, _window.getHeight());
+        float rX = virtualToRealX(transX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(transY);
 
         float sX = (bi.getWidth() * scaleX * _scale);
         float sY = (bi.getHeight() * scaleY * _scale);
@@ -125,8 +122,8 @@ public class DesktopGraphics extends AbstractGraphics {
 
         DesktopImage bi = (DesktopImage)image;
 
-        float rX = compensateX(transX, _window.getWidth());     // Se ajusta a la escala puesta al canvas
-        float rY = compensateY(transY, _window.getHeight());
+        float rX = virtualToRealX(transX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(transY);
 
         _graphics.drawImage(bi.get_bufferedImage(),
                 (int)(rX - (sizeX * _scale)/2), (int)(rY - (sizeY * _scale)),
@@ -160,8 +157,8 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void drawText(String text, int x, int y) {
-        int rX = (int)compensateX(x, _window.getWidth());     // Se ajusta a la escala puesta al canvas
-        int rY = (int)compensateY(y, _window.getHeight());
+        int rX = (int) virtualToRealX(x);     // Se ajusta a la escala puesta al canvas
+        int rY = (int) virtualToRealY(y);
         _graphics.drawString(text, rX, rY);
     }
 
@@ -173,8 +170,8 @@ public class DesktopGraphics extends AbstractGraphics {
     @Override
     public void fillCircle(float cx, float cy, float radius) {
         //setColor(255, 0, 0, 255);
-        float rX = compensateX(cx, _window.getWidth());     // Se ajusta a la escala puesta al canvas
-        float rY = compensateY(cy, _window.getHeight());
+        float rX = virtualToRealX(cx);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(cy);
         _graphics.fillOval((int)(rX - (radius * _scale)),
                 (int)(rY - (radius * _scale)),
                 (int)(radius * 2 * _scale),(int)(radius * 2 * _scale));
@@ -206,37 +203,7 @@ public class DesktopGraphics extends AbstractGraphics {
             return;
         }
 
-        _window.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-                int posX = mouseEvent.getX(); int posY = mouseEvent.getY();
-                if(posX >= (_window.getWidth() - _realX) / 2 &&
-                        posX <= ((_window.getWidth() - _realX) / 2) + _realX &&
-                        posY >= (_window.getHeight() - _realY) / 2 &&
-                        posY <= ((_window.getHeight() - _realY) / 2) + _realY)
-                    System.out.println("Input on canvas");
-            }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-
-            }
-        });
+        //_window.addMouseListener(new DesktopInput(_window)) ;
 
         _strategy = _window.getBufferStrategy();
         adjustCanvasToSize(x, y);
@@ -258,6 +225,10 @@ public class DesktopGraphics extends AbstractGraphics {
         });
     }
 
+    public JFrame getWindow(){
+        return _window;
+    }
+
     /**
      * Cambia el tamaño de la ventana
      *
@@ -277,7 +248,7 @@ public class DesktopGraphics extends AbstractGraphics {
                     //System.out.println(_window.getX() + " ahora height " + get_windowY());
                     clear(255, 255, 255, 255);
                     app.render(this);
-                    fillOffsets();
+                    fillOffsets(Color.white);
                 } finally {
                     _graphics.dispose();
                 }
@@ -294,28 +265,28 @@ public class DesktopGraphics extends AbstractGraphics {
         return _realY;
     }*/
 
-    private void fillOffsets(){
+    private void fillOffsets(Color c){
         if(_verticalCompensation)
-            fillVerticalOffsets();
+            fillVerticalOffsets(c);
         else
-            fillHorizontalOffsets();
+            fillHorizontalOffsets(c);
     }
 
     //Rellena de blanco por los lados
-    private void fillHorizontalOffsets(){
-        _graphics.setColor(new Color(255, 255, 255, 255));
+    private void fillHorizontalOffsets(Color c){
+        _graphics.setColor(c);
         _graphics.fillRect(0, 0,
-                (int)compensateX(0, _window.getWidth()),
+                (int) virtualToRealX(0),
                 _window.getHeight());
         _graphics.fillRect((int)(_window.getWidth() - _realX) / 2 + (int)_realX, 0,
                 _window.getWidth(), _window.getHeight());
     }
 
-    private void fillVerticalOffsets(){
-        _graphics.setColor(new Color(255, 255, 255, 255));
+    private void fillVerticalOffsets(Color c){
+        _graphics.setColor(c);
         _graphics.fillRect(0, 0,
                 _window.getWidth(),
-                (int)compensateY(0, _window.getHeight()));
+                (int) virtualToRealY(0));
 
         _graphics.fillRect(0, (int)(_window.getHeight() - _realY) / 2 + (int)_realY,
                 _window.getWidth(), _window.getHeight());

@@ -13,7 +13,7 @@ public class DesktopEngine implements Engine {
 
     public DesktopEngine(){
         _graphics = new DesktopGraphics(1920, 1080, 600, 900);
-        _input = new DesktopInput();
+        _input = new DesktopInput(_graphics);
     }
 
     public void setApplication(Application app){
