@@ -1,4 +1,6 @@
 package es.ucm.gdv.engine.android;
 
-public class AndroidInput {
+import es.ucm.gdv.engine.Input;
+
+public class AndroidInput implements Input {
 }

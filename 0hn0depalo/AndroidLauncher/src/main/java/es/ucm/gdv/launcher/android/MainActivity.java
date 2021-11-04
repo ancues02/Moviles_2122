@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import es.ucm.gdv.engine.Application;
 import es.ucm.gdv.engine.android.AndroidEngine;
+import es.ucm.gdv.ohno.OhnO;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,12 +23,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*
-        AndroidEngine e = new AndroidEngine();
-        setContentView(e.getSurfaceView());*/
-
-
+        _engine = new AndroidEngine(this);
+        Application a = new OhnO(4);
+        _engine.setApplication(a);
+        setContentView(_engine.getContentView());
     }
+
+    //--------------------------------------------------------------------
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        _engine.resume();
+    }
+
+    //--------------------------------------------------------------------
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        _engine.pause();
+    }
+
+    AndroidEngine _engine;
 }
 
 

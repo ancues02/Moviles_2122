@@ -1,22 +1,39 @@
 package es.ucm.gdv.engine.android;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.view.View;
+
+import es.ucm.gdv.engine.Application;
 import es.ucm.gdv.engine.Engine;
 import es.ucm.gdv.engine.Graphics;
 import es.ucm.gdv.engine.Input;
 
-public class AndroidEngine implements Engine {
+public class AndroidEngine implements Engine, Runnable{
+    Thread _gameLoopTh;
+    volatile boolean _running;
+    private AssetManager _assetsManager;
+
     private AndroidGraphics _graphics;  // has the SurfaceHolder
     private AndroidInput _input;
-    private GameLoopThread _gameLoopTh; // implements runnable
+    private Application _app;
+
+    private long _lastFrameTime;
+
+    public AndroidEngine(Context context){
+        _graphics = new AndroidGraphics(context);
+        _input = new AndroidInput();
+        _assetsManager = context.getAssets();
+    }
 
     @Override
     public Graphics getGraphics() {
-        return null; //_graphics;
+        return _graphics;
     }
 
     @Override
     public Input getInput() {
-        return null; //_input;
+        return _input;
     }
 
     /*
@@ -41,16 +58,73 @@ public class AndroidEngine implements Engine {
     * }
     */
 
-
-
-    public void launch(){
-        // ¿es necesario?
-    }
-
     public void resume(){
-        _gameLoopTh.resume();
+        if (!_running) {
+            // Solo hacemos algo si no nos estábamos ejecutando ya
+            // (programación defensiva, nunca se sabe quién va a
+            // usarnos...)
+            _running = true;
+            // Lanzamos la ejecución de nuestro método run()
+            // en una hebra nueva.
+            _gameLoopTh = new Thread(this);
+            _gameLoopTh.start();
+        }
     }
+
     public void pause(){
-        _gameLoopTh.pause();
+        if (_running) {
+            _running = false;
+            while (true) {
+                try {
+                    _gameLoopTh.join();
+                    _gameLoopTh = null;
+                    break;
+                } catch (InterruptedException ie) {
+                    // Esto no debería ocurrir nunca...
+                }
+            }
+        }
+    }
+    private void handleInput(){
+
+    }
+
+    private void update(){
+        long currentTime = System.nanoTime();
+        long nanoElapsedTime = currentTime - _lastFrameTime;
+        _lastFrameTime = currentTime;
+        float elapsedTime = (float) (nanoElapsedTime / 1.0E9);
+
+        _app.update(elapsedTime);
+    }
+
+    private void render(){
+        _graphics.render(_app);
+    }
+
+    @Override
+    public void run() {
+        if (_gameLoopTh != Thread.currentThread()) {
+            // programacion defensiva
+            throw new RuntimeException("run() should not be called directly");
+        }
+        while(_running && _graphics.getWidth() == 0)//sleep
+            ;
+
+        // Ahora si podemos lanzar el bucle
+        _lastFrameTime = System.nanoTime();
+        while(_running) {
+            handleInput();
+            update();
+            render();
+        }
+    }
+
+    public View getContentView(){
+        return _graphics.getSurfaceView();
+    }
+
+    public void setApplication(Application app){
+        _app = app;
     }
 }
