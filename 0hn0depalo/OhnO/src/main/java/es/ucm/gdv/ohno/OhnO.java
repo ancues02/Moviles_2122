@@ -48,19 +48,19 @@ public class OhnO implements Application {
         g.setColor(0, 0, 0, 255);
         g.setFont(f);
         String name = "Oh no";
-        g.drawText(name, 600 / 5, 900 / 4);
+        g.drawText(name, 0.2f, 0.25f);
 
         fontSize /= 4;
         f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
         //g.setColor(0,0,0,255);
         g.setFont(f);
         String tam = "Elige el tamaño a jugar";
-        g.drawText(tam, 600 / 4, 900 / 3);
+        g.drawText(tam, 0.25f, 0.333f);
 
         //---------------------pintar los circulos----------------------------
-        float yOffset=900/2.5f;//donde empieza a pintarse el tablero
+        float yOffset = 0.4f;//donde empieza a pintarse el tablero
         int numCir = 5;
-        float rad = 600f / ((numCir +1 )*2);
+        float rad = 1f / ((numCir + 1 )*2);
         //hay un diametro a distribuir de offsets
         float totalOffsetCircles =  2*rad ;
         float offsetCircles = totalOffsetCircles / (numCir + 3);
@@ -78,15 +78,15 @@ public class OhnO implements Application {
                 f.setSize(fontSize);
                 g.setFont(f);
                 String num = ""+(cont++);
-                g.drawText(num, (int)(startOffset + (offsetCircles*(j)) + j*rad*2  + rad - rad/5),
-                        (int)(i* rad*2 + rad + offsetCircles*(i+1) + yOffset + rad/5));
+                g.drawText(num, (startOffset + (offsetCircles*(j)) + j*rad*2  + rad - rad/5),
+                        (i* rad*2 + rad + offsetCircles*(i+1) + yOffset + rad/5));
 
             }
         }//circulos pintados
 
         //
-        yOffset =5f * 900/6;
-        float xOffset = 600f/2;
+        yOffset = 5f * 0.1666f;
+        float xOffset = 0.5f;
         Image im = g.newImage("close.png");
         g.drawImage(im, 1.0f,1.0f, xOffset, yOffset);
     }

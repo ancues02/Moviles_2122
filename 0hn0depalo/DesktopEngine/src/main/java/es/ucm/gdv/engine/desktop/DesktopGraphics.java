@@ -98,13 +98,13 @@ public class DesktopGraphics extends AbstractGraphics {
 
     // Dibuja una imagen escalada en la posicion dada
     @Override
-    public void drawImage(Image image, float scaleX, float scaleY, float transX, float transY){
+    public void drawImage(Image image, float scaleX, float scaleY, float percentX, float percentY){
         if(image == null) return;
 
         DesktopImage bi = (DesktopImage)image;
 
-        float rX = virtualToRealX(transX);     // Se ajusta a la escala puesta al canvas
-        float rY = virtualToRealY(transY);
+        float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY);
 
         float sX = (bi.getWidth() * scaleX * _scale);
         float sY = (bi.getHeight() * scaleY * _scale);
@@ -117,13 +117,13 @@ public class DesktopGraphics extends AbstractGraphics {
 
     // Dibuja una imagen del tamaño dado en la posicion dada
     @Override
-    public void drawImage(Image image, int sizeX, int sizeY, float transX, float transY){
+    public void drawImage(Image image, int sizeX, int sizeY, float percentX, float percentY){
         if(image == null) return;
 
         DesktopImage bi = (DesktopImage)image;
 
-        float rX = virtualToRealX(transX);     // Se ajusta a la escala puesta al canvas
-        float rY = virtualToRealY(transY);
+        float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY);
 
         _graphics.drawImage(bi.get_bufferedImage(),
                 (int)(rX - (sizeX * _scale)/2), (int)(rY - (sizeY * _scale)),
@@ -156,9 +156,9 @@ public class DesktopGraphics extends AbstractGraphics {
     }
 
     @Override
-    public void drawText(String text, int x, int y) {
-        int rX = (int) virtualToRealX(x);     // Se ajusta a la escala puesta al canvas
-        int rY = (int) virtualToRealY(y);
+    public void drawText(String text, float pX, float pY) {
+        int rX = (int) virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        int rY = (int) virtualToRealY(pY * _virtualY);
         _graphics.drawString(text, rX, rY);
     }
 
@@ -168,13 +168,14 @@ public class DesktopGraphics extends AbstractGraphics {
     }
 
     @Override
-    public void fillCircle(float cx, float cy, float radius) {
+    public void fillCircle(float percentX, float percentY, float radius) {
         //setColor(255, 0, 0, 255);
-        float rX = virtualToRealX(cx);     // Se ajusta a la escala puesta al canvas
-        float rY = virtualToRealY(cy);
-        _graphics.fillOval((int)(rX - (radius * _scale)),
-                (int)(rY - (radius * _scale)),
-                (int)(radius * 2 * _scale),(int)(radius * 2 * _scale));
+        float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY);
+        float radiusReal = radius  * _virtualX;
+        _graphics.fillOval((int)(rX - (radiusReal * _scale)),
+                (int)(rY - (radiusReal * _scale)),
+                (int)(radiusReal * 2 * _scale), (int)(radiusReal * 2 * _scale));
     }
 
     // Metodos propios de la clase

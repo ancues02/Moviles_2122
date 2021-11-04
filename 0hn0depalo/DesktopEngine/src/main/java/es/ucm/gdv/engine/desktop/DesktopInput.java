@@ -21,8 +21,8 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener {
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
-        int posX = (int)_dGraphics.realToVirtualX(mouseEvent.getX());
-        int posY = (int)_dGraphics.realToVirtualY(mouseEvent.getY());
+        float posX = _dGraphics.realToVirtualX(mouseEvent.getX());
+        float posY = _dGraphics.realToVirtualY(mouseEvent.getY());
         System.out.println("Input Pressed on canvas: " + posX + " " + posY + ".");
     }
 

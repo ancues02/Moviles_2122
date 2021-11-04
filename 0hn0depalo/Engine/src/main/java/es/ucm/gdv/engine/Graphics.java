@@ -20,7 +20,7 @@ public interface Graphics {
 
     Font newFont(String filename, int size, boolean isBold);
     void setFont(Font font);
-    void drawText(String text, int x, int y);
+    void drawText(String text, float x, float y);
 
     void setColor(int r, int g, int b, int a);
     void fillCircle(float cx, float cy, float radius);

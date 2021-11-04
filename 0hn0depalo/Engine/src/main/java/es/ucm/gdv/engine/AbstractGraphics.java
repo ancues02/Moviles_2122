@@ -46,7 +46,7 @@ public abstract class AbstractGraphics implements Graphics{
         float windowW = getWidth();
         if(!_verticalCompensation) rX -= (windowW - _realX) / 2;
         rX /= _scale;
-        return rX;
+        return rX / _virtualX;
     }
 
     public float realToVirtualY(float targetY){
@@ -54,6 +54,6 @@ public abstract class AbstractGraphics implements Graphics{
         float windowH = getHeight();
         if(_verticalCompensation) rY -= (windowH - _realY) / 2;
         rY /= _scale;
-        return rY;
+        return rY / _virtualY;
     }
 }
