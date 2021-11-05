@@ -35,9 +35,12 @@ public class OhnO implements Application {
      */
     public void render(Graphics g){
         //renderizar el selector de tamaño de nivel
-        renderSelectSize(g);
+        //renderSelectSize(g);
         //renderizar el nivel
         //renderLevel(g);
+        g.setColor(0, 0, 255, 255);
+        g.fillCircle(0,0, 100 );
+        g.setColor(255,255,255,255);
     }
     private void renderSelectSize(Graphics g) {
         float width = g.getWidth(), height = g.getHeight();
@@ -75,7 +78,7 @@ public class OhnO implements Application {
                 g.fillCircle(startOffset + j*rad * 2 + rad + offsetCircles*(j ) , i* rad*2 + rad + offsetCircles*(i+1) + yOffset, rad );
                 g.setColor(255,255,255,255);
 
-                f.setSize(fontSize);
+                //f.setSize(fontSize);
                 g.setFont(f);
                 String num = ""+(cont++);
                 g.drawText(num, (int)(startOffset + (offsetCircles*(j)) + j*rad*2  + rad ),

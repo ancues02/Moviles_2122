@@ -26,12 +26,16 @@ public class AndroidGraphics extends AbstractGraphics {
     public AndroidGraphics(Context context){
         super();
         _view = new SurfaceView(context);
-        setCanvasDimensions(_view.getWidth(), _view.getHeight());
-        adjustCanvasToSize(_view.getWidth(), _view.getHeight());
+        int w = _view.getWidth(), h = _view.getHeight();
         _holder = _view.getHolder();
         _paint = new Paint();
 
         _assetsManager = context.getAssets();
+    }
+
+    public void adjustCanvasToView(){
+        setCanvasDimensions(_view.getWidth(), _view.getHeight());
+        adjustCanvasToSize(_view.getWidth(), _view.getHeight());
     }
 
     /**
@@ -265,7 +269,8 @@ public class AndroidGraphics extends AbstractGraphics {
     void render(Application app){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
-        app.render(this);
+        clear(255,255,255,255);
+        //app.render(this);
         _holder.unlockCanvasAndPost(_canvas);
     }
 

@@ -66,6 +66,9 @@ public class AndroidEngine implements Engine, Runnable{
             // en una hebra nueva.
             _gameLoopTh = new Thread(this);
             _gameLoopTh.start();
+
+            System.out.println("GameLoopThread initiated");
+
         }
     }
 
@@ -76,6 +79,7 @@ public class AndroidEngine implements Engine, Runnable{
                 try {
                     _gameLoopTh.join();
                     _gameLoopTh = null;
+                    System.out.println("GameLoopThread terminated");
                     break;
                 } catch (InterruptedException ie) {
                     // Esto no debería ocurrir nunca...
@@ -108,7 +112,7 @@ public class AndroidEngine implements Engine, Runnable{
         }
         while(_running && _graphics.getWidth() == 0)//sleep
             ;
-
+        _graphics.adjustCanvasToView();
         // Ahora si podemos lanzar el bucle
         _lastFrameTime = System.nanoTime();
         while(_running) {
