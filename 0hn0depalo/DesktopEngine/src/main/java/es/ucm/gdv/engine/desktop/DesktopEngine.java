@@ -30,7 +30,8 @@ public class DesktopEngine implements Engine {
     public void setSize(int width, int height) {
         _graphics.setSize(width, height);
     }
-        //bucle ppal del motor
+
+    //bucle ppal del motor
     public void run(){
         _lastFrameTime = System.nanoTime();
         while(true) {
@@ -41,7 +42,7 @@ public class DesktopEngine implements Engine {
     }
 
     private void handleInput(){
-        //_app.handleInput();
+        _app.handleInput(_input.getTouchEvents());
     };
 
     // Calcula el deltaTime y se lo pasa al update de la aplicacion

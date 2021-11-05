@@ -6,7 +6,6 @@ import java.util.Random;
 
 import es.ucm.gdv.engine.*;
 
-
 public class OhnO implements Application {
     private Square[][] board;     // Tablero con todas las casillas
     private List<Square> locked; // Las casillas lockeadas
@@ -19,9 +18,22 @@ public class OhnO implements Application {
 
     }
 
+    public void handleInput(List<TouchEvent> e) {
+        while(e.size() > 0) {
+            TouchEvent processable = e.get(0);
+            e.remove(0);
+            // PROCESAR
+            processInput(processable);
+        }
+    }
 
-    public void handleInput(TouchEvent e) {
-
+    private void processInput(TouchEvent e){
+        float X = e.getX();
+        float Y = e.getY();
+        if((Y >= 1f/5 && Y <= 0.8) && (X >= 0.1 && X <= 0.9)){
+            if(e.getType() == TouchType.Press) System.out.println("PRESSED IN TABLERO");
+            else if(e.getType() == TouchType.Release) System.out.println("RELEASED IN TABLERO");
+        }
     }
 
     public void update(float deltaTime){
@@ -35,10 +47,10 @@ public class OhnO implements Application {
      */
     public void render(Graphics g){
         //renderizar el selector de tamaño de nivel
-        renderSelectSize(g);
+        //renderSelectSize(g);
 
         //renderizar el nivel
-        //renderLevel(g);
+        renderLevel(g);
     }
     private void renderSelectSize(Graphics g) {
 
@@ -101,11 +113,11 @@ public class OhnO implements Application {
         g.setColor(0,0,0,255);
         g.setFont(f);
         String tam = numCir + "   x   "+numCir;
-        g.drawText(tam, 600/3, 900/6);
+        g.drawText(tam, 1f/3, 1f/6);
 
         //tablero
-        float yOffset=900f/5;//donde empieza a pintarse el tablero
-        float rad = 600 / ((numCir +1 )*2);
+        float yOffset=1f/5;//donde empieza a pintarse el tablero
+        float rad = 1f / ((numCir +1 )*2);
         //hay un diametro a distribuir de offsets
         float totalOffsetCircles =  2*rad ;
         float offsetCircles = totalOffsetCircles / (numCir + 3);
@@ -144,19 +156,19 @@ public class OhnO implements Application {
         }//fin tablero
 
         //porcentaje
-        yOffset =5.2f * 900/6;
+        yOffset =5.2f * 1f/6;
         f.setSize(fontSize/1.5f);
         g.setFont(f);
         g.setColor(150,150,150,255);
         float percent =1 -( (float)numGreys / startNumGrey);
         percent*=100;
         String num = (int)Math.ceil(percent) + "%";
-        g.drawText(num, (600/2),(int)(yOffset));
+        g.drawText(num, (1f/2),(int)(yOffset));
 
 
         //imagenes abajo, un tercio de la pantalla
-        yOffset =5.5f * 900/6;
-        float xOffset = 600.0f/6;
+        yOffset =5.5f * 1f/6;
+        float xOffset = 1f/6;
         im = g.newImage("close.png");
         g.drawImage(im, 1.0f,1.0f, 2*xOffset, yOffset);
         im = g.newImage("history.png");
@@ -167,8 +179,6 @@ public class OhnO implements Application {
     
     //crear tablero inicial
     public void initGame(int tam) {
-
-
         //rellenamos el tablero con azules y rojos de forma aleatoria
         //minimo un rojo y un azul que no este rodeado por rojos
         do {

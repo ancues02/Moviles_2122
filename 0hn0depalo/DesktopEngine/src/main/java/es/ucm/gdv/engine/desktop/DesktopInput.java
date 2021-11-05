@@ -1,6 +1,7 @@
 package es.ucm.gdv.engine.desktop;
 
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -17,11 +18,11 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
         _dGraphics = dGraphics;
         _dGraphics.getWindow().addMouseListener(this);
         _dGraphics.getWindow().addMouseMotionListener(this);
+        _touchEventList = new ArrayList<TouchEvent>();
     }
 
     @Override
     synchronized public List<TouchEvent> getTouchEvents() {
-
         return _touchEventList;
     }
 
@@ -36,7 +37,6 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
-
         mouseEvent(mouseEvent, TouchType.Press);
     }
 
