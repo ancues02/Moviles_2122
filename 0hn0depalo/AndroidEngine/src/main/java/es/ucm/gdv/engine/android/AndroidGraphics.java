@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.SurfaceHolder;
@@ -12,7 +13,6 @@ import android.view.SurfaceView;
 import es.ucm.gdv.engine.AbstractGraphics;
 import es.ucm.gdv.engine.Application;
 import es.ucm.gdv.engine.Font;
-import es.ucm.gdv.engine.Graphics;
 import es.ucm.gdv.engine.Image;
 
 public class AndroidGraphics extends AbstractGraphics {
@@ -46,7 +46,7 @@ public class AndroidGraphics extends AbstractGraphics {
      * @param a, Componente alpha del color
      */
     private int colorBitshift(int r, int g, int b, int a){
-        return (a >> 24) | (r >> 16) | (g >> 8) | b;
+        return (a << 24) | (r << 16) | (g << 8) | b << 0;
     }
 
     /**
@@ -269,8 +269,9 @@ public class AndroidGraphics extends AbstractGraphics {
     void render(Application app){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
+        //_canvas.drawColor(Color.RED);
         clear(255,255,255,255);
-        //app.render(this);
+        app.render(this);
         _holder.unlockCanvasAndPost(_canvas);
     }
 

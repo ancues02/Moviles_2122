@@ -23,12 +23,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        /*engine = new AndroidEngine(this);
+        //setContentView(R.layout.activity_main);
+        _engine = new AndroidEngine(this);
+        setContentView(_engine.getContentView());
         Application a = new OhnO(4);
         _engine.setApplication(a);
-        setContentView(_engine.getContentView());
-        int w = _engine.getContentView().getWidth(),
+        /*int w = _engine.getContentView().getWidth(),
             h = _engine.getContentView().getHeight();*/
     }
 
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //_engine.resume();
+        _engine.resume();
     }
 
     //--------------------------------------------------------------------
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //_engine.pause();
+        _engine.pause();
     }
 
     AndroidEngine _engine;

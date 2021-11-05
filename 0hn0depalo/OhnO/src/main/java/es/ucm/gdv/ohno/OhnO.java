@@ -37,10 +37,8 @@ public class OhnO implements Application {
         //renderizar el selector de tamaño de nivel
         //renderSelectSize(g);
         //renderizar el nivel
-        //renderLevel(g);
-        g.setColor(0, 0, 255, 255);
-        g.fillCircle(0,0, 100 );
-        g.setColor(255,255,255,255);
+        renderLevel(g);
+
     }
     private void renderSelectSize(Graphics g) {
         float width = g.getWidth(), height = g.getHeight();
