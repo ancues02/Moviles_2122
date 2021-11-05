@@ -19,7 +19,8 @@ public class AndroidImage implements Image {
     public boolean load(String s, AssetManager as){
         try(InputStream is = as.open(s)) {
             _bitmap = BitmapFactory.decodeStream(is);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             //TODO: usar Logcat?
             System.err.println("Error cargando la imagen: " + e);
             return false;

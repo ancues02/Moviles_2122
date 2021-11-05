@@ -26,13 +26,13 @@ public class DesktopFont implements Font {
         return true;
     }
 
+    public java.awt.Font get_font(){
+        return _font;
+    }
+
     @Override
     public String getFilename() {
         return _filename;
-    }
-
-    public java.awt.Font get_font(){
-        return _font;
     }
 
     @Override

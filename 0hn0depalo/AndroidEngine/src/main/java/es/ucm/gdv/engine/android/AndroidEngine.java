@@ -12,7 +12,6 @@ import es.ucm.gdv.engine.Input;
 public class AndroidEngine implements Engine, Runnable{
     Thread _gameLoopTh;
     volatile boolean _running;
-    private AssetManager _assetsManager;
 
     private AndroidGraphics _graphics;  // has the SurfaceHolder
     private AndroidInput _input;
@@ -23,7 +22,6 @@ public class AndroidEngine implements Engine, Runnable{
     public AndroidEngine(Context context){
         _graphics = new AndroidGraphics(context);
         _input = new AndroidInput();
-        _assetsManager = context.getAssets();
     }
 
     @Override
