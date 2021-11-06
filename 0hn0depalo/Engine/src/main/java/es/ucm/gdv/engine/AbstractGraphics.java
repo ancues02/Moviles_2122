@@ -7,7 +7,9 @@ public abstract class AbstractGraphics implements Graphics{
     protected boolean _verticalCompensation = true;   // Hacia dónde tiene que compensar poniendo barras
     protected float _scale = 1.0f;    // Multiplicador de tamaño del canvas virtual al real
 
-    protected AbstractGraphics(float vX, float vY){
+    protected AbstractGraphics(){ }
+
+    protected void setCanvasDimensions(float vX, float vY){
         _virtualX = vX;
         _virtualY = vY;
         _aspectRatio = _virtualX/_virtualY;

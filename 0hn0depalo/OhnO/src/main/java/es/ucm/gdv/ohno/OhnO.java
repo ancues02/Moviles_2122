@@ -151,7 +151,7 @@ public class OhnO implements Application {
                 g.fillCircle(xPos, yPos, _boardCircleRad);
                 g.setColor(255,255,255,255);
 
-                f.setSize(fontSize);
+                //f.setSize(fontSize);
                 g.setFont(f);
                 String num = ""+(cont++);
                 g.drawText(num, xPos, yPos);

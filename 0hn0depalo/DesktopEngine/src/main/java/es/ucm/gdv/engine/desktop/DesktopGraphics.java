@@ -17,7 +17,8 @@ public class DesktopGraphics extends AbstractGraphics {
     private java.awt.Graphics _graphics;
 
     public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
-        super(virtualX, virtualY);
+        super();
+        setCanvasDimensions(virtualX,virtualY);
         createWindow(x, y);
     }
 

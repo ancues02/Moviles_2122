@@ -4,31 +4,51 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import es.ucm.gdv.engine.Application;
+import es.ucm.gdv.engine.android.AndroidEngine;
+import es.ucm.gdv.ohno.OhnO;
+
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Método llamado por Android como parte del ciclo de vida de
+     * la actividad. Se llama en el momento de lanzarla.
+     *
+     * @param savedInstanceState Información de estado de la actividad
+     *                           previamente serializada por ella misma
+     *                           para reconstruirse en el mismo estado
+     *                           tras un reinicio. Será null la primera
+     *                           vez.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        /*Logic logic = new Logic();
-        logic.init(4);
-        for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print(logic.board[i][j].solutionState + " ");
-            }
-            System.out.println();
-        }
-
-        System.out.println();
-        for(int i = 0; i < 4 ; ++i){
-            for(int j = 0; j < 4 ; ++j){
-                System.out.print((logic.board[i][j].row + logic.board[i][j].column) + " " );
-            }
-            System.out.println();
-        }
-        System.out.println();*/
-
+        //setContentView(R.layout.activity_main);
+        _engine = new AndroidEngine(this);
+        setContentView(_engine.getContentView());
+        Application a = new OhnO(4);
+        _engine.setApplication(a);
+        /*int w = _engine.getContentView().getWidth(),
+            h = _engine.getContentView().getHeight();*/
     }
+
+    //--------------------------------------------------------------------
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        _engine.resume();
+    }
+
+    //--------------------------------------------------------------------
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        _engine.pause();
+    }
+
+    AndroidEngine _engine;
 }
 
 
