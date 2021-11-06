@@ -84,7 +84,9 @@ public class OhnO implements Application {
                     g.setColor(255, 0, 0, 255);
                 else
                     g.setColor(0, 0, 255, 255);
-                g.fillCircle(startOffset + j*rad * 2 + rad + offsetCircles*(j ) , i* rad*2 + rad + offsetCircles*(i+1) + yOffset, rad );
+                float xPos = startOffset + j*rad * 2 + rad + offsetCircles*(j );
+                float yPos = i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
+                g.fillCircle(xPos , yPos, rad );
                 g.setColor(255,255,255,255);
 
                 f.setSize(fontSize);
@@ -116,12 +118,13 @@ public class OhnO implements Application {
         g.drawText(tam, 1f/3, 1f/6);
 
         //tablero
-        float yOffset=1f/5;//donde empieza a pintarse el tablero
+        float yOffset=0.2f;//donde empieza a pintarse el tablero
         float rad = 1f / ((numCir +1 )*2);
         //hay un diametro a distribuir de offsets
         float totalOffsetCircles =  2*rad ;
         float offsetCircles = totalOffsetCircles / (numCir + 3);
         Image im;
+        float yPos=(yOffset + rad);
         for (int i = 0; i < numCir; ++i) {
             for (int j = 0; j < numCir; ++j) {
                 if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
@@ -133,9 +136,11 @@ public class OhnO implements Application {
                 else
                     g.setColor(150, 150, 150, 255);
                 float xPos = 2 * offsetCircles + (offsetCircles*j) + j*rad * 2 + rad;
-                float yPos=i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
+
+                //float yPos = i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
                 g.fillCircle( xPos, yPos, rad );
 
+                //candado en los rojos lockeados
                 if(showLock && board[i+1][j+1].currentState == Square.SquareColor.Red){
                     //
                     im = g.newImage("lock.png");
@@ -149,10 +154,13 @@ public class OhnO implements Application {
                     f.setSize(fontSize/1.5f);
                     g.setFont(f);
                     String num = ""+board[i+1][j+1].total;
-                    g.drawText(num, (int)(2 * offsetCircles + (offsetCircles*j) + j*rad*2  + rad - rad/5),
-                            (int)(i* rad*2 + rad + offsetCircles*(i+1) + yOffset + rad/5));
+                    g.drawText(num, (int)(xPos ),
+                            (int)(yPos));
                 }
+
             }
+            yPos+= 2*offsetCircles +  rad  ;
+
         }//fin tablero
 
         //porcentaje
