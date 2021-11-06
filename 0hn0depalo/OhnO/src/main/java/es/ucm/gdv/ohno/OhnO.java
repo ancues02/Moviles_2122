@@ -19,6 +19,8 @@ public class OhnO implements Application {
     private float _boardCircleRad;
     private float _totalOffsetCircles;
     private float _offsetCircles;
+    private float _xStartOffset;
+
 
     public OhnO(int tam){
         _numCircles = tam;
@@ -40,12 +42,50 @@ public class OhnO implements Application {
     private void processInput(TouchEvent e){
         float X = e.getX();
         float Y = e.getY();
-        if((Y >= _boardStart + (_boardCircleRad / 4) && Y < 0.9f
-                /*Y <= (_boardStart + _boardCircleRad + _numCircles * (2 * _offsetCircles +  _boardCircleRad) - (_boardCircleRad / 2))*/) &&
-                (X >= 0.15 && X <= 0.85)) {
-            if(e.getType() == TouchType.Press) System.out.println("PRESSED IN TABLERO");
-            //else if(e.getType() == TouchType.Release) System.out.println("RELEASED IN TABLERO");
-        }else if(_currState == GameState.SELECT) _currState = GameState.GAME;
+        System.out.println(X + "  "+Y);
+        //System.out.println(_xStartOffset + 2*_boardCircleRad +_offsetCircles);
+        float offset =  2*_boardCircleRad +_offsetCircles;
+        System.out.println("start " +( _xStartOffset ));
+        System.out.println("circleRad " +( _boardCircleRad));
+        System.out.println("offCircle " +( _offsetCircles));
+
+        System.out.println("primero " +( _xStartOffset  + offset));
+        System.out.println("segundo " +(_xStartOffset  + 2*offset));
+        System.out.println("tercer "+(_xStartOffset  + 3*offset));
+
+        if(Y >= 0.4f && Y <= 0.56f) {
+            System.out.println("He pulsado en la primera fila de ciruclos");
+            if(X >= _xStartOffset && X <= _xStartOffset + offset) {
+                System.out.println("He pulsado en la primera columna de circulos");
+            }
+            else if(X >= _xStartOffset + offset && X <= _xStartOffset + 2*offset) {
+                System.out.println("He pulsado en la segunda columna de circulos");
+            }
+            else if(X >= _xStartOffset + 2*offset && X <= _xStartOffset + 3*offset) {
+                System.out.println("He pulsado en la tercera columna de circulos");
+            }
+        }
+        else if(Y >= 0.63f && Y <= 0.75f) {
+            System.out.println("He pulsado en la segunda fila de circulos");
+            if(X >= 0.2f && X <= 0.4f) {
+                System.out.println("He pulsado en la primera columna de circulos");
+            }
+            else if(X >= 0.4f && X <= 0.6f) {
+                System.out.println("He pulsado en la segunda columna de circulos");
+            }
+            else if(X >= 0.6f && X <= 0.8f) {
+                System.out.println("He pulsado en la tercera columna de circulos");
+            }
+
+        }
+
+//        if((Y >= _boardStart + (_boardCircleRad / 4) && Y < 0.9f
+//                /*Y <= (_boardStart + _boardCircleRad + _numCircles * (2 * _offsetCircles +  _boardCircleRad) - (_boardCircleRad / 2))*/) &&
+//                (X >= 0.15 && X <= 0.85)) {
+//            if(e.getType() == TouchType.Press) System.out.println("PRESSED IN TABLERO");
+//            //else if(e.getType() == TouchType.Release) System.out.println("RELEASED IN TABLERO");
+//        }else if(_currState == GameState.SELECT) _currState = GameState.GAME;
+
     }
 
     public void update(float deltaTime){
@@ -93,12 +133,12 @@ public class OhnO implements Application {
 
         //---------------------pintar los circulos----------------------------
         float yOffset = 0.4f;//donde empieza a pintarse el tablero
-        int numCir = 5;
-        float rad = 1f / ((numCir + 1 )*2);
+        _numCircles = 5;
+        _boardCircleRad = 1f / ((_numCircles + 1 )*2);
         //hay un diametro a distribuir de offsets
-        float totalOffsetCircles =  2*rad ;
-        float offsetCircles = totalOffsetCircles / (numCir + 3);
-        float startOffset = 2*offsetCircles + 2* rad + offsetCircles;
+        _totalOffsetCircles =  2*_boardCircleRad ;
+        _offsetCircles = _totalOffsetCircles / (_numCircles + 3);
+        _xStartOffset = 2*_offsetCircles + 2* _boardCircleRad + _offsetCircles;
         int cont = 4;
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 3; ++j) {
@@ -106,9 +146,9 @@ public class OhnO implements Application {
                     g.setColor(255, 0, 0, 255);
                 else
                     g.setColor(0, 0, 255, 255);
-                float xPos = startOffset + j*rad * 2 + rad + offsetCircles*(j );
-                float yPos = i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
-                g.fillCircle(xPos, yPos, rad);
+                float xPos = _xStartOffset + j*_boardCircleRad * 2 + _boardCircleRad + _offsetCircles*(j );
+                float yPos = i* _boardCircleRad*2 + _boardCircleRad + _offsetCircles*(i+1) + yOffset;
+                g.fillCircle(xPos, yPos, _boardCircleRad);
                 g.setColor(255,255,255,255);
 
                 f.setSize(fontSize);
