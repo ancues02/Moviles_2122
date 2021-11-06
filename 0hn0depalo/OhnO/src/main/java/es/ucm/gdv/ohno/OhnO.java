@@ -44,36 +44,37 @@ public class OhnO implements Application {
         float Y = e.getY();
         System.out.println(X + "  "+Y);
         //System.out.println(_xStartOffset + 2*_boardCircleRad +_offsetCircles);
-        float offset =  2*_boardCircleRad +_offsetCircles;
-        System.out.println("start " +( _xStartOffset ));
+        float offset =  2*_boardCircleRad +_offsetCircles/2;
+
+        /*System.out.println("start " +( _xStartOffset ));
         System.out.println("circleRad " +( _boardCircleRad));
-        System.out.println("offCircle " +( _offsetCircles));
+        System.out.println("offCircle " +( _offsetCircles));*/
 
         System.out.println("primero " +( _xStartOffset  + offset));
-        System.out.println("segundo " +(_xStartOffset  + 2*offset));
-        System.out.println("tercer "+(_xStartOffset  + 3*offset));
+        System.out.println("segundo " +(_xStartOffset  + 2*offset +_offsetCircles/2));
+        System.out.println("tercer "+(_xStartOffset  + 3*offset + 2*_offsetCircles/2 ));
 
         if(Y >= 0.4f && Y <= 0.56f) {
             System.out.println("He pulsado en la primera fila de ciruclos");
-            if(X >= _xStartOffset && X <= _xStartOffset + offset) {
+            if(X >= _xStartOffset  -_offsetCircles/2 && X <= _xStartOffset + offset) {
                 System.out.println("He pulsado en la primera columna de circulos");
             }
-            else if(X >= _xStartOffset + offset && X <= _xStartOffset + 2*offset) {
+            else if(X >= _xStartOffset + offset && X <= _xStartOffset + 2*offset +_offsetCircles/2) {
                 System.out.println("He pulsado en la segunda columna de circulos");
             }
-            else if(X >= _xStartOffset + 2*offset && X <= _xStartOffset + 3*offset) {
+            else if(X >= _xStartOffset + 2*offset +_offsetCircles/2 && X <= _xStartOffset + 3*offset + 2*_offsetCircles/2) {
                 System.out.println("He pulsado en la tercera columna de circulos");
             }
         }
         else if(Y >= 0.63f && Y <= 0.75f) {
             System.out.println("He pulsado en la segunda fila de circulos");
-            if(X >= 0.2f && X <= 0.4f) {
+            if(X >= _xStartOffset  -_offsetCircles/2 && X <= _xStartOffset + offset) {
                 System.out.println("He pulsado en la primera columna de circulos");
             }
-            else if(X >= 0.4f && X <= 0.6f) {
+            else if(X >= _xStartOffset + offset && X <= _xStartOffset + 2*offset +_offsetCircles/2) {
                 System.out.println("He pulsado en la segunda columna de circulos");
             }
-            else if(X >= 0.6f && X <= 0.8f) {
+            else if(X >= _xStartOffset + 2*offset +_offsetCircles/2 && X <= _xStartOffset + 3*offset + 2*_offsetCircles/2) {
                 System.out.println("He pulsado en la tercera columna de circulos");
             }
 
@@ -132,7 +133,7 @@ public class OhnO implements Application {
         g.drawText(tam, 0.5f, 0.333f);
 
         //---------------------pintar los circulos----------------------------
-        float yOffset = 0.4f;//donde empieza a pintarse el tablero
+        _boardStart = 0.4f;//donde empieza a pintarse el tablero
         _numCircles = 5;
         _boardCircleRad = 1f / ((_numCircles + 1 )*2);
         //hay un diametro a distribuir de offsets
@@ -147,7 +148,7 @@ public class OhnO implements Application {
                 else
                     g.setColor(0, 0, 255, 255);
                 float xPos = _xStartOffset + j*_boardCircleRad * 2 + _boardCircleRad + _offsetCircles*(j );
-                float yPos = i* _boardCircleRad*2 + _boardCircleRad + _offsetCircles*(i+1) + yOffset;
+                float yPos = i* _boardCircleRad*2 + _boardCircleRad + _offsetCircles*(i+1) + _boardStart;
                 g.fillCircle(xPos, yPos, _boardCircleRad);
                 g.setColor(255,255,255,255);
 
@@ -160,7 +161,7 @@ public class OhnO implements Application {
         }//circulos pintados
 
         //
-        yOffset = 5f * 0.1666f;
+        float yOffset = 5f * 0.1666f;
         float xOffset = 0.5f;
         Image im = g.newImage("close.png");
         g.drawImage(im, 1.0f,1.0f, xOffset, yOffset);
@@ -178,13 +179,13 @@ public class OhnO implements Application {
         g.drawText(tam, 1f/2, 0.15f);
 
         //tablero
-        float yOffset = _boardStart;//donde empieza a pintarse el tablero
+        _boardStart = 0.175f;//donde empieza a pintarse el tablero
         _boardCircleRad = 1f / ((_numCircles +1 )*2);
         //hay un diametro a distribuir de offsets
         _totalOffsetCircles =  2 * _boardCircleRad ;
         _offsetCircles = _totalOffsetCircles / (_numCircles + 3);
         Image im;
-        float yPos = (yOffset + _boardCircleRad);
+        float yPos = (_boardStart + _boardCircleRad);
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
                 if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
@@ -222,7 +223,7 @@ public class OhnO implements Application {
         }//fin tablero
 
         //porcentaje
-        yOffset = 5.1f * 1f/6;
+        float yOffset = 5.1f * 1f/6;
         f.setSize(fontSize/1.5f);
         g.setFont(f);
         g.setColor(150,150,150,255);
