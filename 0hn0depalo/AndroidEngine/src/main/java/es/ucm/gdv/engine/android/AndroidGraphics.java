@@ -7,8 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import es.ucm.gdv.engine.AbstractGraphics;
 import es.ucm.gdv.engine.Application;
@@ -63,6 +65,16 @@ public class AndroidGraphics extends AbstractGraphics {
     @Override
     public float getHeight() {
         return _view.getHeight();
+    }
+
+    @Override
+    public float getCanvasWidth() {
+        return 0;
+    }
+
+    @Override
+    public float getCanvasHeight() {
+        return 0;
     }
 
     /**
@@ -155,6 +167,7 @@ public class AndroidGraphics extends AbstractGraphics {
     public void drawImage(Image image, float scaleX, float scaleY, float posX, float posY) {
         if(image == null) return;
 
+
         AndroidImage ai = (AndroidImage)image;
         Bitmap b = ai.get_bitmap();
 
@@ -220,17 +233,19 @@ public class AndroidGraphics extends AbstractGraphics {
         _paint.setTextSize(af.get_size());
     }
 
+    //TODO revisar
+
     /**
      * Escribe el texto en pantalla usando la fuente establecida
      *
      * @param text El texto que se escribe en pantalla
-     * @param x Coordenada x de la posicion en la que se quiere empezar a escribir (left)
-     * @param y Coordenada y de la posicion en la que se quiere empezar a escribir (top)
+     * @param pX Coordenada x de la posicion en la que se quiere empezar a escribir (left)
+     * @param pY Coordenada y de la posicion en la que se quiere empezar a escribir (top)
      */
     @Override
-    public void drawText(String text, int x, int y) {
-        int rX = (int)compensateX(x, _canvas.getWidth());     // Se ajusta a la escala puesta al canvas
-        int rY = (int)compensateY(y, _canvas.getHeight());
+    public void drawText(String text, float pX, float pY) {
+        float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(pY * _virtualY);
 
         _canvas.drawText(text, rX, rY, _paint);
     }

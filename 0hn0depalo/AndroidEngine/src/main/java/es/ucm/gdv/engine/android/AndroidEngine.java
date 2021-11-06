@@ -21,7 +21,7 @@ public class AndroidEngine implements Engine, Runnable{
 
     public AndroidEngine(Context context){
         _graphics = new AndroidGraphics(context);
-        _input = new AndroidInput();
+        _input = new AndroidInput(_graphics);
     }
 
     @Override
