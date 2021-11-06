@@ -11,11 +11,21 @@ public class OhnO implements Application {
     private List<Square> locked; // Las casillas lockeadas
     private int numGreys, startNumGrey;       //numero de casillas grises, para hacer el porcentaje
     private boolean showLock;   //booleano para mostrar o no el candado en los rojos
+
+    private GameState _currState;
+
+    private int _numCircles;
+    private float _boardStart = 0.175f;
+    private float _boardCircleRad;
+    private float _totalOffsetCircles;
+    private float _offsetCircles;
+
     public OhnO(int tam){
+        _numCircles = tam;
 
         initGame(tam);
         showLock = true;
-
+        _currState = GameState.SELECT;
     }
 
     public void handleInput(List<TouchEvent> e) {
@@ -30,10 +40,12 @@ public class OhnO implements Application {
     private void processInput(TouchEvent e){
         float X = e.getX();
         float Y = e.getY();
-        if((Y >= 1f/5 && Y <= 0.8) && (X >= 0.1 && X <= 0.9)){
+        if((Y >= _boardStart + (_boardCircleRad / 4) && Y < 0.9f
+                /*Y <= (_boardStart + _boardCircleRad + _numCircles * (2 * _offsetCircles +  _boardCircleRad) - (_boardCircleRad / 2))*/) &&
+                (X >= 0.15 && X <= 0.85)) {
             if(e.getType() == TouchType.Press) System.out.println("PRESSED IN TABLERO");
-            else if(e.getType() == TouchType.Release) System.out.println("RELEASED IN TABLERO");
-        }
+            //else if(e.getType() == TouchType.Release) System.out.println("RELEASED IN TABLERO");
+        }else if(_currState == GameState.SELECT) _currState = GameState.GAME;
     }
 
     public void update(float deltaTime){
@@ -46,11 +58,21 @@ public class OhnO implements Application {
      * @param g Graphics
      */
     public void render(Graphics g){
-        //renderizar el selector de tamaño de nivel
-        //renderSelectSize(g);
-
-        //renderizar el nivel
-        renderLevel(g);
+        switch (_currState){
+            case START: {
+                break;
+            }
+            case SELECT: {
+                //renderizar el selector de tamaño de nivel
+                renderSelectSize(g);
+                break;
+            }
+            case GAME: {
+                //renderizar el nivel
+                renderLevel(g);
+                break;
+            }
+        }
     }
     private void renderSelectSize(Graphics g) {
 
@@ -60,14 +82,14 @@ public class OhnO implements Application {
         g.setColor(0, 0, 0, 255);
         g.setFont(f);
         String name = "Oh no";
-        g.drawText(name, 0.2f, 0.25f);
+        g.drawText(name, 0.5f, 0.25f);
 
         fontSize /= 4;
         f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
         //g.setColor(0,0,0,255);
         g.setFont(f);
         String tam = "Elige el tamaño a jugar";
-        g.drawText(tam, 0.25f, 0.333f);
+        g.drawText(tam, 0.5f, 0.333f);
 
         //---------------------pintar los circulos----------------------------
         float yOffset = 0.4f;//donde empieza a pintarse el tablero
@@ -86,14 +108,13 @@ public class OhnO implements Application {
                     g.setColor(0, 0, 255, 255);
                 float xPos = startOffset + j*rad * 2 + rad + offsetCircles*(j );
                 float yPos = i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
-                g.fillCircle(xPos , yPos, rad );
+                g.fillCircle(xPos, yPos, rad);
                 g.setColor(255,255,255,255);
 
                 f.setSize(fontSize);
                 g.setFont(f);
                 String num = ""+(cont++);
-                g.drawText(num, (startOffset + (offsetCircles*(j)) + j*rad*2  + rad - rad/5),
-                        (i* rad*2 + rad + offsetCircles*(i+1) + yOffset + rad/5));
+                g.drawText(num, xPos, yPos);
 
             }
         }//circulos pintados
@@ -106,7 +127,6 @@ public class OhnO implements Application {
     }
 
     private void renderLevel(Graphics g){
-        int numCir = board[0].length - 2;
         float width = g.getWidth(), height = g.getHeight();
 
         int fontSize= (int)g.getCanvasWidth() / 8;
@@ -114,19 +134,19 @@ public class OhnO implements Application {
         Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
         g.setColor(0,0,0,255);
         g.setFont(f);
-        String tam = numCir + "   x   "+numCir;
-        g.drawText(tam, 1f/3, 1f/6);
+        String tam = _numCircles + "   x   " + _numCircles;
+        g.drawText(tam, 1f/2, 0.15f);
 
         //tablero
-        float yOffset=0.2f;//donde empieza a pintarse el tablero
-        float rad = 1f / ((numCir +1 )*2);
+        float yOffset = _boardStart;//donde empieza a pintarse el tablero
+        _boardCircleRad = 1f / ((_numCircles +1 )*2);
         //hay un diametro a distribuir de offsets
-        float totalOffsetCircles =  2*rad ;
-        float offsetCircles = totalOffsetCircles / (numCir + 3);
+        _totalOffsetCircles =  2 * _boardCircleRad ;
+        _offsetCircles = _totalOffsetCircles / (_numCircles + 3);
         Image im;
-        float yPos=(yOffset + rad);
-        for (int i = 0; i < numCir; ++i) {
-            for (int j = 0; j < numCir; ++j) {
+        float yPos = (yOffset + _boardCircleRad);
+        for (int i = 0; i < _numCircles; ++i) {
+            for (int j = 0; j < _numCircles; ++j) {
                 if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
                     g.setColor(0, 0, 255, 255);
                 else if(board[i+1][j+1].currentState == Square.SquareColor.Red) {
@@ -135,17 +155,16 @@ public class OhnO implements Application {
                 }
                 else
                     g.setColor(150, 150, 150, 255);
-                float xPos = 2 * offsetCircles + (offsetCircles*j) + j*rad * 2 + rad;
+                float xPos = 2 * _offsetCircles + (_offsetCircles*j) + j*_boardCircleRad * 2 + _boardCircleRad;
 
                 //float yPos = i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
-                g.fillCircle( xPos, yPos, rad );
+                g.fillCircle( xPos, yPos, _boardCircleRad);
 
                 //candado en los rojos lockeados
                 if(showLock && board[i+1][j+1].currentState == Square.SquareColor.Red){
                     //
                     im = g.newImage("lock.png");
-                    g.drawImage(im, 1.0f,1.0f, (int)(xPos ),
-                            (int)(yPos ));
+                    g.drawImage(im, 0.55f,0.55f, xPos, yPos);
                 }
                 //numeros en los azules lockeados
 
@@ -153,25 +172,24 @@ public class OhnO implements Application {
                     g.setColor(255,255,255,255);
                     f.setSize(fontSize/1.5f);
                     g.setFont(f);
-                    String num = ""+board[i+1][j+1].total;
-                    g.drawText(num, (int)(xPos ),
-                            (int)(yPos));
+                    String num = String.valueOf(board[i+1][j+1].total);
+                    g.drawText(num, xPos, yPos);
                 }
 
             }
-            yPos+= 2*offsetCircles +  rad  ;
+            yPos += 2 * _offsetCircles +  _boardCircleRad;
 
         }//fin tablero
 
         //porcentaje
-        yOffset =5.2f * 1f/6;
+        yOffset = 5.1f * 1f/6;
         f.setSize(fontSize/1.5f);
         g.setFont(f);
         g.setColor(150,150,150,255);
-        float percent =1 -( (float)numGreys / startNumGrey);
+        float percent = 1 - ( (float)numGreys / startNumGrey);
         percent*=100;
         String num = (int)Math.ceil(percent) + "%";
-        g.drawText(num, (1f/2),(int)(yOffset));
+        g.drawText(num, (1f/2),(yOffset));
 
 
         //imagenes abajo, un tercio de la pantalla

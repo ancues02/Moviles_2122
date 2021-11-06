@@ -3,6 +3,8 @@ package es.ucm.gdv.engine.desktop;
 import java.awt.Color;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 
 import es.ucm.gdv.engine.*;
@@ -157,9 +159,21 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void drawText(String text, float pX, float pY) {
-        int rX = (int) virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
-        int rY = (int) virtualToRealY(pY * _virtualY);
-        _graphics.drawString(text, rX, rY);
+        float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(pY * _virtualY);
+
+        FontRenderContext frc = new FontRenderContext(null, true, true);
+        Rectangle2D r2D = _graphics.getFont().getStringBounds(text, frc);
+
+        int rWidth = (int) Math.round(r2D.getWidth());
+        int rHeight = (int) Math.round(r2D.getHeight());
+        int tX = (int) Math.round(r2D.getX());
+        int tY = (int) Math.round(r2D.getY());
+
+        int a = (int)(rX - (rWidth / 2) - tX);
+        int b = (int)(rY - (rHeight / 2) - tY);
+
+        _graphics.drawString(text, a, b);
     }
 
     @Override
