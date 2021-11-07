@@ -20,8 +20,6 @@ public class OhnO implements Application {
     private float _xBoardOffset;
     private float _boardCircleRad;
     private float _extraCircle;
-    //private float _totalOffsetCircles;
-    //private float _offsetCircles;
 
 
     public OhnO(int tam){

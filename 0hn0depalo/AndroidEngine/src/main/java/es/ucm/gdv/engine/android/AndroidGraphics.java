@@ -28,7 +28,6 @@ public class AndroidGraphics extends AbstractGraphics {
     public AndroidGraphics(Context context){
         super();
         _view = new SurfaceView(context);
-        int w = _view.getWidth(), h = _view.getHeight();
         _holder = _view.getHolder();
         _paint = new Paint();
 
@@ -36,8 +35,10 @@ public class AndroidGraphics extends AbstractGraphics {
     }
 
     public void adjustCanvasToView(){
-        setCanvasDimensions(_view.getWidth(), _view.getHeight());
+        setCanvasDimensions(600, 900);
         adjustCanvasToSize(_view.getWidth(), _view.getHeight());
+
+
     }
 
     /**
@@ -87,7 +88,7 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public void clear(int r, int g, int b, int a){
-        _canvas.drawColor(colorBitshift(r, g, b, a));
+        _canvas.drawColor(colorBitshift(180,180,180,255));
     }
 
     @Override
@@ -266,13 +267,17 @@ public class AndroidGraphics extends AbstractGraphics {
     /**
      * Dibuja un circulo en pantalla
      *
-     * @param cx Coordenada x del centro del circulo
-     * @param cy Coordenada y del centro del circulo
+     * @param percentX Coordenada x del centro del circulo
+     * @param percentY Coordenada y del centro del circulo
      * @param radius Radio del circulo
      */
     @Override
-    public void fillCircle(float cx, float cy, float radius) {
-        _canvas.drawCircle(cx, cy, radius, _paint);
+    public void fillCircle(float percentX, float percentY, float radius) {
+        float rX = virtualToRealX(percentX * _virtualX); //302    // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY); //712
+        float radiusReal = radius  * _virtualX;
+        _canvas.drawCircle((int)(rX - (radiusReal)),
+                (int)(rY - (radiusReal )), (int)(radiusReal * 2), _paint);
     }
 
     /**
@@ -284,6 +289,11 @@ public class AndroidGraphics extends AbstractGraphics {
     void render(Application app){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
+        _canvas.scale(_scale,_scale);
+        /*if(!_verticalCompensation)
+            _canvas.scale(0.5f,0.5f);
+        else
+            _canvas.scale(0, (_view.getHeight() - _realY)/2f);*/
         //_canvas.drawColor(Color.RED);
         clear(255,255,255,255);
         app.render(this);
