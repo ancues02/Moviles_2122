@@ -1,9 +1,11 @@
 package es.ucm.gdv.engine.desktop;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 
@@ -15,6 +17,7 @@ public class DesktopGraphics extends AbstractGraphics {
     private JFrame _window;
     private BufferStrategy _strategy;
     private java.awt.Graphics _graphics;
+    private AffineTransform _savedTransform;
 
     public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
         super();
@@ -68,12 +71,12 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void save() {
-
+        _savedTransform = ((Graphics2D)_graphics).getTransform();
     }
 
     @Override
     public void restore() {
-
+        ((Graphics2D)_graphics).setTransform(_savedTransform);
     }
 
     // Metodos sobre imagenes
@@ -111,11 +114,18 @@ public class DesktopGraphics extends AbstractGraphics {
 
         float sX = (bi.getWidth() * scaleX * _scale);
         float sY = (bi.getHeight() * scaleY * _scale);
+
+        //save();
+        //_graphics.translate((int)(rX  - (sX/2)), (int)(rY - (sY/2)));
+
         _graphics.drawImage(bi.get_bufferedImage(),
                 (int)(rX  - (sX/2)), (int)(rY - (sY/2)),
                 (int)(sX),
                 (int)(sY),
                 null);
+
+        //restore();
+        //_graphics.translate((int)-(rX  - (sX/2)), (int)-(rY - (sY/2)));
     }
 
     // Dibuja una imagen del tamaño dado en la posicion dada
@@ -128,10 +138,13 @@ public class DesktopGraphics extends AbstractGraphics {
         float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(percentY * _virtualY);
 
-        _graphics.drawImage(bi.get_bufferedImage(),
-                (int)(rX - (sizeX * _scale)/2), (int)(rY - (sizeY * _scale)),
+        _graphics.translate((int)(rX - (sizeX * _scale)/2), (int)(rY - (sizeY * _scale)));
+
+        _graphics.drawImage(bi.get_bufferedImage(), 0, 0,
                 (int)(sizeX * _scale), (int)(sizeY * _scale),
                 null);
+
+        _graphics.translate((int) -(rX - (sizeX * _scale)/2), (int) -(rY - (sizeY * _scale)));
     }
 
     // Metodos sobre fonts

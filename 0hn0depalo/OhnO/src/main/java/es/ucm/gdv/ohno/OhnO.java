@@ -62,15 +62,6 @@ public class OhnO implements Application {
     }
 
     private void parseInputSelect(float X, float Y){
-       /* float offset = 2 * _boardCircleRad + _offsetCircles;
-        System.out.println("start " + (_xBoardOffset));
-        System.out.println("circleRad " + (_boardCircleRad));
-        System.out.println("offCircle " + (_offsetCircles));
-
-        System.out.println("primero " + (_YBoardOffset + 2*_boardCircleRad));
-        System.out.println("segundo " + (_xBoardOffset + 2 * offset));
-        System.out.println("tercer " + (_xBoardOffset + 3 * offset));*/
-
         float offsetCircles = (_extraCircle / (_numCircles - 1));
         System.out.println(offsetCircles);
 
@@ -86,9 +77,11 @@ public class OhnO implements Application {
             } else if (X >= _xBoardOffset + 2 * offset && X <= _xBoardOffset + 3 * offset) {
                 System.out.println("He pulsado en la tercera columna de circulos");
             }*/
+            _currState = GameState.GAME;
         } else if (Y >= _YBoardOffset + (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)
                 && Y <= _YBoardOffset + (2*_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) {
             System.out.println("He pulsado en la segunda fila de circulos");
+            _currState = GameState.GAME;
             /*if (X >= 0.2f && X <= 0.4f) {
                 System.out.println("He pulsado en la primera columna de circulos");
             } else if (X >= 0.4f && X <= 0.6f) {
