@@ -26,7 +26,7 @@ public class OhnO implements Application {
         _numCircles = tam;
 
         initGame(tam);
-        showLock = true;
+        showLock = false;
         _currState = GameState.SELECT;
     }
 

@@ -1,5 +1,6 @@
 package es.ucm.gdv.engine.desktop;
 
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -204,6 +205,7 @@ public class DesktopGraphics extends AbstractGraphics {
         //_window.setUndecorated(true);
         _window.setVisible(true);
         _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
         int intentos = 100;
         while(intentos-- > 0) {

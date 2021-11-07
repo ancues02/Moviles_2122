@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
         _engine = new AndroidEngine(this);
         setContentView(_engine.getContentView());
-        Application a = new OhnO(4);
+        Application a = new OhnO(9);
         _engine.setApplication(a);
         /*int w = _engine.getContentView().getWidth(),
             h = _engine.getContentView().getHeight();*/

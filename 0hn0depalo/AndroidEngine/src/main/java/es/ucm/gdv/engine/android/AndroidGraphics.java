@@ -88,7 +88,7 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public void clear(int r, int g, int b, int a){
-        _canvas.drawColor(colorBitshift(180,180,180,255));
+        _canvas.drawColor(colorBitshift(r,g,b,a));
     }
 
     @Override
@@ -193,6 +193,8 @@ public class AndroidGraphics extends AbstractGraphics {
 
         AndroidImage ai = (AndroidImage)image;
         Bitmap b = ai.get_bitmap();
+
+
         _canvas.drawBitmap(b,
                 new Rect(0,0,b.getWidth(), b.getHeight()),
                 new Rect((int)posX, (int)posY, sizeX, sizeY),
@@ -273,11 +275,12 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public void fillCircle(float percentX, float percentY, float radius) {
-        float rX = virtualToRealX(percentX * _virtualX); //302    // Se ajusta a la escala puesta al canvas
-        float rY = virtualToRealY(percentY * _virtualY); //712
+        float rX = virtualToRealX(percentX * _virtualX);// Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY);
         float radiusReal = radius  * _virtualX;
-        _canvas.drawCircle((int)(rX - (radiusReal)),
-                (int)(rY - (radiusReal )), (int)(radiusReal * 2), _paint);
+        _canvas.drawCircle((int)(rX - (radiusReal * _scale)),
+                (int)(rY - (radiusReal * _scale)),
+                (int)(radiusReal * 2 * _scale), _paint);
     }
 
     /**
@@ -289,13 +292,20 @@ public class AndroidGraphics extends AbstractGraphics {
     void render(Application app){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
-        _canvas.scale(_scale,_scale);
-        /*if(!_verticalCompensation)
-            _canvas.scale(0.5f,0.5f);
-        else
-            _canvas.scale(0, (_view.getHeight() - _realY)/2f);*/
+        //_canvas.scale(_scale,_scale);
+        /*if(!_verticalCompensation) {
+            float aux = (_view.getWidth() - _virtualX) / 2.0f;
+            _canvas.translate(aux, 0);
+            //_canvas.scale(_scale * _aspectRatio * _realY, 1.0f);
+        }
+        else {
+            _canvas.translate((int) virtualToRealX(0), 0);
+            _canvas.scale(_scale * _aspectRatio * _realY, 1.0f);
+        }*/
         //_canvas.drawColor(Color.RED);
         clear(255,255,255,255);
+        setColor(180,180,180,255);
+        _canvas.drawRect(new Rect(0,0,_canvas.getWidth(), _canvas.getHeight()),_paint);
         app.render(this);
         _holder.unlockCanvasAndPost(_canvas);
     }
