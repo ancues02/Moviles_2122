@@ -11,15 +11,17 @@ public class OhnO implements Application {
     private List<Square> locked; // Las casillas lockeadas
     private int numGreys, startNumGrey;       //numero de casillas grises, para hacer el porcentaje
     private boolean showLock;   //booleano para mostrar o no el candado en los rojos
+    private final float _aspectRatio = 2f/3f;
 
     private GameState _currState;
 
     private int _numCircles;
-    private float _boardStart = 0.175f;
+    private float _YBoardOffset;
+    private float _xBoardOffset;
     private float _boardCircleRad;
-    private float _totalOffsetCircles;
-    private float _offsetCircles;
-    private float _xStartOffset;
+    private float _extraCircle;
+    //private float _totalOffsetCircles;
+    //private float _offsetCircles;
 
 
     public OhnO(int tam){
@@ -40,51 +42,64 @@ public class OhnO implements Application {
     }
 
     private void processInput(TouchEvent e){
+        if(e.getType() != TouchType.Press) return;
         float X = e.getX();
         float Y = e.getY();
-        System.out.println(X + "  "+Y);
-        //System.out.println(_xStartOffset + 2*_boardCircleRad +_offsetCircles);
-        float offset =  2*_boardCircleRad +_offsetCircles;
-        System.out.println("start " +( _xStartOffset ));
-        System.out.println("circleRad " +( _boardCircleRad));
-        System.out.println("offCircle " +( _offsetCircles));
+        System.out.println(X + "  " + Y);
+        switch(_currState) {
+            case START: {
+                _currState = GameState.SELECT;
+                break;
+            }
+            case SELECT: {
+                parseInputSelect(X, Y);
+                break;
+            }
+            case GAME: {
 
-        System.out.println("primero " +( _xStartOffset  + offset));
-        System.out.println("segundo " +(_xStartOffset  + 2*offset));
-        System.out.println("tercer "+(_xStartOffset  + 3*offset));
+            }
+        }
+    }
 
-        if(Y >= 0.4f && Y <= 0.56f) {
+    private void parseInputSelect(float X, float Y){
+       /* float offset = 2 * _boardCircleRad + _offsetCircles;
+        System.out.println("start " + (_xBoardOffset));
+        System.out.println("circleRad " + (_boardCircleRad));
+        System.out.println("offCircle " + (_offsetCircles));
+
+        System.out.println("primero " + (_YBoardOffset + 2*_boardCircleRad));
+        System.out.println("segundo " + (_xBoardOffset + 2 * offset));
+        System.out.println("tercer " + (_xBoardOffset + 3 * offset));*/
+
+        float offsetCircles = (_extraCircle / (_numCircles - 1));
+        System.out.println(offsetCircles);
+
+        System.out.println(_YBoardOffset + (_boardCircleRad * _aspectRatio));
+
+
+        if (Y >= _YBoardOffset && Y <= _YBoardOffset + (_boardCircleRad * _aspectRatio)) {
             System.out.println("He pulsado en la primera fila de ciruclos");
-            if(X >= _xStartOffset && X <= _xStartOffset + offset) {
+           /* if (X >= _xBoardOffset && X <= _xBoardOffset + offset) {
                 System.out.println("He pulsado en la primera columna de circulos");
-            }
-            else if(X >= _xStartOffset + offset && X <= _xStartOffset + 2*offset) {
+            } else if (X >= _xBoardOffset + offset && X <= _xBoardOffset + 2 * offset) {
                 System.out.println("He pulsado en la segunda columna de circulos");
-            }
-            else if(X >= _xStartOffset + 2*offset && X <= _xStartOffset + 3*offset) {
+            } else if (X >= _xBoardOffset + 2 * offset && X <= _xBoardOffset + 3 * offset) {
                 System.out.println("He pulsado en la tercera columna de circulos");
-            }
-        }
-        else if(Y >= 0.63f && Y <= 0.75f) {
+            }*/
+        } else if (Y >= _YBoardOffset + (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)
+                && Y <= _YBoardOffset + (2*_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) {
             System.out.println("He pulsado en la segunda fila de circulos");
-            if(X >= 0.2f && X <= 0.4f) {
+            /*if (X >= 0.2f && X <= 0.4f) {
                 System.out.println("He pulsado en la primera columna de circulos");
-            }
-            else if(X >= 0.4f && X <= 0.6f) {
+            } else if (X >= 0.4f && X <= 0.6f) {
                 System.out.println("He pulsado en la segunda columna de circulos");
-            }
-            else if(X >= 0.6f && X <= 0.8f) {
+            } else if (X >= 0.6f && X <= 0.8f) {
                 System.out.println("He pulsado en la tercera columna de circulos");
-            }
-
+            }*/
         }
+    }
 
-//        if((Y >= _boardStart + (_boardCircleRad / 4) && Y < 0.9f
-//                /*Y <= (_boardStart + _boardCircleRad + _numCircles * (2 * _offsetCircles +  _boardCircleRad) - (_boardCircleRad / 2))*/) &&
-//                (X >= 0.15 && X <= 0.85)) {
-//            if(e.getType() == TouchType.Press) System.out.println("PRESSED IN TABLERO");
-//            //else if(e.getType() == TouchType.Release) System.out.println("RELEASED IN TABLERO");
-//        }else if(_currState == GameState.SELECT) _currState = GameState.GAME;
+    private void parseInputGame(float X, float Y){
 
     }
 
@@ -126,19 +141,19 @@ public class OhnO implements Application {
 
         fontSize /= 4;
         f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
-        //g.setColor(0,0,0,255);
         g.setFont(f);
         String tam = "Elige el tamaño a jugar";
         g.drawText(tam, 0.5f, 0.333f);
 
         //---------------------pintar los circulos----------------------------
-        float yOffset = 0.4f;//donde empieza a pintarse el tablero
-        _numCircles = 5;
-        _boardCircleRad = 1f / ((_numCircles + 1 )*2);
-        //hay un diametro a distribuir de offsets
-        _totalOffsetCircles =  2*_boardCircleRad ;
-        _offsetCircles = _totalOffsetCircles / (_numCircles + 3);
-        _xStartOffset = 2*_offsetCircles + 2* _boardCircleRad + _offsetCircles;
+        _YBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
+        _xBoardOffset = (1 - 2 * _YBoardOffset);
+
+        _numCircles = 3;
+        _extraCircle = 1f;   // Círculo fantasma extra para el offset
+        _boardCircleRad = (1 - _xBoardOffset * 2) / (_numCircles + _extraCircle);
+        float yPos = _YBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
+        float xPos = _xBoardOffset + (_boardCircleRad / 2);
         int cont = 4;
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 3; ++j) {
@@ -146,21 +161,21 @@ public class OhnO implements Application {
                     g.setColor(255, 0, 0, 255);
                 else
                     g.setColor(0, 0, 255, 255);
-                float xPos = _xStartOffset + j*_boardCircleRad * 2 + _boardCircleRad + _offsetCircles*(j );
-                float yPos = i* _boardCircleRad*2 + _boardCircleRad + _offsetCircles*(i+1) + yOffset;
-                g.fillCircle(xPos, yPos, _boardCircleRad);
+                g.fillCircle(xPos, yPos, _boardCircleRad / 2f);
                 g.setColor(255,255,255,255);
 
                 f.setSize(fontSize);
                 g.setFont(f);
                 String num = ""+(cont++);
                 g.drawText(num, xPos, yPos);
-
+                xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
             }
+            xPos = _xBoardOffset + (_boardCircleRad / 2);
+            yPos += (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio);
         }//circulos pintados
 
         //
-        yOffset = 5f * 0.1666f;
+        float yOffset = 5f * 0.1666f;
         float xOffset = 0.5f;
         Image im = g.newImage("close.png");
         g.drawImage(im, 1.0f,1.0f, xOffset, yOffset);
@@ -170,21 +185,24 @@ public class OhnO implements Application {
         float width = g.getWidth(), height = g.getHeight();
 
         int fontSize= (int)g.getCanvasWidth() / 8;
+
         //tamaño tablero
         Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
         g.setColor(0,0,0,255);
         g.setFont(f);
-        String tam = _numCircles + "   x   " + _numCircles;
-        g.drawText(tam, 1f/2, 0.15f);
+        String tam = _numCircles + " x " + _numCircles;
+        g.drawText(tam, 1f/2, 0.1f);
+
+        //tablero dimensiones
+        _xBoardOffset = 0.1f; // 1 - _xStartOffset el final
+        _YBoardOffset = 0.2f;
 
         //tablero
-        float yOffset = _boardStart;//donde empieza a pintarse el tablero
-        _boardCircleRad = 1f / ((_numCircles +1 )*2);
-        //hay un diametro a distribuir de offsets
-        _totalOffsetCircles =  2 * _boardCircleRad ;
-        _offsetCircles = _totalOffsetCircles / (_numCircles + 3);
+        _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
+        _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
         Image im;
-        float yPos = (yOffset + _boardCircleRad);
+        float yPos = _YBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
+        float xPos = _xBoardOffset + (_boardCircleRad / 2);
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
                 if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
@@ -195,10 +213,9 @@ public class OhnO implements Application {
                 }
                 else
                     g.setColor(150, 150, 150, 255);
-                float xPos = 2 * _offsetCircles + (_offsetCircles*j) + j*_boardCircleRad * 2 + _boardCircleRad;
 
                 //float yPos = i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
-                g.fillCircle( xPos, yPos, _boardCircleRad);
+                g.fillCircle(xPos, yPos, (_boardCircleRad / 2));
 
                 //candado en los rojos lockeados
                 if(showLock && board[i+1][j+1].currentState == Square.SquareColor.Red){
@@ -215,25 +232,25 @@ public class OhnO implements Application {
                     String num = String.valueOf(board[i+1][j+1].total);
                     g.drawText(num, xPos, yPos);
                 }
-
+                xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
             }
-            yPos += 2 * _offsetCircles +  _boardCircleRad;
+            xPos = _xBoardOffset + (_boardCircleRad / 2);
+            yPos += (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio);
 
         }//fin tablero
 
         //porcentaje
-        yOffset = 5.1f * 1f/6;
         f.setSize(fontSize/1.5f);
         g.setFont(f);
         g.setColor(150,150,150,255);
         float percent = 1 - ( (float)numGreys / startNumGrey);
         percent*=100;
         String num = (int)Math.ceil(percent) + "%";
-        g.drawText(num, (1f/2),(yOffset));
+        g.drawText(num, (1f/2),(1/6f * 4.75f));
 
 
         //imagenes abajo, un tercio de la pantalla
-        yOffset =5.5f * 1f/6;
+        float yOffset = 5.5f * 1f/6;
         float xOffset = 1f/6;
         im = g.newImage("close.png");
         g.drawImage(im, 1.0f,1.0f, 2*xOffset, yOffset);
