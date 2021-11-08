@@ -197,7 +197,7 @@ public class OhnO implements Application {
 
     private void renderLevel(Graphics g){
 
-        int fontSize= (int)g.getCanvasWidth() / 8;//44
+        int fontSize= 45;//44
 
         //tamaño tablero
         Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);

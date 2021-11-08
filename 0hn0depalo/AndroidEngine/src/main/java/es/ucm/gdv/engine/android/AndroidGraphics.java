@@ -31,6 +31,7 @@ public class AndroidGraphics extends AbstractGraphics {
         _holder = _view.getHolder();
         _paint = new Paint();
 
+
         _assetsManager = context.getAssets();
 
         setCanvasDimensions(virtualWidth, virtualHeight);
@@ -183,10 +184,10 @@ public class AndroidGraphics extends AbstractGraphics {
 
         float sX = (ai.getWidth() * scaleX * _scale);
         float sY = (ai.getHeight() * scaleY * _scale);
-
+        int aux = (int)(rX  - (sX/2)), aux2=(int)(rY - (sY/2));
         _canvas.drawBitmap(b,
-                new Rect(0,0, b.getWidth(), b.getHeight()),
-                new Rect((int)rX, (int)rY, (int)sX, (int)sY),
+                null,
+                new Rect(aux,aux2, aux + (int)sX, aux2 + (int)sY),
                 _paint);
     }
 
@@ -237,7 +238,6 @@ public class AndroidGraphics extends AbstractGraphics {
 
 
         af.setBold(isBold);
-        
         af.setSize(size * _scale);
         return af;
     }
