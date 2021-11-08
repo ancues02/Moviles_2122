@@ -1,5 +1,6 @@
 package es.ucm.gdv.engine.desktop;
 
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentEvent;
@@ -84,10 +85,16 @@ public class DesktopGraphics extends AbstractGraphics {
     // Metodo factoria que crea una imagen, devuelve null si no ha podido crearla
     @Override
     public Image newImage(String filename) {
-        DesktopImage di = new DesktopImage();
-        if(!di.load(filename)){
-            return null;
+        DesktopImage di = null;
+        if(!_images.containsKey(filename)) {
+            di = new DesktopImage();
+            if (!di.load(filename )) {
+                return null;
+            }
+            _images.put(filename,di);
         }
+        else
+            di=(DesktopImage) _images.get(filename);
 
         return di;
     }
@@ -152,14 +159,21 @@ public class DesktopGraphics extends AbstractGraphics {
     // Metodo factoria que crea una font, devuelve null si no ha podido crearla
     @Override
     public Font newFont(String filename, int size, boolean isBold) {
+        DesktopFont df = null;
+        if(!_fonts.containsKey(filename)) {
+            df = new DesktopFont();
 
-        DesktopFont df = new DesktopFont();
-        if(!df.load(filename)){
-            return null;
+            if (!df.load(filename)) {
+                return null;
+            }
+            _fonts.put(filename, df);
         }
+        else
+            df=(DesktopFont)_fonts.get(filename);
+
 
         df.setBold(isBold);
-        df.setSize(size);
+        df.setSize(size * _scale);
         return df;
     }
 
@@ -173,6 +187,7 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void drawText(String text, float pX, float pY) {
+
         float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(pY * _virtualY);
 
@@ -217,6 +232,7 @@ public class DesktopGraphics extends AbstractGraphics {
         //_window.setUndecorated(true);
         _window.setVisible(true);
         _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
         int intentos = 100;
         while(intentos-- > 0) {

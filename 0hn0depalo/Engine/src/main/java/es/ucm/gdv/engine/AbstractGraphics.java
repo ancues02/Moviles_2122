@@ -1,13 +1,20 @@
 package es.ucm.gdv.engine;
 
+import java.util.HashMap;
+
 public abstract class AbstractGraphics implements Graphics{
     protected float _virtualX, _virtualY; // Dimensiones del canvas virtual
     protected float _aspectRatio;       // Relación de aspecto entre X e Y del canvas
     protected float _realX, _realY;   // Dimensiones del canvas ajustado a la ventana real
     protected boolean _verticalCompensation = true;   // Hacia dónde tiene que compensar poniendo barras
     protected float _scale = 1.0f;    // Multiplicador de tamaño del canvas virtual al real
+    protected HashMap<String, Font> _fonts; //Fonts cargadas
+    protected HashMap<String, Image> _images; //Imagenes cargadas
 
-    protected AbstractGraphics(){ }
+    protected AbstractGraphics(){
+        _fonts = new HashMap<>();
+        _images = new HashMap<>();
+    }
 
     protected void setCanvasDimensions(float vX, float vY){
         _virtualX = vX;
@@ -32,6 +39,7 @@ public abstract class AbstractGraphics implements Graphics{
     protected float virtualToRealX(float targetX){
         float rX = targetX * _scale;
         float windowW = getWidth();
+        float canvasW = getCanvasWidth();
         if(!_verticalCompensation) rX += (windowW - _realX) / 2;
         return rX;
     }
@@ -39,6 +47,7 @@ public abstract class AbstractGraphics implements Graphics{
     protected float virtualToRealY(float targetY){
         float rY = targetY * _scale;
         float windowH = getHeight();
+        float canvasH = getCanvasHeight();
         if(_verticalCompensation) rY += (windowH - _realY) / 2;
         return rY;
     }

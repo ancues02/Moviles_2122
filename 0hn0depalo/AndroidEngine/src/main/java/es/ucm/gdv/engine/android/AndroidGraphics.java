@@ -25,18 +25,20 @@ public class AndroidGraphics extends AbstractGraphics {
     private Paint _paint;
     private Canvas _canvas;
 
-    public AndroidGraphics(Context context){
+    public AndroidGraphics(Context context, int virtualWidth, int virtualHeight){
         super();
         _view = new SurfaceView(context);
-        int w = _view.getWidth(), h = _view.getHeight();
         _holder = _view.getHolder();
         _paint = new Paint();
 
+
         _assetsManager = context.getAssets();
+
+        setCanvasDimensions(virtualWidth, virtualHeight);
+
     }
 
     public void adjustCanvasToView(){
-        setCanvasDimensions(_view.getWidth(), _view.getHeight());
         adjustCanvasToSize(_view.getWidth(), _view.getHeight());
     }
 
@@ -69,12 +71,12 @@ public class AndroidGraphics extends AbstractGraphics {
 
     @Override
     public float getCanvasWidth() {
-        return 0;
+        return _realX;
     }
 
     @Override
     public float getCanvasHeight() {
-        return 0;
+        return _realY;
     }
 
     /**
@@ -87,7 +89,7 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public void clear(int r, int g, int b, int a){
-        _canvas.drawColor(colorBitshift(r, g, b, a));
+        _canvas.drawColor(colorBitshift(r,g,b,a));
     }
 
     @Override
@@ -111,7 +113,7 @@ public class AndroidGraphics extends AbstractGraphics {
     }
 
     /**
-     * Devuelve una imagen
+     * Devuelve una imagen. Solo la creamos una vez y la guardamos en un mapa
      *
      * @param filename Nombre del archivo de la imagen
      *
@@ -120,10 +122,16 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public Image newImage(String filename) {
-        AndroidImage ai = new AndroidImage();
-        if(!ai.load(filename, _assetsManager)){
-            return null;
+        AndroidImage ai = null;
+        if(!_images.containsKey(filename)) {
+            ai = new AndroidImage();
+            if (!ai.load(filename, _assetsManager)) {
+                return null;
+            }
+            _images.put(filename,ai);
         }
+        else
+            ai=(AndroidImage) _images.get(filename);
 
         return ai;
     }
@@ -171,9 +179,15 @@ public class AndroidGraphics extends AbstractGraphics {
         AndroidImage ai = (AndroidImage)image;
         Bitmap b = ai.get_bitmap();
 
+        float rX = virtualToRealX(posX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(posY * _virtualY);
+
+        float sX = (ai.getWidth() * scaleX * _scale);
+        float sY = (ai.getHeight() * scaleY * _scale);
+        int aux = (int)(rX  - (sX/2)), aux2=(int)(rY - (sY/2));
         _canvas.drawBitmap(b,
-                new Rect(0,0, b.getWidth(), b.getHeight()),
-                new Rect((int)posX, (int)posY, (int)(b.getWidth() * scaleX), (int)(b.getWidth() * scaleY)),
+                null,
+                new Rect(aux,aux2, aux + (int)sX, aux2 + (int)sY),
                 _paint);
     }
 
@@ -192,6 +206,8 @@ public class AndroidGraphics extends AbstractGraphics {
 
         AndroidImage ai = (AndroidImage)image;
         Bitmap b = ai.get_bitmap();
+
+
         _canvas.drawBitmap(b,
                 new Rect(0,0,b.getWidth(), b.getHeight()),
                 new Rect((int)posX, (int)posY, sizeX, sizeY),
@@ -199,7 +215,7 @@ public class AndroidGraphics extends AbstractGraphics {
     }
 
     /**
-     * Devuelve una fuente
+     * Devuelve una fuente. Solo la creamos una vez y la guardamos en un mapa
      *
      * @param filename Nombre del archivo de la fuente
      *
@@ -208,13 +224,21 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public Font newFont(String filename, int size, boolean isBold) {
-        AndroidFont af = new AndroidFont();
-        if(!af.load(filename, _assetsManager)){
-            return null;
+        AndroidFont af = null;
+        if(!_fonts.containsKey(filename)) {
+            af = new AndroidFont();
+
+            if (!af.load(filename, _assetsManager)) {
+                return null;
+            }
+            _fonts.put(filename, af);
         }
+        else
+            af=(AndroidFont)_fonts.get(filename);
+
 
         af.setBold(isBold);
-        af.setSize(size);
+        af.setSize(size * _scale);
         return af;
     }
 
@@ -229,6 +253,7 @@ public class AndroidGraphics extends AbstractGraphics {
 
         AndroidFont af = (AndroidFont)font;
         _paint.setTypeface(af.get_font());
+        _paint.setTextAlign(Paint.Align.CENTER);
         _paint.setFakeBoldText(af.get_bold());
         _paint.setTextSize(af.get_size());
     }
@@ -266,16 +291,27 @@ public class AndroidGraphics extends AbstractGraphics {
     /**
      * Dibuja un circulo en pantalla
      *
-     * @param cx Coordenada x del centro del circulo
-     * @param cy Coordenada y del centro del circulo
+     * @param percentX Coordenada x del centro del circulo
+     * @param percentY Coordenada y del centro del circulo
      * @param radius Radio del circulo
      */
     @Override
-    public void fillCircle(float cx, float cy, float radius) {
-        _canvas.drawCircle(cx, cy, radius, _paint);
+    public void fillCircle(float percentX, float percentY, float radius) {
+        float rX = virtualToRealX(percentX * _virtualX);// Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY);
+        float radiusReal;
+        if(_aspectRatio < 1)
+            radiusReal = radius  * _virtualX;
+        else
+            radiusReal = radius  * _virtualY;
+
+        _canvas.drawCircle((int)(rX ),
+                (int)(rY ),
+                (int)(radiusReal *  _scale), _paint);
+
     }
 
-    /**
+   /**
      * Gestiona los buffers de renderizado y el swap
      * para tener renderizado activo y renderizar el estado de la aplicacion.
      *
@@ -284,9 +320,20 @@ public class AndroidGraphics extends AbstractGraphics {
     void render(Application app){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
+        //_canvas.scale(_scale,_scale);
+        /*if(!_verticalCompensation) {
+            float aux = (_view.getWidth() - _virtualX) / 2.0f;
+            _canvas.translate(aux, 0);
+            //_canvas.scale(_scale * _aspectRatio * _realY, 1.0f);
+        }
+        else {
+            _canvas.translate((int) virtualToRealX(0), 0);
+            _canvas.scale(_scale * _aspectRatio * _realY, 1.0f);
+        }*/
         //_canvas.drawColor(Color.RED);
         clear(255,255,255,255);
         app.render(this);
+        fillOffsets(Color.GRAY);
         _holder.unlockCanvasAndPost(_canvas);
     }
 
@@ -298,5 +345,40 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     SurfaceView getSurfaceView(){
         return _view;
+    }
+
+    private void fillOffsets(int c){
+        if(_verticalCompensation)
+            fillVerticalOffsets(c);
+        else
+            fillHorizontalOffsets(c);
+    }
+
+    //Rellena de blanco por los lados
+    private void fillHorizontalOffsets(int c){
+        _paint.setColor(c);
+        _canvas.drawRect(0,0,(int) virtualToRealX(0),
+                _canvas.getHeight(),
+                _paint);
+
+        _canvas.drawRect((_canvas.getWidth() - _realX)/ 2 + (int)_realX,
+                0,_canvas.getWidth(),
+                _canvas.getHeight(),
+                _paint);
+
+
+    }
+
+    private void fillVerticalOffsets(int c){
+
+        _paint.setColor(c);
+        _canvas.drawRect(0,0,_canvas.getWidth(),
+                (int) virtualToRealY(0),
+                _paint);
+
+        _canvas.drawRect(0,
+                (_canvas.getHeight() - _realY)/ 2 + (int)_realY,
+                _canvas.getWidth(), _canvas.getHeight(),
+                _paint);
     }
 }
