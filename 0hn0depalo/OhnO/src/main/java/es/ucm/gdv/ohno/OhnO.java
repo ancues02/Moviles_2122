@@ -65,30 +65,44 @@ public class OhnO implements Application {
         System.out.println(offsetCircles);
 
         System.out.println(_YBoardOffset + (_boardCircleRad * _aspectRatio));
-
+        int tam;
 
         if (Y >= _YBoardOffset && Y <= _YBoardOffset + (_boardCircleRad * _aspectRatio)) {
             System.out.println("He pulsado en la primera fila de ciruclos");
-           /* if (X >= _xBoardOffset && X <= _xBoardOffset + offset) {
+            /*if (X >= _xBoardOffset && X <= _xBoardOffset + offset) {
                 System.out.println("He pulsado en la primera columna de circulos");
+                tam=4;
+                initGame(tam);
             } else if (X >= _xBoardOffset + offset && X <= _xBoardOffset + 2 * offset) {
+                tam=5;
+                initGame(tam);
                 System.out.println("He pulsado en la segunda columna de circulos");
             } else if (X >= _xBoardOffset + 2 * offset && X <= _xBoardOffset + 3 * offset) {
                 System.out.println("He pulsado en la tercera columna de circulos");
-            }*/
-            _currState = GameState.GAME;
+                tam = 6;
+                initGame(tam);
+            }
+            _currState = GameState.GAME;*/
         } else if (Y >= _YBoardOffset + (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)
                 && Y <= _YBoardOffset + (2*_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) {
             System.out.println("He pulsado en la segunda fila de circulos");
             _currState = GameState.GAME;
             /*if (X >= 0.2f && X <= 0.4f) {
                 System.out.println("He pulsado en la primera columna de circulos");
+                tam=7;
+                 initGame(tam);
             } else if (X >= 0.4f && X <= 0.6f) {
                 System.out.println("He pulsado en la segunda columna de circulos");
+                tam = 8;
+                 initGame(tam);
             } else if (X >= 0.6f && X <= 0.8f) {
                 System.out.println("He pulsado en la tercera columna de circulos");
+                tam = 9;
+                 initGame(tam);
             }*/
+
         }
+        //      initGame(tam);
     }
 
     private void parseInputGame(float X, float Y){
@@ -151,6 +165,7 @@ public class OhnO implements Application {
         g.drawText(tam, 0.5f, 0.333f);
 
         //---------------------pintar los circulos----------------------------
+
         _YBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
         _xBoardOffset = (1 - 2 * _YBoardOffset);
 
@@ -170,7 +185,7 @@ public class OhnO implements Application {
                 g.setColor(255,255,255,255);
 
                 //f.setSize(fontSize);
-                g.setFont(f);
+
                 String num = ""+(cont++);
                 g.drawText(num, xPos, yPos);
                 xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
@@ -202,6 +217,8 @@ public class OhnO implements Application {
         _YBoardOffset = 0.2f;
 
         //tablero
+        f.setSize(fontSize/1.5f);
+        g.setFont(f);
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
         Image im;
@@ -231,8 +248,7 @@ public class OhnO implements Application {
 
                 else if(board[i+1][j+1].lock && board[i+1][j+1].solutionState == Square.SquareColor.Blue){
                     g.setColor(255,255,255,255);
-                    f.setSize(fontSize/1.5f);
-                    g.setFont(f);
+
                     String num = String.valueOf(board[i+1][j+1].total);
                     g.drawText(num, xPos, yPos);
                 }
