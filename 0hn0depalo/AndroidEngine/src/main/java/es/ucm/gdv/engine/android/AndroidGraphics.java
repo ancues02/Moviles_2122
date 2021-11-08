@@ -7,10 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 import es.ucm.gdv.engine.AbstractGraphics;
 import es.ucm.gdv.engine.Application;
@@ -223,7 +221,7 @@ public class AndroidGraphics extends AbstractGraphics {
      *          null Si la fuente no se pudo cargar
      */
     @Override
-    public Font newFont(String filename, int size, boolean isBold) {
+    public Font newFont(String filename, float size, boolean isBold) {
         AndroidFont af = null;
         if(!_fonts.containsKey(filename)) {
             af = new AndroidFont();
@@ -254,8 +252,8 @@ public class AndroidGraphics extends AbstractGraphics {
         AndroidFont af = (AndroidFont)font;
         _paint.setTypeface(af.get_font());
         _paint.setTextAlign(Paint.Align.CENTER);
-        _paint.setFakeBoldText(af.get_bold());
-        _paint.setTextSize(af.get_size());
+        _paint.setFakeBoldText(af.getBold());
+        _paint.setTextSize(af.getSize());
     }
 
     //TODO revisar

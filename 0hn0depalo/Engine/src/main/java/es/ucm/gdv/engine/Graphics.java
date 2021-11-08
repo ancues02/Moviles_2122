@@ -18,7 +18,7 @@ public interface Graphics {
     void drawImage(Image image, float scaleX, float scaleY, float posX, float posY);
     void drawImage(Image image, int sizeX, int sizeY, float posX, float posY);
 
-    Font newFont(String filename, int size, boolean isBold);
+    Font newFont(String filename, float size, boolean isBold);
     void setFont(Font font);
     void drawText(String text, float x, float y);
 

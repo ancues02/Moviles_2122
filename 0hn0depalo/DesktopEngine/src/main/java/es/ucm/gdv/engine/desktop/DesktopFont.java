@@ -1,6 +1,5 @@
 package es.ucm.gdv.engine.desktop;
 
-import org.graalvm.compiler.lir.amd64.AMD64MathIntrinsicBinaryOp;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -11,6 +10,8 @@ public class DesktopFont implements Font {
     private java.awt.Font _font;
 
     private String _filename;
+    private boolean _bold;
+    private float _size;
 
     public DesktopFont(){ }
 
@@ -26,7 +27,7 @@ public class DesktopFont implements Font {
         return true;
     }
 
-    public java.awt.Font get_font(){
+    public java.awt.Font getFont(){
         return _font;
     }
 
@@ -44,12 +45,21 @@ public class DesktopFont implements Font {
         }
         else
             _font = _font.deriveFont(java.awt.Font.PLAIN);
+        _bold = bold;
     }
 
     @Override
     public void setSize(float size){
-        _font = _font.deriveFont(size);
+        _font = _font.deriveFont(size );
+        _size = size;
         //_font = _font.derive
+    }
+
+    public float getSize(){
+        return _size;
+    }
+    public boolean getBold(){
+        return _bold;
     }
 
 }

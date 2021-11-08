@@ -49,11 +49,11 @@ public class AndroidFont implements Font{
         _size = size;
     }
 
-    public boolean get_bold(){
+    public boolean getBold(){
         return _bold;
     }
 
-    public float get_size(){
+    public float getSize(){
         return _size;
     }
 }

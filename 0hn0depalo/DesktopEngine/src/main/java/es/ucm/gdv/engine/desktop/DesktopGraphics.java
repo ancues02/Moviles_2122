@@ -1,6 +1,5 @@
 package es.ucm.gdv.engine.desktop;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentEvent;
@@ -158,7 +157,7 @@ public class DesktopGraphics extends AbstractGraphics {
 
     // Metodo factoria que crea una font, devuelve null si no ha podido crearla
     @Override
-    public Font newFont(String filename, int size, boolean isBold) {
+    public Font newFont(String filename, float size, boolean isBold) {
         DesktopFont df = null;
         if(!_fonts.containsKey(filename)) {
             df = new DesktopFont();
@@ -182,7 +181,11 @@ public class DesktopGraphics extends AbstractGraphics {
         if(font == null) return;
 
         DesktopFont df = (DesktopFont)font;
-        _graphics.setFont(df.get_font());
+        df.setSize(df.getSize()*_scale);
+        df.setBold(df.getBold());
+        _graphics.setFont(df.getFont());
+
+
     }
 
     @Override

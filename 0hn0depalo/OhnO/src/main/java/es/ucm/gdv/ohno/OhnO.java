@@ -1,9 +1,7 @@
 package es.ucm.gdv.ohno;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import es.ucm.gdv.engine.*;
@@ -137,7 +135,7 @@ public class OhnO implements Application {
     }
     private void renderSelectSize(Graphics g) {
 
-        int fontSize= 120;
+        float fontSize= 120;
         //tamaño tablero
         Font f = g.newFont("Molle-Regular.ttf", fontSize, true);
         g.setColor(0, 0, 0, 255);
@@ -190,14 +188,14 @@ public class OhnO implements Application {
 
     private void renderLevel(Graphics g){
 
-        int fontSize= 45;//44
+        float fontSize= 45;//44
 
         //tamaño tablero
         Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
         g.setColor(0,0,0,255);
         g.setFont(f);
-        String tam = _numCircles + " x " + _numCircles;
-        g.drawText(tam, 1f/2, 0.1f);
+        String text = _numCircles + " x " + _numCircles;
+        g.drawText(text, 1f/2, 0.1f);
 
         //tablero dimensiones
         _xBoardOffset = 0.1f; // 1 - _xStartOffset el final
@@ -279,7 +277,7 @@ public class OhnO implements Application {
             }
             numGreys = tam * tam;
             Random rnd = new Random();
-            locked = new ArrayList<Square>();
+            locked = new ArrayList<>();
             for (int i = 0; i < board[0].length; ++i) {
                 for (int j = 0; j < board[1].length; ++j) {
                     //bordeamos de rojos
@@ -473,13 +471,6 @@ public class OhnO implements Application {
 
     // Aplica pistas. Se usa para terminar de generar un nivel soluble
     public boolean doHint(){
-        int cont =0;
-        for(int i = 0; i < board[0].length; ++i) {
-            for (int j = 0; j < board[1].length; ++j) {
-                if(board[i][j].solutionState == Square.SquareColor.Blue && board[i][j].lock)
-                    cont++;
-            }
-        }
 
         for(Square s : locked){
             if(hint1(s,true)){
