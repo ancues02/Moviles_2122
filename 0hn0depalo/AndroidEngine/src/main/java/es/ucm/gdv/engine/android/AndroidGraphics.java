@@ -259,7 +259,7 @@ public class AndroidGraphics extends AbstractGraphics {
         _paint.setTypeface(af.get_font());
         _paint.setTextAlign(Paint.Align.CENTER);
         _paint.setFakeBoldText(af.getBold());
-        _paint.setTextSize(af.getSize());
+        _paint.setTextSize(af.getSize()*_scale);
     }
 
     //TODO revisar
