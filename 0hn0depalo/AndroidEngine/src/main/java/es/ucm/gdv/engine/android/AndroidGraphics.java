@@ -205,10 +205,16 @@ public class AndroidGraphics extends AbstractGraphics {
         AndroidImage ai = (AndroidImage)image;
         Bitmap b = ai.get_bitmap();
 
+        float rX = virtualToRealX(posX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(posY * _virtualY);
+
+        float sX = (sizeX* _scale);
+        float sY = (sizeY * _scale);
+        int aux = (int)(rX  - (sX/2)), aux2=(int)(rY - (sY/2));
 
         _canvas.drawBitmap(b,
-                new Rect(0,0,b.getWidth(), b.getHeight()),
-                new Rect((int)posX, (int)posY, sizeX, sizeY),
+                null,
+                new Rect(aux,aux2, aux + (int)sX, aux2 + (int)sY),
                 _paint);
     }
 
