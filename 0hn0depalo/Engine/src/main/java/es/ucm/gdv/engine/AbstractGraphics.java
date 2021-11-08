@@ -32,6 +32,7 @@ public abstract class AbstractGraphics implements Graphics{
     protected float virtualToRealX(float targetX){
         float rX = targetX * _scale;
         float windowW = getWidth();
+        float canvasW = getCanvasWidth();
         if(!_verticalCompensation) rX += (windowW - _realX) / 2;
         return rX;
     }
@@ -39,6 +40,7 @@ public abstract class AbstractGraphics implements Graphics{
     protected float virtualToRealY(float targetY){
         float rY = targetY * _scale;
         float windowH = getHeight();
+        float canvasH = getCanvasHeight();
         if(_verticalCompensation) rY += (windowH - _realY) / 2;
         return rY;
     }

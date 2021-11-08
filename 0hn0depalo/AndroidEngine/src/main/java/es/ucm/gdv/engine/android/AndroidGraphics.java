@@ -38,7 +38,6 @@ public class AndroidGraphics extends AbstractGraphics {
         setCanvasDimensions(600, 900);
         adjustCanvasToSize(_view.getWidth(), _view.getHeight());
 
-
     }
 
     /**
@@ -70,12 +69,12 @@ public class AndroidGraphics extends AbstractGraphics {
 
     @Override
     public float getCanvasWidth() {
-        return 0;
+        return _canvas.getWidth();
     }
 
     @Override
     public float getCanvasHeight() {
-        return 0;
+        return _canvas.getHeight();
     }
 
     /**
@@ -278,12 +277,15 @@ public class AndroidGraphics extends AbstractGraphics {
         float rX = virtualToRealX(percentX * _virtualX);// Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(percentY * _virtualY);
         float radiusReal = radius  * _virtualX;
-        _canvas.drawCircle((int)(rX - (radiusReal * _scale)),
-                (int)(rY - (radiusReal * _scale)),
-                (int)(radiusReal * 2 * _scale), _paint);
+        _canvas.drawCircle((int)(rX ),
+                (int)(rY ),
+                (int)(radiusReal *  _scale), _paint);
+        /*_canvas.drawCircle((int)percentX,
+                (int)(percentY),
+                (int)(radius), _paint);*/
     }
 
-    /**
+   /**
      * Gestiona los buffers de renderizado y el swap
      * para tener renderizado activo y renderizar el estado de la aplicacion.
      *
@@ -304,9 +306,8 @@ public class AndroidGraphics extends AbstractGraphics {
         }*/
         //_canvas.drawColor(Color.RED);
         clear(255,255,255,255);
-        setColor(180,180,180,255);
-        _canvas.drawRect(new Rect(0,0,_canvas.getWidth(), _canvas.getHeight()),_paint);
         app.render(this);
+        fillOffsets(Color.GRAY);
         _holder.unlockCanvasAndPost(_canvas);
     }
 
@@ -318,5 +319,40 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     SurfaceView getSurfaceView(){
         return _view;
+    }
+
+    private void fillOffsets(int c){
+        if(_verticalCompensation)
+            fillVerticalOffsets(c);
+        else
+            fillHorizontalOffsets(c);
+    }
+
+    //Rellena de blanco por los lados
+    private void fillHorizontalOffsets(int c){
+        _paint.setColor(c);
+        _canvas.drawRect(0,0,(int) virtualToRealX(0),
+                _canvas.getHeight(),
+                _paint);
+
+        _canvas.drawRect((_canvas.getWidth() - _realX)/ 2 + (int)_realX,
+                0,_canvas.getWidth(),
+                _canvas.getHeight(),
+                _paint);
+
+
+    }
+
+    private void fillVerticalOffsets(int c){
+
+        _paint.setColor(c);
+        _canvas.drawRect(0,0,_canvas.getWidth(),
+                (int) virtualToRealY(0),
+                _paint);
+
+        _canvas.drawRect(0,
+                (_canvas.getHeight() - _realY)/ 2 + (int)_realY,
+                _canvas.getWidth(), _canvas.getHeight(),
+                _paint);
     }
 }

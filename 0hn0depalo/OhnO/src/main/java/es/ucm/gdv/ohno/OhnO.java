@@ -118,6 +118,18 @@ public class OhnO implements Application {
             case SELECT: {
                 //renderizar el selector de tamaño de nivel
                 renderSelectSize(g);
+                _YBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
+                _xBoardOffset = (1 - 2 * _YBoardOffset);
+
+                _numCircles = 3;
+                _extraCircle = 1f;   // Círculo fantasma extra para el offset
+                _boardCircleRad = (1 - _xBoardOffset * 2) / (_numCircles + _extraCircle);
+
+              //  g.setColor(255, 0, 0, 255);
+
+              //  g.fillCircle(0, 0, 1f/6f);
+//                g.fillCircle(1, 0, 1f/6f);
+
                 break;
             }
             case GAME: {
@@ -134,6 +146,7 @@ public class OhnO implements Application {
         Font f = g.newFont("Molle-Regular.ttf", fontSize, true);
         g.setColor(0, 0, 0, 255);
         g.setFont(f);
+
         String name = "Oh no";
         g.drawText(name, 0.5f, 0.25f);
 
