@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        _engine = new AndroidEngine(this);
+        _engine = new AndroidEngine(this, 600, 900);
         setContentView(_engine.getContentView());
         Application a = new OhnO(9);
         _engine.setApplication(a);

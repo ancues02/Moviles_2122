@@ -25,19 +25,20 @@ public class AndroidGraphics extends AbstractGraphics {
     private Paint _paint;
     private Canvas _canvas;
 
-    public AndroidGraphics(Context context){
+    public AndroidGraphics(Context context, int virtualWidth, int virtualHeight){
         super();
         _view = new SurfaceView(context);
         _holder = _view.getHolder();
         _paint = new Paint();
 
         _assetsManager = context.getAssets();
+
+        setCanvasDimensions(virtualWidth, virtualHeight);
+
     }
 
     public void adjustCanvasToView(){
-        setCanvasDimensions(600, 900);
         adjustCanvasToSize(_view.getWidth(), _view.getHeight());
-
     }
 
     /**
@@ -69,12 +70,12 @@ public class AndroidGraphics extends AbstractGraphics {
 
     @Override
     public float getCanvasWidth() {
-        return _canvas.getWidth();
+        return _realX;
     }
 
     @Override
     public float getCanvasHeight() {
-        return _canvas.getHeight();
+        return _realY;
     }
 
     /**
@@ -177,9 +178,15 @@ public class AndroidGraphics extends AbstractGraphics {
         AndroidImage ai = (AndroidImage)image;
         Bitmap b = ai.get_bitmap();
 
+        float rX = virtualToRealX(posX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(posY * _virtualY);
+
+        float sX = (ai.getWidth() * scaleX * _scale);
+        float sY = (ai.getHeight() * scaleY * _scale);
+
         _canvas.drawBitmap(b,
                 new Rect(0,0, b.getWidth(), b.getHeight()),
-                new Rect((int)posX, (int)posY, (int)(b.getWidth() * scaleX), (int)(b.getWidth() * scaleY)),
+                new Rect((int)rX, (int)rY, (int)sX, (int)sY),
                 _paint);
     }
 
@@ -230,7 +237,8 @@ public class AndroidGraphics extends AbstractGraphics {
 
 
         af.setBold(isBold);
-        af.setSize(size);
+        
+        af.setSize(size * _scale);
         return af;
     }
 
@@ -245,6 +253,7 @@ public class AndroidGraphics extends AbstractGraphics {
 
         AndroidFont af = (AndroidFont)font;
         _paint.setTypeface(af.get_font());
+        _paint.setTextAlign(Paint.Align.CENTER);
         _paint.setFakeBoldText(af.get_bold());
         _paint.setTextSize(af.get_size());
     }
@@ -290,13 +299,16 @@ public class AndroidGraphics extends AbstractGraphics {
     public void fillCircle(float percentX, float percentY, float radius) {
         float rX = virtualToRealX(percentX * _virtualX);// Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(percentY * _virtualY);
-        float radiusReal = radius  * _virtualX;
+        float radiusReal;
+        if(_aspectRatio < 1)
+            radiusReal = radius  * _virtualX;
+        else
+            radiusReal = radius  * _virtualY;
+
         _canvas.drawCircle((int)(rX ),
                 (int)(rY ),
                 (int)(radiusReal *  _scale), _paint);
-        /*_canvas.drawCircle((int)percentX,
-                (int)(percentY),
-                (int)(radius), _paint);*/
+
     }
 
    /**

@@ -11,8 +11,8 @@ public class DesktopEngine implements Engine {
     private Application _app;
     private long _lastFrameTime;
 
-    public DesktopEngine(){
-        _graphics = new DesktopGraphics(1920, 1080, 600, 900);
+    public DesktopEngine(int width, int height, int virtualWidth, int virtualHeight){
+        _graphics = new DesktopGraphics(width, height, virtualWidth, virtualHeight);
         _input = new DesktopInput(_graphics);
     }
 

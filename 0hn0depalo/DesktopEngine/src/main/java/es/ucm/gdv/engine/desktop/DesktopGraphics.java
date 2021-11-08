@@ -160,7 +160,7 @@ public class DesktopGraphics extends AbstractGraphics {
 
 
         df.setBold(isBold);
-        df.setSize(size);
+        df.setSize(size * _scale);
         return df;
     }
 
@@ -174,6 +174,7 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void drawText(String text, float pX, float pY) {
+
         float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(pY * _virtualY);
 

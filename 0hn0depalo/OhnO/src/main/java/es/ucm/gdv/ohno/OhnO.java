@@ -28,8 +28,8 @@ public class OhnO implements Application {
         _numCircles = tam;
 
         initGame(tam);
-        showLock = false;
-        _currState = GameState.SELECT;
+        showLock = true;
+        _currState = GameState.GAME;
     }
 
 
@@ -144,7 +144,7 @@ public class OhnO implements Application {
     }
     private void renderSelectSize(Graphics g) {
 
-        int fontSize= (int)g.getCanvasWidth() / 5;
+        int fontSize= 120;
         //tamaño tablero
         Font f = g.newFont("Molle-Regular.ttf", fontSize, true);
         g.setColor(0, 0, 0, 255);
@@ -196,9 +196,8 @@ public class OhnO implements Application {
     }
 
     private void renderLevel(Graphics g){
-        float width = g.getWidth(), height = g.getHeight();
 
-        int fontSize= (int)g.getCanvasWidth() / 8;
+        int fontSize= (int)g.getCanvasWidth() / 8;//44
 
         //tamaño tablero
         Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);

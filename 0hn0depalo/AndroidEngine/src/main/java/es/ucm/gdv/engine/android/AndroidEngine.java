@@ -19,8 +19,8 @@ public class AndroidEngine implements Engine, Runnable{
 
     private long _lastFrameTime;
 
-    public AndroidEngine(Context context){
-        _graphics = new AndroidGraphics(context);
+    public AndroidEngine(Context context, int virtualWidth, int virtualHeight){
+        _graphics = new AndroidGraphics(context,virtualWidth,virtualHeight);
         _input = new AndroidInput(_graphics);
     }
 
