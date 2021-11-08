@@ -1,7 +1,9 @@
 package es.ucm.gdv.ohno;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import es.ucm.gdv.engine.*;
@@ -29,6 +31,7 @@ public class OhnO implements Application {
         showLock = false;
         _currState = GameState.SELECT;
     }
+
 
     public void handleInput(List<TouchEvent> e) {
         while(e.size() > 0) {

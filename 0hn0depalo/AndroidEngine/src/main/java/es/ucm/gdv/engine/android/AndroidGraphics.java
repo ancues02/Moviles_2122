@@ -111,7 +111,7 @@ public class AndroidGraphics extends AbstractGraphics {
     }
 
     /**
-     * Devuelve una imagen
+     * Devuelve una imagen. Solo la creamos una vez y la guardamos en un mapa
      *
      * @param filename Nombre del archivo de la imagen
      *
@@ -120,10 +120,16 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public Image newImage(String filename) {
-        AndroidImage ai = new AndroidImage();
-        if(!ai.load(filename, _assetsManager)){
-            return null;
+        AndroidImage ai = null;
+        if(!_images.containsKey(filename)) {
+            ai = new AndroidImage();
+            if (!ai.load(filename, _assetsManager)) {
+                return null;
+            }
+            _images.put(filename,ai);
         }
+        else
+            ai=(AndroidImage) _images.get(filename);
 
         return ai;
     }
@@ -201,7 +207,7 @@ public class AndroidGraphics extends AbstractGraphics {
     }
 
     /**
-     * Devuelve una fuente
+     * Devuelve una fuente. Solo la creamos una vez y la guardamos en un mapa
      *
      * @param filename Nombre del archivo de la fuente
      *
@@ -210,10 +216,18 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public Font newFont(String filename, int size, boolean isBold) {
-        AndroidFont af = new AndroidFont();
-        if(!af.load(filename, _assetsManager)){
-            return null;
+        AndroidFont af = null;
+        if(!_fonts.containsKey(filename)) {
+            af = new AndroidFont();
+
+            if (!af.load(filename, _assetsManager)) {
+                return null;
+            }
+            _fonts.put(filename, af);
         }
+        else
+            af=(AndroidFont)_fonts.get(filename);
+
 
         af.setBold(isBold);
         af.setSize(size);

@@ -82,10 +82,16 @@ public class DesktopGraphics extends AbstractGraphics {
     // Metodo factoria que crea una imagen, devuelve null si no ha podido crearla
     @Override
     public Image newImage(String filename) {
-        DesktopImage di = new DesktopImage();
-        if(!di.load(filename)){
-            return null;
+        DesktopImage di = null;
+        if(!_images.containsKey(filename)) {
+            di = new DesktopImage();
+            if (!di.load(filename )) {
+                return null;
+            }
+            _images.put(filename,di);
         }
+        else
+            di=(DesktopImage) _images.get(filename);
 
         return di;
     }
@@ -140,11 +146,18 @@ public class DesktopGraphics extends AbstractGraphics {
     // Metodo factoria que crea una font, devuelve null si no ha podido crearla
     @Override
     public Font newFont(String filename, int size, boolean isBold) {
+        DesktopFont df = null;
+        if(!_fonts.containsKey(filename)) {
+            df = new DesktopFont();
 
-        DesktopFont df = new DesktopFont();
-        if(!df.load(filename)){
-            return null;
+            if (!df.load(filename)) {
+                return null;
+            }
+            _fonts.put(filename, df);
         }
+        else
+            df=(DesktopFont)_fonts.get(filename);
+
 
         df.setBold(isBold);
         df.setSize(size);
