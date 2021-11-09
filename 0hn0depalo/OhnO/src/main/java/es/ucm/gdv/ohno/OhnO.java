@@ -16,7 +16,7 @@ public class OhnO implements Application {
     private GameState _currState;
 
     private int _numCircles;
-    private float _YBoardOffset;
+    private float _yBoardOffset;
     private float _xBoardOffset;
     private float _boardCircleRad;
     private float _extraCircle;
@@ -45,28 +45,29 @@ public class OhnO implements Application {
         if(e.getType() != TouchType.Press) return;
         float X = e.getX();
         float Y = e.getY();
-        System.out.println(X + "  " + Y);
         switch(_currState) {
             case START: {
                 _currState = GameState.SELECT;
                 break;
             }
             case SELECT: {
-                parseInputSelect(X, Y);
+                parseInputSelect(e);
                 break;
             }
             case GAME: {
-                parseInputGame(X, Y);
+                parseInputGame(e);
                 break;
             }
         }
     }
 
-    private void parseInputSelect(float X, float Y){
+    private void parseInputSelect(TouchEvent e){
+        float X = e.getX();
+        float Y = e.getY();
 
         float col2=_xBoardOffset + _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
         float col3=col2 +_boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
-        if (Y >= _YBoardOffset && Y <= _YBoardOffset + (_boardCircleRad * _aspectRatio)) {
+        if (Y >= _yBoardOffset && Y <= _yBoardOffset + (_boardCircleRad * _aspectRatio)) {
             if (X >= _xBoardOffset && X <= _xBoardOffset + _boardCircleRad ) {
                 _numCircles = 4;
                 initGame(_numCircles);
@@ -81,8 +82,8 @@ public class OhnO implements Application {
                 _currState = GameState.GAME;
             }
             //_currState = GameState.GAME;
-        } else if (Y >= _YBoardOffset + (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)
-                && Y <= _YBoardOffset + (2*_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) {
+        } else if (Y >= _yBoardOffset + (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)
+                && Y <= _yBoardOffset + (2*_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) {
             if (X >= _xBoardOffset && X <= _xBoardOffset + _boardCircleRad ) {
                 _numCircles = 7;
                 initGame(_numCircles);
@@ -110,12 +111,23 @@ public class OhnO implements Application {
 
     /**
      * Actualiza el tablero segun el input que le llega
-     * @param X posicion x donde ha habido un evento
-     * @param Y posicion y donde ha habido un evento
+     * @param e evento
      */
-    private void parseInputGame(float X, float Y){
-        //deteccion input en tablero
+    private void parseInputGame(TouchEvent e){
+        float X = e.getX();
+        float Y = e.getY();
 
+        //deteccion input en tablero
+        float boardY = Y - _yBoardOffset; // La Y "en el tablero"
+        float boardX = X - _xBoardOffset; // La X "en el tablero"
+        int indexY = (int)(boardY / ((_boardCircleRad * _aspectRatio) +
+                ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)));
+        int indexX = (int)(boardX / ((_boardCircleRad) +
+                ((_extraCircle / (_numCircles - 1)) * _boardCircleRad)));
+        if(indexX < _numCircles && indexX >= 0 && indexY < _numCircles && indexY >= 0){ // en tablero
+            activateCell(indexX, indexY, e.isRightMouse());
+            System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
+        }
 
         //deteccion botones de abajo
         float yOffset = 5.5f * 1f/6 ;
@@ -153,8 +165,8 @@ public class OhnO implements Application {
             case SELECT: {
                 //renderizar el selector de tamaño de nivel
                 renderSelectSize(g);
-                _YBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
-                _xBoardOffset = (1 - 2 * _YBoardOffset);
+                _yBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
+                _xBoardOffset = (1 - 2 * _yBoardOffset);
 
                 _numCircles = 3;
                 _extraCircle = 1f;   // Círculo fantasma extra para el offset
@@ -196,13 +208,13 @@ public class OhnO implements Application {
 
         //---------------------pintar los circulos----------------------------
 
-        _YBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
-        _xBoardOffset = (1 - 2 * _YBoardOffset);
+        _yBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
+        _xBoardOffset = (1 - 2 * _yBoardOffset);
 
         _numCircles = 3;
         _extraCircle = 1f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1 - _xBoardOffset * 2) / (_numCircles + _extraCircle);
-        float yPos = _YBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
+        float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
         float xPos = _xBoardOffset + (_boardCircleRad / 2);
         int cont = 4;
         for (int i = 0; i < 2; ++i) {
@@ -247,7 +259,7 @@ public class OhnO implements Application {
 
         //tablero dimensiones
         _xBoardOffset = 0.1f; // 1 - _xStartOffset el final
-        _YBoardOffset = 0.2f;
+        _yBoardOffset = 0.2f;
 
         //tablero
         f.setSize(fontSize/1.5f);
@@ -255,7 +267,7 @@ public class OhnO implements Application {
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
         Image im;
-        float yPos = _YBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
+        float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
         float xPos = _xBoardOffset + (_boardCircleRad / 2);
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
@@ -263,7 +275,6 @@ public class OhnO implements Application {
                     g.setColor(0, 0, 255, 255);
                 else if(board[i+1][j+1].currentState == Square.SquareColor.Red) {
                     g.setColor(255, 0, 0, 255);
-
                 }
                 else
                     g.setColor(150, 150, 150, 255);
@@ -373,17 +384,11 @@ public class OhnO implements Application {
             }
 
         } while (locked.size() == 0);//tablero con al menos dos azules juntos
-        //printSolution();
-        //print();
 
         do {//terminar de crear una solucion valida
             if (!doHint()) {//si no se ha completado el nivel y no se pueden aplicar mas pistas
-                System.out.println("REINICIAR");
                 reStart(false); //añade un rojo y resetea el nivel al principio
-                //printSolution();
             }
-            //print();
-
         } while (!check());
 
 
@@ -790,11 +795,11 @@ public class OhnO implements Application {
                 if(board[i][j].lock && board[i][j].currentState == Square.SquareColor.Blue)
                     System.out.print(board[i][j].total+" ");
                 else if(board[i][j].currentState == Square.SquareColor.Blue)
-                    System.out.print("A ");
+                    System.out.print("A");
                 else if(board[i][j].currentState == Square.SquareColor.Grey)
-                    System.out.print("0 ");
+                    System.out.print("0");
                 else if(board[i][j].currentState == Square.SquareColor.Red)
-                    System.out.print("R ");
+                    System.out.print("R");
             }
             System.out.println();
         }
@@ -997,7 +1002,19 @@ public class OhnO implements Application {
             markShowInRow(i);   //revela los necesarios en filas
             markShowInCol(i);   //revela los nocesarios en columnas
         }
+    }
 
+    private void activateCell(int indexX, int indexY, boolean leftMouse){
+        Square activated = board[indexY+1][indexX+1];
+        if(!activated.lock){
+            if(leftMouse) activated.currentState = Square.SquareColor.values()[
+                    (activated.currentState.ordinal() + 1) % Square.SquareColor.values().length];
+            else{
+                int newIndex = activated.currentState.ordinal() - 1;
+                if(newIndex < 0) newIndex = Square.SquareColor.values().length - 1;
+                activated.currentState = Square.SquareColor.values()[newIndex];
+            }
+        }
     }
 
     private void pruebas(){

@@ -2,7 +2,7 @@ package es.ucm.gdv.ohno;
 
 public class Square {
     public enum SquareColor {
-        Red, Blue, Grey
+        Grey, Blue, Red
     }
 
     public int posX,posY; //posicion en el tablero
