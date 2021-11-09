@@ -23,6 +23,7 @@ public class OhnO implements Application {
     private float _widthImages, _heightImages;
 
     private Square _hintedSquare;
+    private String _hintText;
 
     public OhnO(int tam){
         //_numCircles = tam;
@@ -140,10 +141,7 @@ public class OhnO implements Application {
         float yOffset = 5.5f * 1f/6 ;
         float xOffset = 1f/6 ;
         if(Y >= yOffset - _heightImages/2 && Y <= yOffset + _heightImages/2){
-            System.out.println("He pulsado la Y de las imagenes");
-
             if (X >= 2*xOffset - _widthImages / 2  && X <= 2*xOffset + _widthImages / 2){
-                System.out.println("He pulsado la X");
                 _currState = GameState.SELECT;
             }
             else if (X >= 3*xOffset - _widthImages / 2 && X <= 3*xOffset + _widthImages / 2){
@@ -151,9 +149,8 @@ public class OhnO implements Application {
             }
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
                 if(_hintedSquare == null)
-                    giveHint();
+                    _hintText = giveHint();
                 else _hintedSquare = null;
-                System.out.println("He pulsado la Pista");
             }
         }
     }
@@ -297,7 +294,11 @@ public class OhnO implements Application {
         Font f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
         g.setColor(0,0,0,255);
         g.setFont(f);
-        String text = _numCircles + " x " + _numCircles;
+        String text ="";
+        if(_hintedSquare == null)
+            text = _numCircles + " x " + _numCircles;
+        else
+            text = _hintText;
         g.drawText(text, 1f/2, 0.1f);
 
         //tablero dimensiones
@@ -314,6 +315,10 @@ public class OhnO implements Application {
         float xPos = _xBoardOffset + (_boardCircleRad / 2);
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
+                if(_hintedSquare != null && _hintedSquare == board[i+1][j+1]) {
+                    g.setColor(0, 0, 0, 255);
+                    g.fillCircle(xPos, yPos, (_boardCircleRad / 2) *1.2f);
+                }
                 if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
                     g.setColor(0, 0, 255, 255);
                 else if(board[i+1][j+1].currentState == Square.SquareColor.Red) {
@@ -340,10 +345,10 @@ public class OhnO implements Application {
                     String num = String.valueOf(board[i+1][j+1].total);
                     g.drawText(num, xPos, yPos);
                 }
-                if(_hintedSquare != null && _hintedSquare == board[i+1][j+1]) {
+                /*if(_hintedSquare != null && _hintedSquare == board[i+1][j+1]) {
                     g.setColor(0, 0, 0, 255);
                     g.drawCircle(xPos, yPos, (_boardCircleRad / 2));
-                }
+                }*/
                 xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
             }
             xPos = _xBoardOffset + (_boardCircleRad / 2);
@@ -451,6 +456,8 @@ public class OhnO implements Application {
                 if(board[i][j].currentState != board[i][j].solutionState)
                     return false;
             }
+            countRow(i,true);
+            countCol(i,true);
         }
         if(player) _currState = GameState.SELECT;
         return true;
@@ -530,40 +537,54 @@ public class OhnO implements Application {
         //para poder generar pistas en diferentes casillas cada vez que
         // se llame al metodo (cuando el jugador quiere una pista)
         int pos = rnd.nextInt(locked.size());
-        for(int i = pos; i >= 0 && i != pos - 1 ; i++){
+        int i= pos;
+        do{
             Square s = locked.get(i);
             if(hint1(s,false)){
                 System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 _hintedSquare = s;
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return Hint.CanClose.name();
             }
             else if(hint2(s,false)){
                 System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 _hintedSquare = s;
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return Hint.WouldSeeTooMuch.name();
 
             }
             else if(hint3(s,false)){
                 System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 _hintedSquare = s;
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return Hint.WouldSeeTooLittle.name();
 
             }
             else if(hint4(s)){
                 System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 _hintedSquare = s;
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return Hint.SeesTooMuch.name();
 
             }
             else if(hint5(s)){
                 System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 _hintedSquare = s;
+                countRow(s.posX,true);
+                countCol(s.posY,true);
                 return Hint.SeesToLittle.name();
 
             }
+            i++;
             i %= locked.size();
-        }
-        for(int i = 1; i < board[0].length -1; ++i){
+        }while(i != pos);
+
+        //Si no ha encontrado ninguna pista, se busca poner rojos obligatorios
+        for( i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j) {
                 if(!board[i][j].lock)
                     if(hint6_7(board[i][j], false)) {
@@ -1071,6 +1092,8 @@ public class OhnO implements Application {
                 if(newIndex < 0) newIndex = Square.SquareColor.values().length - 1;
                 activated.currentState = Square.SquareColor.values()[newIndex];
             }
+            countRow(activated.posX,true);
+            countCol(activated.posY,true);
         }else{
             showLock = !showLock;
             //vibrar
