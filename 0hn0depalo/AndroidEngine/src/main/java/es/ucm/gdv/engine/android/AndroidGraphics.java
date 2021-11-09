@@ -10,8 +10,10 @@ import android.graphics.Rect;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import es.ucm.gdv.engine.AbstractGraphics;
-import es.ucm.gdv.engine.Application;
+import es.ucm.gdv.engine.Scene;
 import es.ucm.gdv.engine.Font;
 import es.ucm.gdv.engine.Image;
 
@@ -23,17 +25,16 @@ public class AndroidGraphics extends AbstractGraphics {
     private Paint _paint;
     private Canvas _canvas;
 
-    public AndroidGraphics(Context context, int virtualWidth, int virtualHeight){
+    public AndroidGraphics(AppCompatActivity activity, int virtualWidth, int virtualHeight){
         super();
-        _view = new SurfaceView(context);
+        _view = new SurfaceView(activity);
         _holder = _view.getHolder();
         _paint = new Paint();
 
-
-        _assetsManager = context.getAssets();
-
         setCanvasDimensions(virtualWidth, virtualHeight);
 
+        _assetsManager = activity.getAssets();
+        activity.setContentView(_view);
     }
 
     public void adjustCanvasToView(){
@@ -343,7 +344,8 @@ public class AndroidGraphics extends AbstractGraphics {
      *
      * @param app Aplicacion que se renderiza
      */
-    void render(Application app){
+    @Override
+    public void render(Scene app){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
         //_canvas.scale(_scale,_scale);
@@ -358,7 +360,7 @@ public class AndroidGraphics extends AbstractGraphics {
         }*/
         //_canvas.drawColor(Color.RED);
         clear(255,255,255,255);
-        app.render(this);
+        app.render();
         fillOffsets(Color.GRAY);
         _holder.unlockCanvasAndPost(_canvas);
     }

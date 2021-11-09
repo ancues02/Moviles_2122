@@ -6,7 +6,7 @@ import java.util.Random;
 
 import es.ucm.gdv.engine.*;
 
-public class OhnO implements Application {
+public class OhnO implements Scene {
     private Square[][] board;     // Tablero con todas las casillas
     private List<Square> locked; // Las casillas lockeadas
     private int numGreys, startNumGrey;       //numero de casillas grises, para hacer el porcentaje
@@ -62,6 +62,7 @@ public class OhnO implements Application {
             }
         }
     }
+
     private void parseInputStart(TouchEvent e) {
 
     }

@@ -1,60 +1,18 @@
 package es.ucm.gdv.engine.android;
 
-import android.content.Context;
-import android.content.res.AssetManager;
-import android.view.View;
+import es.ucm.gdv.engine.AbstractEngine;
 
-import es.ucm.gdv.engine.Application;
-import es.ucm.gdv.engine.Engine;
-import es.ucm.gdv.engine.Graphics;
-import es.ucm.gdv.engine.Input;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class AndroidEngine implements Engine, Runnable{
+public class AndroidEngine extends AbstractEngine implements Runnable{
     Thread _gameLoopTh;
     volatile boolean _running;
 
-    private AndroidGraphics _graphics;  // has the SurfaceHolder
-    private AndroidInput _input;
-    private Application _app;
-
-    private long _lastFrameTime;
-
-    public AndroidEngine(Context context, int virtualWidth, int virtualHeight){
-        _graphics = new AndroidGraphics(context,virtualWidth,virtualHeight);
-        _input = new AndroidInput(_graphics);
+    public AndroidEngine(AppCompatActivity activity, int virtualWidth, int virtualHeight){
+        super();
+        _graphics = new AndroidGraphics(activity,virtualWidth,virtualHeight);
+        _input = new AndroidInput((AndroidGraphics)_graphics);
     }
-
-    @Override
-    public Graphics getGraphics() {
-        return _graphics;
-    }
-
-    @Override
-    public Input getInput() {
-        return _input;
-    }
-
-    /*
-    * A la constructora del engine le llega el contexto para crear
-    * el SurfaceView desde Graphics.
-    * Graphics tiene el SurfaceView y lo relacionado con el paint y canvas
-    * GameLoopThread es el thread que implementa en su run el bucle principal
-    * El engine se encarga de gestionar el thread cuando se destruye y se vuelve
-    * a crear la applicacion de android
-    *
-    * class GameLoopThread implements Runnable{
-    * AndroidGraphics _graphics;
-    *
-    * void run(){
-    *   while(_running){
-    *       update();   // calcula el deltaTime y llama al update del app
-    *
-    *       render();   // llama al render de Graphics que se encarga de hacer
-    *                   // lockear el canvas, hacer el render del app y despues el flip
-    *   }
-    * }
-    * }
-    */
 
     public void resume(){
         if (!_running) {
@@ -87,22 +45,7 @@ public class AndroidEngine implements Engine, Runnable{
             }
         }
     }
-    private void handleInput(){
-        _app.handleInput(_input.getTouchEvents());
-    }
 
-    private void update(){
-        long currentTime = System.nanoTime();
-        long nanoElapsedTime = currentTime - _lastFrameTime;
-        _lastFrameTime = currentTime;
-        float elapsedTime = (float) (nanoElapsedTime / 1.0E9);
-
-        _app.update(elapsedTime);
-    }
-
-    private void render(){
-        _graphics.render(_app);
-    }
 
     @Override
     public void run() {
@@ -112,21 +55,8 @@ public class AndroidEngine implements Engine, Runnable{
         }
         while(_running && _graphics.getWidth() == 0)//sleep
             ;
-        _graphics.adjustCanvasToView();
+        ((AndroidGraphics)_graphics).adjustCanvasToView();
         // Ahora si podemos lanzar el bucle
-        _lastFrameTime = System.nanoTime();
-        while(_running) {
-            handleInput();
-            update();
-            render();
-        }
-    }
-
-    public View getContentView(){
-        return _graphics.getSurfaceView();
-    }
-
-    public void setApplication(Application app){
-        _app = app;
+        launch();
     }
 }

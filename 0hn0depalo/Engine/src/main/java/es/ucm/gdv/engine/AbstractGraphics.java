@@ -2,6 +2,15 @@ package es.ucm.gdv.engine;
 
 import java.util.HashMap;
 
+/**
+ * Clase abstracta que implementa Graphics.
+ * Tiene la funcionalidad comun que implementan los
+ * motores graficos de Pc y Android.
+ * Los metodos para el calculo del canvas virtual y el escalado.
+ * Ademas tiene un metodo render que deberan implementar
+ * las clases que lo extiendan, para renderizar la escena proporcionada
+ * por el motor.
+ */
 public abstract class AbstractGraphics implements Graphics{
     protected float _virtualX, _virtualY; // Dimensiones del canvas virtual
     protected float _aspectRatio;       // Relación de aspecto entre X e Y del canvas
@@ -67,4 +76,8 @@ public abstract class AbstractGraphics implements Graphics{
         rY /= _scale;
         return rY / _virtualY;
     }
+
+    abstract public void render(Scene scene);
+
+    //TODO: Color de clear y barras en el engine
 }

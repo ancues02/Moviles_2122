@@ -1,61 +1,18 @@
 package es.ucm.gdv.engine.desktop;
 
-import es.ucm.gdv.engine.Engine;
-import es.ucm.gdv.engine.Application;
-import es.ucm.gdv.engine.Graphics;
-import es.ucm.gdv.engine.Input;
+import es.ucm.gdv.engine.AbstractEngine;
 
-public class DesktopEngine implements Engine {
-    private DesktopGraphics _graphics;
-    private DesktopInput _input;
-    private Application _app;
-    private long _lastFrameTime;
+public class DesktopEngine extends AbstractEngine {
 
     public DesktopEngine(int width, int height, int virtualWidth, int virtualHeight){
+        super();
+        //TODO: No castear.
         _graphics = new DesktopGraphics(width, height, virtualWidth, virtualHeight);
-        _input = new DesktopInput(_graphics);
+        _input = new DesktopInput((DesktopGraphics)_graphics);
     }
-
-    public void setApplication(Application app){
-        _app = app;
-    }
-    public Graphics getGraphics(){
-        return _graphics;
-    };
-
-    public Input getInput(){
-        return _input;
-    };
 
     public void setSize(int width, int height) {
-        _graphics.setSize(width, height);
+        ((DesktopGraphics)_graphics).setSize(width, height);
     }
 
-    //bucle ppal del motor
-    public void run(){
-        _lastFrameTime = System.nanoTime();
-        while(true) {
-            handleInput();
-            update();
-            render();
-        }
-    }
-
-    private void handleInput(){
-        _app.handleInput(_input.getTouchEvents());
-    };
-
-    // Calcula el deltaTime y se lo pasa al update de la aplicacion
-    private void update(){
-        long currentTime = System.nanoTime();
-        long nanoElapsedTime = currentTime - _lastFrameTime;
-        _lastFrameTime = currentTime;
-        float elapsedTime = (float) (nanoElapsedTime / 1.0E9);
-
-        _app.update(elapsedTime);
-    };
-
-    private void render(){
-        _graphics.render(_app);
-    };
 }

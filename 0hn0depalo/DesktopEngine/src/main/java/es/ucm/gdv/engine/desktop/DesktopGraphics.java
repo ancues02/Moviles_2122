@@ -298,14 +298,15 @@ public class DesktopGraphics extends AbstractGraphics {
         adjustCanvasToSize(width, height);
     }
 
-    public void render(Application app) {
+    @Override
+    public void render(Scene app) {
         do {
             do {
                 _graphics = _strategy.getDrawGraphics();
                 try {
                     //System.out.println(_window.getX() + " ahora height " + get_windowY());
                     clear(255, 255, 255, 255);
-                    app.render(this);
+                    app.render();
                     fillOffsets(Color.white);
                 } finally {
                     _graphics.dispose();

@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import es.ucm.gdv.engine.Application;
+import es.ucm.gdv.engine.Scene;
 import es.ucm.gdv.engine.android.AndroidEngine;
 import es.ucm.gdv.ohno.OhnO;
 
@@ -25,9 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
         _engine = new AndroidEngine(this, 600, 900);
-        setContentView(_engine.getContentView());
-        Application a = new OhnO(9);
-        _engine.setApplication(a);
+        Scene a = new OhnO(9);
+        _engine.setScene(a);
         /*int w = _engine.getContentView().getWidth(),
             h = _engine.getContentView().getHeight();*/
     }
