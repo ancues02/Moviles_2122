@@ -13,6 +13,7 @@ import es.ucm.gdv.engine.Image;
 public class AndroidImage implements Image {
     String _name = null;
     Bitmap _bitmap;
+    float _canvasWidth,_canvasHeight;
 
     public AndroidImage(){ }
 
@@ -29,10 +30,10 @@ public class AndroidImage implements Image {
         return true;
     }
 
-    public Bitmap get_bitmap() { return _bitmap; }
+    public Bitmap getBitmap() { return _bitmap; }
 
     @Override
-    public String get_name() {
+    public String getName() {
         return _name;
     }
 
@@ -44,6 +45,20 @@ public class AndroidImage implements Image {
     @Override
     public float getHeight() {
         return _bitmap.getHeight();
+    }
+
+    @Override
+    public float getCanvasWidth() {
+        return _canvasWidth;
+    }
+    @Override
+    public float getCanvasHeight() {
+        return _canvasHeight;
+    }
+
+    public void setCanvasWidthHeight(float width, float height){
+        _canvasHeight = height;
+        _canvasWidth = width;
     }
 
 }

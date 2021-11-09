@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 public class DesktopImage implements Image {
     String _name = null;
     BufferedImage _bufferedImage;
+    float _canvasWidth,_canvasHeight;
 
     public DesktopImage(){ }
 
@@ -26,10 +27,10 @@ public class DesktopImage implements Image {
         return true;
     }
 
-    public BufferedImage get_bufferedImage() { return _bufferedImage; }
+    public BufferedImage getBufferedImage() { return _bufferedImage; }
 
     @Override
-    public String get_name() {
+    public String getName() {
         return _name;
     }
 
@@ -41,5 +42,18 @@ public class DesktopImage implements Image {
     @Override
     public float getHeight() {
         return _bufferedImage.getHeight();
+    }
+
+    @Override
+    public float getCanvasHeight() {
+        return _canvasHeight;
+    }
+    @Override
+    public float getCanvasWidth(){
+        return _canvasWidth;
+    }
+    public void setCanvasWidthHeight(float width, float height){
+        _canvasHeight = height;
+        _canvasWidth = width;
     }
 }

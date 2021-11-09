@@ -1,7 +1,9 @@
 package es.ucm.gdv.engine;
 
 public interface Image {
-    String get_name();
+    String getName();
     float getWidth();
     float getHeight();
+    float getCanvasHeight();
+    float getCanvasWidth();
 }

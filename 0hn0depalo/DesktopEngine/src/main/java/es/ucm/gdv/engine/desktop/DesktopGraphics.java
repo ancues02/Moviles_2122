@@ -108,7 +108,7 @@ public class DesktopGraphics extends AbstractGraphics {
         drawImage(image, scaleX, scaleY, 0, 0);
     }
 
-    // Dibuja una imagen escalada en la posicion dada
+    // Dibuja una imagen escalada con centro en la posicion dada
     @Override
     public void drawImage(Image image, float scaleX, float scaleY, float percentX, float percentY){
         if(image == null) return;
@@ -123,8 +123,8 @@ public class DesktopGraphics extends AbstractGraphics {
 
         //save();
         //_graphics.translate((int)(rX  - (sX/2)), (int)(rY - (sY/2)));
-
-        _graphics.drawImage(bi.get_bufferedImage(),
+        bi.setCanvasWidthHeight(sX/getCanvasWidth()  ,sY/getCanvasHeight() );
+        _graphics.drawImage(bi.getBufferedImage(),
                 (int)(rX  - (sX/2)), (int)(rY - (sY/2)),
                 (int)(sX),
                 (int)(sY),
@@ -134,7 +134,7 @@ public class DesktopGraphics extends AbstractGraphics {
         //_graphics.translate((int)-(rX  - (sX/2)), (int)-(rY - (sY/2)));
     }
 
-    // Dibuja una imagen del tamaño dado en la posicion dada
+    // Dibuja una imagen del tamaño dado con centro en la posicion dada
     @Override
     public void drawImage(Image image, int sizeX, int sizeY, float percentX, float percentY){
         if(image == null) return;
@@ -146,7 +146,7 @@ public class DesktopGraphics extends AbstractGraphics {
 
         _graphics.translate((int)(rX - (sizeX * _scale)/2), (int)(rY - (sizeY * _scale)));
 
-        _graphics.drawImage(bi.get_bufferedImage(), 0, 0,
+        _graphics.drawImage(bi.getBufferedImage(), 0, 0,
                 (int)(sizeX * _scale), (int)(sizeY * _scale),
                 null);
 
@@ -172,7 +172,7 @@ public class DesktopGraphics extends AbstractGraphics {
 
 
         df.setBold(isBold);
-        df.setSize(size * _scale);
+        df.setSize(size /** _scale*/);
         return df;
     }
 

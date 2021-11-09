@@ -145,7 +145,7 @@ public class AndroidGraphics extends AbstractGraphics {
 
         AndroidImage ai = (AndroidImage)image;
 
-        _canvas.drawBitmap(ai.get_bitmap(), 0, 0, _paint);
+        _canvas.drawBitmap(ai.getBitmap(), 0, 0, _paint);
     }
 
     /**
@@ -175,7 +175,7 @@ public class AndroidGraphics extends AbstractGraphics {
 
 
         AndroidImage ai = (AndroidImage)image;
-        Bitmap b = ai.get_bitmap();
+        Bitmap b = ai.getBitmap();
 
         float rX = virtualToRealX(posX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(posY * _virtualY);
@@ -183,6 +183,8 @@ public class AndroidGraphics extends AbstractGraphics {
         float sX = (ai.getWidth() * scaleX * _scale);
         float sY = (ai.getHeight() * scaleY * _scale);
         int aux = (int)(rX  - (sX/2)), aux2=(int)(rY - (sY/2));
+        ai.setCanvasWidthHeight(sX/getCanvasWidth()  ,sY/getCanvasHeight() );
+
         _canvas.drawBitmap(b,
                 null,
                 new Rect(aux,aux2, aux + (int)sX, aux2 + (int)sY),
@@ -203,7 +205,7 @@ public class AndroidGraphics extends AbstractGraphics {
         if(image == null) return;
 
         AndroidImage ai = (AndroidImage)image;
-        Bitmap b = ai.get_bitmap();
+        Bitmap b = ai.getBitmap();
 
         float rX = virtualToRealX(posX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(posY * _virtualY);
@@ -211,6 +213,7 @@ public class AndroidGraphics extends AbstractGraphics {
         float sX = (sizeX* _scale);
         float sY = (sizeY * _scale);
         int aux = (int)(rX  - (sX/2)), aux2=(int)(rY - (sY/2));
+        ai.setCanvasWidthHeight(sX/getCanvasWidth()  ,sY/getCanvasHeight() );
 
         _canvas.drawBitmap(b,
                 null,

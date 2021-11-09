@@ -20,14 +20,15 @@ public class OhnO implements Application {
     private float _xBoardOffset;
     private float _boardCircleRad;
     private float _extraCircle;
+    private float _widthImages, _heightImages;
 
 
     public OhnO(int tam){
-        _numCircles = tam;
+        //_numCircles = tam;
 
-        initGame(tam);
+        //initGame(tam);
         showLock = true;
-        _currState = GameState.GAME;
+        _currState = GameState.SELECT;
     }
 
 
@@ -55,58 +56,84 @@ public class OhnO implements Application {
                 break;
             }
             case GAME: {
-
+                parseInputGame(X, Y);
+                break;
             }
         }
     }
 
     private void parseInputSelect(float X, float Y){
-        float offsetCircles = (_extraCircle / (_numCircles - 1));
-        System.out.println(offsetCircles);
 
-        System.out.println(_YBoardOffset + (_boardCircleRad * _aspectRatio));
-        int tam;
-
+        float col2=_xBoardOffset + _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
+        float col3=col2 +_boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
         if (Y >= _YBoardOffset && Y <= _YBoardOffset + (_boardCircleRad * _aspectRatio)) {
-            System.out.println("He pulsado en la primera fila de ciruclos");
-            /*if (X >= _xBoardOffset && X <= _xBoardOffset + offset) {
-                System.out.println("He pulsado en la primera columna de circulos");
-                tam=4;
-                initGame(tam);
-            } else if (X >= _xBoardOffset + offset && X <= _xBoardOffset + 2 * offset) {
-                tam=5;
-                initGame(tam);
-                System.out.println("He pulsado en la segunda columna de circulos");
-            } else if (X >= _xBoardOffset + 2 * offset && X <= _xBoardOffset + 3 * offset) {
-                System.out.println("He pulsado en la tercera columna de circulos");
-                tam = 6;
-                initGame(tam);
+            if (X >= _xBoardOffset && X <= _xBoardOffset + _boardCircleRad ) {
+                _numCircles = 4;
+                initGame(_numCircles);
+                _currState = GameState.GAME;
+            } else if (X >= col2 && X <= col2+_boardCircleRad) {
+                _numCircles = 5;
+                initGame(_numCircles);
+                _currState = GameState.GAME;
+            } else if (X >= col3 && X <= col3 + _boardCircleRad) {
+                _numCircles = 6;
+                initGame(_numCircles);
+                _currState = GameState.GAME;
             }
-            _currState = GameState.GAME;*/
+            //_currState = GameState.GAME;
         } else if (Y >= _YBoardOffset + (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)
                 && Y <= _YBoardOffset + (2*_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) {
-            System.out.println("He pulsado en la segunda fila de circulos");
-            _currState = GameState.GAME;
-            /*if (X >= 0.2f && X <= 0.4f) {
-                System.out.println("He pulsado en la primera columna de circulos");
-                tam=7;
-                 initGame(tam);
-            } else if (X >= 0.4f && X <= 0.6f) {
-                System.out.println("He pulsado en la segunda columna de circulos");
-                tam = 8;
-                 initGame(tam);
-            } else if (X >= 0.6f && X <= 0.8f) {
-                System.out.println("He pulsado en la tercera columna de circulos");
-                tam = 9;
-                 initGame(tam);
-            }*/
+            if (X >= _xBoardOffset && X <= _xBoardOffset + _boardCircleRad ) {
+                _numCircles = 7;
+                initGame(_numCircles);
+                _currState = GameState.GAME;
+            } else if (X >= col2 && X <= col2+_boardCircleRad) {
+                _numCircles = 8;
+                initGame(_numCircles);
+                _currState = GameState.GAME;
+            } else if (X >= col3 && X <= col3 + _boardCircleRad) {
+                _numCircles = 9;
+                initGame(_numCircles);
+                _currState = GameState.GAME;
+            }
+        }//fin detectar input en circulos
 
+        //detectar input en la cruz
+        float yOffset = 5f * 0.1666f;
+        float xOffset = 0.5f;
+        if(Y >= yOffset - _heightImages/2 && Y <= yOffset + _heightImages/2) {
+            if (X >=  xOffset - _widthImages / 2 && X <=  xOffset + _widthImages / 2) {
+                System.out.println("He pulsado la X");//cerrar el juego o ir al menu principal
+            }
         }
-        //      initGame(tam);
     }
 
+    /**
+     * Actualiza el tablero segun el input que le llega
+     * @param X posicion x donde ha habido un evento
+     * @param Y posicion y donde ha habido un evento
+     */
     private void parseInputGame(float X, float Y){
+        //deteccion input en tablero
 
+
+        //deteccion botones de abajo
+        float yOffset = 5.5f * 1f/6 ;
+        float xOffset = 1f/6 ;
+        if(Y >= yOffset - _heightImages/2 && Y <= yOffset + _heightImages/2){
+            System.out.println("He pulsado la Y de las imagenes");
+
+            if (X >= 2*xOffset - _widthImages / 2  && X <= 2*xOffset + _widthImages / 2){
+                System.out.println("He pulsado la X");
+                _currState = GameState.SELECT;
+            }
+            else if (X >= 3*xOffset - _widthImages / 2 && X <= 3*xOffset + _widthImages / 2){
+                System.out.println("He pulsado deshacer movimiento");
+            }
+            else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
+                System.out.println("He pulsado la Pista");
+            }
+        }
     }
 
     public void update(float deltaTime){
@@ -147,6 +174,7 @@ public class OhnO implements Application {
             }
         }
     }
+
     private void renderSelectSize(Graphics g) {
 
         float fontSize= 120;
@@ -160,7 +188,9 @@ public class OhnO implements Application {
 
         fontSize /= 4;
         f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
+        f.setSize(fontSize);
         g.setFont(f);
+
         String tam = "Elige el tamaño a jugar";
         g.drawText(tam, 0.5f, 0.333f);
 
@@ -184,7 +214,8 @@ public class OhnO implements Application {
                 g.fillCircle(xPos, yPos, _boardCircleRad / 2f);
                 g.setColor(255,255,255,255);
 
-                //f.setSize(fontSize);
+                f.setSize(fontSize);
+                //g.setFont(f);
 
                 String num = ""+(cont++);
                 g.drawText(num, xPos, yPos);
@@ -198,6 +229,8 @@ public class OhnO implements Application {
         float yOffset = 5f * 0.1666f;
         float xOffset = 0.5f;
         Image im = g.newImage("close.png");
+        _widthImages = im.getCanvasWidth();
+        _heightImages = im.getCanvasHeight();
         g.drawImage(im, 1.0f,1.0f, xOffset, yOffset);
     }
 
@@ -277,6 +310,8 @@ public class OhnO implements Application {
         im = g.newImage("history.png");
         g.drawImage(im, 1.0f,1.0f,3*xOffset, yOffset);
         im = g.newImage("eye.png");
+        _widthImages = im.getCanvasWidth();
+        _heightImages = im.getCanvasHeight();
         g.drawImage(im, 1.0f,1.0f,4*xOffset, yOffset);
     }
     
