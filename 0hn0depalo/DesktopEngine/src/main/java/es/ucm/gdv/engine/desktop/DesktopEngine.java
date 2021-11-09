@@ -9,6 +9,7 @@ public class DesktopEngine extends AbstractEngine {
         //TODO: No castear.
         _graphics = new DesktopGraphics(width, height, virtualWidth, virtualHeight);
         _input = new DesktopInput((DesktopGraphics)_graphics);
+        _running = true;
     }
 
     public void setSize(int width, int height) {

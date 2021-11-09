@@ -6,12 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class AndroidEngine extends AbstractEngine implements Runnable{
     Thread _gameLoopTh;
-    volatile boolean _running;
 
     public AndroidEngine(AppCompatActivity activity, int virtualWidth, int virtualHeight){
         super();
         _graphics = new AndroidGraphics(activity,virtualWidth,virtualHeight);
         _input = new AndroidInput((AndroidGraphics)_graphics);
+        _running = false;
     }
 
     public void resume(){
