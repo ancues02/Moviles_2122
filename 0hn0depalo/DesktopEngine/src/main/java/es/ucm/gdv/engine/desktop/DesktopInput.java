@@ -4,8 +4,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-
 import es.ucm.gdv.engine.Input;
 import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
@@ -26,7 +24,7 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
         return _touchEventList;
     }
 
-    private void mouseEvent(MouseEvent mouseEvent, TouchType type){
+    private void addEvent(MouseEvent mouseEvent, TouchType type){
         float posX = _dGraphics.realToVirtualX(mouseEvent.getX());
         float posY = _dGraphics.realToVirtualY(mouseEvent.getY());
         TouchEvent event = new TouchEvent(type, posX, posY, mouseEvent.getID(), (mouseEvent.getButton() == MouseEvent.BUTTON1));
@@ -37,12 +35,12 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
-        mouseEvent(mouseEvent, TouchType.Press);
+        addEvent(mouseEvent, TouchType.Press);
     }
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-        mouseEvent(mouseEvent, TouchType.Release);
+        addEvent(mouseEvent, TouchType.Release);
     }
 
     @Override
@@ -57,7 +55,7 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
 
     @Override
     public void mouseDragged(MouseEvent mouseEvent) {
-        mouseEvent(mouseEvent, TouchType.Drag);
+        addEvent(mouseEvent, TouchType.Drag);
     }
 
     @Override

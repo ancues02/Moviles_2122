@@ -88,7 +88,7 @@ public class AndroidEngine implements Engine, Runnable{
         }
     }
     private void handleInput(){
-
+        _app.handleInput(_input.getTouchEvents());
     }
 
     private void update(){

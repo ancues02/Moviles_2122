@@ -29,7 +29,7 @@ public class OhnO implements Application {
 
         //initGame(tam);
         showLock = false;
-        _currState = GameState.START;
+        _currState = GameState.SELECT;
     }
 
 
@@ -44,6 +44,7 @@ public class OhnO implements Application {
 
     private void processInput(TouchEvent e){
         if(e.getType() != TouchType.Press) return;
+        System.out.println("Oulsado");
         float X = e.getX();
         float Y = e.getY();
         switch(_currState) {

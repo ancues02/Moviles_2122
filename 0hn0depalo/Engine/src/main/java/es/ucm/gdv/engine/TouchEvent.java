@@ -1,6 +1,10 @@
 package es.ucm.gdv.engine;
 
 public class TouchEvent {
+    public TouchEvent(){
+
+    }
+
     public TouchEvent ( TouchType typeOf, float x, float y, int fingerId, boolean leftMouse){
         _typeOf = typeOf;
         _x = x;
