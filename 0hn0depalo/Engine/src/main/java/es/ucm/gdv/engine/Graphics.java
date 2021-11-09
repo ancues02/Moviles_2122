@@ -23,5 +23,6 @@ public interface Graphics {
     void drawText(String text, float x, float y);
 
     void setColor(int r, int g, int b, int a);
+    void drawCircle(float cx, float cy, float radius);
     void fillCircle(float cx, float cy, float radius);
 }

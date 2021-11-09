@@ -22,12 +22,13 @@ public class OhnO implements Application {
     private float _extraCircle;
     private float _widthImages, _heightImages;
 
+    private Square _hintedSquare;
 
     public OhnO(int tam){
         //_numCircles = tam;
 
         //initGame(tam);
-        showLock = true;
+        showLock = false;
         _currState = GameState.SELECT;
     }
 
@@ -105,6 +106,7 @@ public class OhnO implements Application {
         if(Y >= yOffset - _heightImages/2 && Y <= yOffset + _heightImages/2) {
             if (X >=  xOffset - _widthImages / 2 && X <=  xOffset + _widthImages / 2) {
                 System.out.println("He pulsado la X");//cerrar el juego o ir al menu principal
+
             }
         }
     }
@@ -127,6 +129,7 @@ public class OhnO implements Application {
         if(indexX < _numCircles && indexX >= 0 && indexY < _numCircles && indexY >= 0){ // en tablero
             activateCell(indexX, indexY, e.isRightMouse());
             System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
+            check(true);
         }
 
         //deteccion botones de abajo
@@ -143,6 +146,9 @@ public class OhnO implements Application {
                 System.out.println("He pulsado deshacer movimiento");
             }
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
+                if(_hintedSquare == null)
+                    giveHint();
+                else _hintedSquare = null;
                 System.out.println("He pulsado la Pista");
             }
         }
@@ -283,7 +289,8 @@ public class OhnO implements Application {
                 g.fillCircle(xPos, yPos, (_boardCircleRad / 2));
 
                 //candado en los rojos lockeados
-                if(showLock && board[i+1][j+1].currentState == Square.SquareColor.Red){
+                if(showLock && board[i+1][j+1].lock &&
+                        board[i+1][j+1].currentState == Square.SquareColor.Red){
                     //
                     im = g.newImage("lock.png");
                     g.drawImage(im, 0.55f,0.55f, xPos, yPos);
@@ -295,6 +302,10 @@ public class OhnO implements Application {
 
                     String num = String.valueOf(board[i+1][j+1].total);
                     g.drawText(num, xPos, yPos);
+                }
+                if(_hintedSquare != null && _hintedSquare == board[i+1][j+1]) {
+                    g.setColor(0, 0, 0, 255);
+                    g.drawCircle(xPos, yPos, (_boardCircleRad / 2));
                 }
                 xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
             }
@@ -389,7 +400,7 @@ public class OhnO implements Application {
             if (!doHint()) {//si no se ha completado el nivel y no se pueden aplicar mas pistas
                 reStart(false); //añade un rojo y resetea el nivel al principio
             }
-        } while (!check());
+        } while (!check(false));
 
 
         reStart(true);
@@ -397,13 +408,14 @@ public class OhnO implements Application {
     }
 
     // Comprueba si se ha solucionado
-    public boolean check(){
+    public boolean check(boolean player){
         for(int i = 1; i < board[0].length -1; ++i) {
             for (int j = 1; j < board[1].length - 1; ++j) {
                 if(board[i][j].currentState != board[i][j].solutionState)
                     return false;
             }
         }
+        if(player) _currState = GameState.SELECT;
         return true;
     }
 
@@ -485,25 +497,30 @@ public class OhnO implements Application {
             Square s = locked.get(i);
             if(hint1(s,false)){
                 System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                _hintedSquare = s;
                 return Hint.CanClose.name();
             }
             else if(hint2(s,false)){
                 System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                _hintedSquare = s;
                 return Hint.WouldSeeTooMuch.name();
 
             }
             else if(hint3(s,false)){
                 System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                _hintedSquare = s;
                 return Hint.WouldSeeTooLittle.name();
 
             }
             else if(hint4(s)){
                 System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                _hintedSquare = s;
                 return Hint.SeesTooMuch.name();
 
             }
             else if(hint5(s)){
                 System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
+                _hintedSquare = s;
                 return Hint.SeesToLittle.name();
 
             }
@@ -513,8 +530,10 @@ public class OhnO implements Application {
             for(int j = 1; j < board[1].length -1; ++j) {
                 if(!board[i][j].lock)
                     if(hint6_7(board[i][j], false)) {
+                        _hintedSquare = (board[i][j]);
                         System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
                                 + " " + (board[i][j].posY - 1));
+
                         if(board[i][j].currentState == Square.SquareColor.Blue)
                             return Hint.MustBeRedBlue.name();
                         return Hint.MustBeRedGrey.name();
@@ -1005,6 +1024,7 @@ public class OhnO implements Application {
     }
 
     private void activateCell(int indexX, int indexY, boolean leftMouse){
+        if(_hintedSquare != null) _hintedSquare = null;
         Square activated = board[indexY+1][indexX+1];
         if(!activated.lock){
             if(leftMouse) activated.currentState = Square.SquareColor.values()[
@@ -1014,6 +1034,9 @@ public class OhnO implements Application {
                 if(newIndex < 0) newIndex = Square.SquareColor.values().length - 1;
                 activated.currentState = Square.SquareColor.values()[newIndex];
             }
+        }else{
+            showLock = !showLock;
+            //vibrar
         }
     }
 

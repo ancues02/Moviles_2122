@@ -295,6 +295,26 @@ public class AndroidGraphics extends AbstractGraphics {
         _paint.setColor(colorBitshift(r, g, b, a));
     }
 
+    @Override
+    public void drawCircle(float percentX, float percentY, float radius) {
+        float rX = virtualToRealX(percentX * _virtualX);// Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY);
+        float radiusReal;
+        if(_aspectRatio < 1)
+            radiusReal = radius  * _virtualX;
+        else
+            radiusReal = radius  * _virtualY;
+
+        Paint.Style prevStyle = _paint.getStyle();
+        _paint.setStyle(Paint.Style.STROKE);
+        
+        _canvas.drawCircle((int)(rX ),
+                (int)(rY ),
+                (int)(radiusReal *  _scale), _paint);
+
+        _paint.setStyle(prevStyle);
+    }
+
     /**
      * Dibuja un circulo en pantalla
      *
@@ -311,7 +331,6 @@ public class AndroidGraphics extends AbstractGraphics {
             radiusReal = radius  * _virtualX;
         else
             radiusReal = radius  * _virtualY;
-
         _canvas.drawCircle((int)(rX ),
                 (int)(rY ),
                 (int)(radiusReal *  _scale), _paint);

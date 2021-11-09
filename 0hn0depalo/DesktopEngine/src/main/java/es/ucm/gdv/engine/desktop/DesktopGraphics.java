@@ -184,8 +184,6 @@ public class DesktopGraphics extends AbstractGraphics {
         df.setSize(df.getSize()*_scale);
         df.setBold(df.getBold());
         _graphics.setFont(df.getFont());
-
-
     }
 
     @Override
@@ -214,6 +212,17 @@ public class DesktopGraphics extends AbstractGraphics {
     }
 
     @Override
+    public void drawCircle(float percentX, float percentY, float radius) {
+        float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
+        float rY = virtualToRealY(percentY * _virtualY);
+        float radiusReal = radius  * _virtualX;
+        _graphics.drawOval((int)(rX - (radiusReal * _scale)),
+                (int)(rY - (radiusReal * _scale)),
+                (int)(radiusReal * 2 * _scale),
+                (int)(radiusReal * 2 * _scale));
+    }
+
+    @Override
     public void fillCircle(float percentX, float percentY, float radius) {
         //setColor(255, 0, 0, 255);
         float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
@@ -231,8 +240,6 @@ public class DesktopGraphics extends AbstractGraphics {
 
         _window.setSize(x, y);
         _window.setIgnoreRepaint(true);
-        //_window.setExtendedState(JFrame.MAXIMIZED_BOTH);  // FULLSCREEN
-        //_window.setUndecorated(true);
         _window.setVisible(true);
         _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
