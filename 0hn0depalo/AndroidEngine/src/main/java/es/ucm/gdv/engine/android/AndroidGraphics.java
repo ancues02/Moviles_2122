@@ -245,7 +245,7 @@ public class AndroidGraphics extends AbstractGraphics {
 
 
         af.setBold(isBold);
-        af.setSize(size * _scale);
+        af.setSize(size );
         return af;
     }
 

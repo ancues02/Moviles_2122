@@ -52,11 +52,11 @@ public class DesktopGraphics extends AbstractGraphics {
         _graphics.fillRect(0, 0, _window.getWidth(), _window.getHeight());
 
         // TODO: Quitar esto para no ver el canvas virtual
-        float rX = virtualToRealX(0);     // Se ajusta a la escala puesta al canvas
+        /*float rX = virtualToRealX(0);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(0);
         _graphics.setColor(new Color(180, 180, 180, 255));
         _graphics.fillRect((int) rX, (int) rY,
-                (int) _realX, (int) _realY);
+                (int) _realX, (int) _realY);*/
     }
 
     @Override
@@ -144,13 +144,16 @@ public class DesktopGraphics extends AbstractGraphics {
         float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(percentY * _virtualY);
 
-        _graphics.translate((int)(rX - (sizeX * _scale)/2), (int)(rY - (sizeY * _scale)));
+        float sX = (sizeX * _scale);
+        float sY = (sizeY * _scale);
 
-        _graphics.drawImage(bi.getBufferedImage(), 0, 0,
-                (int)(sizeX * _scale), (int)(sizeY * _scale),
+
+        _graphics.drawImage(bi.getBufferedImage(), (int)(rX  - (sX/2)), (int)(rY - (sY/2)),
+                (int)(sX),
+                (int)(sY),
                 null);
 
-        _graphics.translate((int) -(rX - (sizeX * _scale)/2), (int) -(rY - (sizeY * _scale)));
+        //_graphics.translate((int) -(rX - (sizeX * _scale)/2), (int) -(rY - (sizeY * _scale)));
     }
 
     // Metodos sobre fonts

@@ -29,7 +29,7 @@ public class OhnO implements Application {
 
         //initGame(tam);
         showLock = false;
-        _currState = GameState.SELECT;
+        _currState = GameState.START;
     }
 
 
@@ -48,7 +48,7 @@ public class OhnO implements Application {
         float Y = e.getY();
         switch(_currState) {
             case START: {
-                _currState = GameState.SELECT;
+                parseInputStart(e);
                 break;
             }
             case SELECT: {
@@ -60,6 +60,9 @@ public class OhnO implements Application {
                 break;
             }
         }
+    }
+    private void parseInputStart(TouchEvent e) {
+
     }
 
     private void parseInputSelect(TouchEvent e){
@@ -166,6 +169,7 @@ public class OhnO implements Application {
     public void render(Graphics g){
         switch (_currState){
             case START: {
+                renderStartMenu(g);
                 break;
             }
             case SELECT: {
@@ -192,12 +196,44 @@ public class OhnO implements Application {
             }
         }
     }
+    private void renderStartMenu(Graphics g) {
+        float fontSize= 120;
+        //tamaño tablero
+        Font f = g.newFont("Molle-Regular.ttf", fontSize, false);
+        g.setColor(0, 0, 0, 255);
+        g.setFont(f);
+
+
+        String name = "Oh no";
+        g.drawText(name, 0.5f, 0.25f);
+
+        f = g.newFont("JosefinSans-Bold.ttf", fontSize, true);
+        f.setSize(fontSize);
+        g.setFont(f);
+        name = "Jugar";
+        g.drawText(name, 0.5f, 0.5f);
+
+
+        g.setColor(180, 180, 180, 255);
+
+        f.setSize(fontSize/4);
+        g.setFont(f);
+        name = "Un juego copiado a Q42";
+        g.drawText(name, 0.5f, 0.75f);
+        name = "Creado por Martin Kool";
+        g.drawText(name, 0.5f, 0.80f);
+
+        Image im = g.newImage("q42.png");
+        _widthImages = im.getCanvasWidth();
+        _heightImages = im.getCanvasHeight();
+        g.drawImage(im, 64,64, 0.5f, 0.90f);
+    }
 
     private void renderSelectSize(Graphics g) {
 
         float fontSize= 120;
         //tamaño tablero
-        Font f = g.newFont("Molle-Regular.ttf", fontSize, true);
+        Font f = g.newFont("Molle-Regular.ttf", fontSize, false);
         g.setColor(0, 0, 0, 255);
         g.setFont(f);
 
