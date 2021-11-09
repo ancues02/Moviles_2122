@@ -30,12 +30,22 @@ public class OhnO_Game extends AbstractScene {
 
     private List<Square> locked; // Las casillas lockeadas
     private Square _hintedSquare;
-    private String _hintText;
 
     private int numGreys, startNumGrey;       //numero de casillas grises, para hacer el porcentaje
     private boolean showLock;   //booleano para mostrar o no el candado en los rojos
 
     private float _widthImages, _heightImages;
+
+    // Tiempo que tardan los textos en hacer el fade
+    private float _textFadeTime = 1.0f;
+
+    private String _sizeText;
+    private float _sizeTextAlpha = 0.0f;
+    private int _sizeTextFadeFactor = 1;    // 1 = fadeIn // -1 = fadeOut
+
+    private String _hintText;
+    private float _hintTextAlpha = 0.0f;
+    private int _hintTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     public OhnO_Game(int num){
         _numCircles = num;
@@ -49,7 +59,8 @@ public class OhnO_Game extends AbstractScene {
         _input = _engine.getInput();
         _fontMolle = _graphics.newFont("Molle-Regular.ttf", _fontSize, false);
         _fontJose = _graphics.newFont("JosefinSans-Bold.ttf", _fontSize, false);
-
+        _sizeText = _numCircles + " x " + _numCircles;
+        _hintText = "";
     }
 
     @Override
@@ -92,16 +103,35 @@ public class OhnO_Game extends AbstractScene {
                 System.out.println("He pulsado deshacer movimiento");
             }
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
-                if(_hintedSquare == null)
+                if(_hintedSquare == null) {
                     _hintText = giveHint();
-                else _hintedSquare = null;
+                    _sizeTextFadeFactor = -1;
+                    _hintTextFadeFactor = 1;
+                }
+                else{
+                    _sizeTextFadeFactor = 1;
+                    _hintTextFadeFactor = -1;
+                }
             }
         }
     }
 
     @Override
     public void update(float deltaTime) {
+        // Texto del tamano del tablero
+        _sizeTextAlpha += _sizeTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
 
+        // Clamp
+        _sizeTextAlpha = Math.max(0, _sizeTextAlpha);
+        _sizeTextAlpha = Math.min(_sizeTextAlpha, 255);
+
+
+        // Texto de las hints
+        _hintTextAlpha += _hintTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
+
+        // Clamp
+        _hintTextAlpha = Math.max(0, _hintTextAlpha);
+        _hintTextAlpha = Math.min(_hintTextAlpha, 255);
     }
 
     @Override
@@ -112,14 +142,16 @@ public class OhnO_Game extends AbstractScene {
         Font f = _fontJose;
         f.setBold(true);
         f.setSize(fontSize);
-        _graphics.setColor(0,0,0,255);
         _graphics.setFont(f);
-        String text ="";
-        if(_hintedSquare == null)
-            text = _numCircles + " x " + _numCircles;
-        else
-            text = _hintText;
-        _graphics.drawText(text, 1f/2, 0.1f);
+
+        // Escribe el tamaño del tablero
+        _graphics.setColor(0,0,0,(int)_sizeTextAlpha);
+        _graphics.drawText(_sizeText, 1f/2, 0.1f);
+
+        // Escribe la pista
+        _graphics.setColor(0,0,0,(int)_hintTextAlpha);
+        _graphics.drawText(_hintText, 1f/2, 0.1f);
+
 
         //tablero dimensiones
         _xBoardOffset = 0.1f; // 1 - _xStartOffset el final
