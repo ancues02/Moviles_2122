@@ -18,13 +18,17 @@ public class OhnO_Game extends AbstractScene {
     /**
      * Clase para tener una casilla y su alpha para ser dibujado
      * Solo la usamos aqui y por la unica razon de que no hay
-     * parejas mutables aqui asiq hacemos esto.
+     * parejas mutables aqui asique hacemos esto.
      */
-    private class SquareAlpha{
-        public SquareAlpha(Square s, float f){
-            square = s; alpha = f;
+    private class FadeOutSquare {
+        public FadeOutSquare(Square.SquareColor s, int x, int y, float f){
+            this.color = s;
+            this.x = x;
+            this.y = y;
+            this.alpha = f;
         }
-        public Square square;
+        public Square.SquareColor color;
+        public int x, y;
         public float alpha;
     }
 
@@ -63,7 +67,9 @@ public class OhnO_Game extends AbstractScene {
     private int _hintTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     private float _squaresFadeTime = 1.0f;
-    private List<SquareAlpha> _fadingSquares;
+    private List<FadeOutSquare> _fadingSquares;
+    // TPVI efectivamente
+    private List<Integer> _fadingSquaresToRemove;
 
     private Stack<TouchEvent> oppositeMoves = new Stack<TouchEvent>();
 
@@ -82,6 +88,7 @@ public class OhnO_Game extends AbstractScene {
         _sizeText = _numCircles + " x " + _numCircles;
         _hintText = "";
         _fadingSquares = new LinkedList<>();
+        _fadingSquaresToRemove = new LinkedList<>();
     }
 
     @Override
@@ -108,6 +115,8 @@ public class OhnO_Game extends AbstractScene {
         int indexX = (int)(boardX / ((_boardCircleRad) +
                 ((_extraCircle / (_numCircles - 1)) * _boardCircleRad)));
         if(indexX < _numCircles && indexX >= 0 && indexY < _numCircles && indexY >= 0){ // en tablero
+            // TODO: Mirar como hacer esto de las casillas
+            _fadingSquares.add(new FadeOutSquare(board[indexX][indexY].currentState, indexX, indexY, 255.0f));
             activateCell(indexX, indexY, e.isRightMouse(), true);
             System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
             check(true);
@@ -140,7 +149,6 @@ public class OhnO_Game extends AbstractScene {
         }
     }
 
-    private float seconds = 0;
     @Override
     public void update(float deltaTime) {
         // Texto del tamano del tablero
@@ -153,16 +161,25 @@ public class OhnO_Game extends AbstractScene {
         _hintTextAlpha = clamp(_hintTextAlpha, 0.0f, 255.0f);
 
         // Casillas que se esten animando
-        for(SquareAlpha sa: _fadingSquares){
-           sa.alpha -= (deltaTime * (255.0f / _squaresFadeTime));
+        FadeOutSquare fsq;
+        for(int i = 0; i < _fadingSquares.size(); i++){
+            fsq = _fadingSquares.get(i);
+            fsq.alpha -= (deltaTime * (255.0f / _squaresFadeTime));
+            if(fsq.alpha <= 0.0f)
+               _fadingSquaresToRemove.add(i);
         }
+        // TPVI otra vez
+        for(Integer ind: _fadingSquaresToRemove){
+            _fadingSquares.remove(_fadingSquares.get(ind));
+        }
+        _fadingSquaresToRemove.clear();
     }
 
     @Override
     public void render() {
-        float fontSize= 45;//44
+        float fontSize= 45;
 
-        //tamaño tablero
+        // Tamaño del tablero
         Font f = _fontJose;
         f.setBold(true);
         f.setSize(fontSize);
@@ -177,11 +194,11 @@ public class OhnO_Game extends AbstractScene {
         _graphics.drawText(_hintText, 1f/2, 0.1f);
 
 
-        //tablero dimensiones
+        // Dimensiones del tablero
         _xBoardOffset = 0.1f; // 1 - _xStartOffset el final
         _yBoardOffset = 0.2f;
 
-        //tablero
+        // Dibujar tablero
         f.setSize(fontSize/1.5f);
         _graphics.setFont(f);
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
@@ -189,6 +206,7 @@ public class OhnO_Game extends AbstractScene {
         Image im;
         float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
         float xPos = _xBoardOffset + (_boardCircleRad / 2);
+        Square boardSquare;
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
                 if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
@@ -197,36 +215,24 @@ public class OhnO_Game extends AbstractScene {
                     if(_hintTextAlpha == 0)
                         _hintedSquareCircle=null;
                 }
-                if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
-                    _graphics.setColor(0, 0, 255, 255);
-                else if(board[i+1][j+1].currentState == Square.SquareColor.Red) {
-                    _graphics.setColor(255, 0, 0, 255);
-                }
-                else
-                    _graphics.setColor(150, 150, 150, 255);
-
-                //float yPos = i* rad*2 + rad + offsetCircles*(i+1) + yOffset;
+                // Dibujar la casilla
+                boardSquare = board[i+1][j+1];
+                _graphics.setColor(boardSquare.currentState.getR(), boardSquare.currentState.getG(), boardSquare.currentState.getB(), 255);
                 _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2));
 
-                //candado en los rojos lockeados
-                if(_showLock && board[i+1][j+1].lock &&
-                        board[i+1][j+1].currentState == Square.SquareColor.Red){
-                    //
+                // Dibujar el candado en los rojos lockeados
+                if(_showLock && boardSquare.lock && boardSquare.currentState == Square.SquareColor.Red){
                     im = _graphics.newImage("lock.png");
                     _graphics.drawImage(im, 0.55f,0.55f, xPos, yPos);
                 }
-                //numeros en los azules lockeados
 
-                else if(board[i+1][j+1].lock && board[i+1][j+1].solutionState == Square.SquareColor.Blue){
+                // Dibujar los numeros en los azules lockeados
+                else if(boardSquare.lock && board[i+1][j+1].solutionState == Square.SquareColor.Blue){
                     _graphics.setColor(255,255,255,255);
 
                     String num = String.valueOf(board[i+1][j+1].total);
                     _graphics.drawText(num, xPos, yPos);
                 }
-                /*if(_hintedSquare != null && _hintedSquare == board[i+1][j+1]) {
-                    g.setColor(0, 0, 0, 255);
-                    g.drawCircle(xPos, yPos, (_boardCircleRad / 2));
-                }*/
                 xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
             }
             xPos = _xBoardOffset + (_boardCircleRad / 2);
@@ -234,7 +240,7 @@ public class OhnO_Game extends AbstractScene {
 
         }//fin tablero
 
-        //porcentaje
+        // Dibujar el porcentaje
         f.setSize(fontSize/1.5f);
         _graphics.setFont(f);
         _graphics.setColor(150,150,150,255);
@@ -244,7 +250,7 @@ public class OhnO_Game extends AbstractScene {
         _graphics.drawText(num, (1f/2),(1/6f * 4.75f));
 
 
-        //imagenes abajo, un tercio de la pantalla
+        // Dibujar las imagenes de la interfaz en el  tercio inferior de la pantalla
         float yOffset = 5.5f * 1f/6;
         float xOffset = 1f/6;
         im = _graphics.newImage("close.png");
@@ -258,19 +264,13 @@ public class OhnO_Game extends AbstractScene {
 
         // Dibujar el fade out de las casillas pulsadas
         float cx, cy;
-        for(SquareAlpha sa: _fadingSquares){
-            cx = _xBoardOffset + (_boardCircleRad / 2) + (_boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad) * sa.square.posX;
+        for(FadeOutSquare s: _fadingSquares){
+            cx = _xBoardOffset + (_boardCircleRad / 2) + (_boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad) * s.x;
             cy = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2)
-                    + ((_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) * sa.square.posY;
+                    + ((_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) * s.y;
 
-            if(sa.square.currentState == Square.SquareColor.Blue)
-                _graphics.setColor(0, 0, 255, 255);
-            else if (sa.square.currentState == Square.SquareColor.Red)
-                _graphics.setColor(255, 0, 0, 255);
-            else
-                _graphics.setColor(180, 180, 180, 255);
-
-            _graphics.drawCircle(cx, cy,_boardCircleRad / 2);
+            _graphics.setColor(s.color.getR(), s.color.getG(), s.color.getB(), (int)s.alpha);
+            _graphics.fillCircle(cx, cy,_boardCircleRad / 2);
         }
 
     }
