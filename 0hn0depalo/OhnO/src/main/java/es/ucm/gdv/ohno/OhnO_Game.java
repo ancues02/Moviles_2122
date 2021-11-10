@@ -3,6 +3,7 @@ package es.ucm.gdv.ohno;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 
 import es.ucm.gdv.engine.AbstractScene;
 import es.ucm.gdv.engine.Font;
@@ -48,6 +49,8 @@ public class OhnO_Game extends AbstractScene {
     private float _hintTextAlpha = 0.0f;
     private int _hintTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
+    private Stack<TouchEvent> oppositeMoves = new Stack<TouchEvent>();
+
     public OhnO_Game(int num){
         _numCircles = num;
         initGame();
@@ -88,7 +91,7 @@ public class OhnO_Game extends AbstractScene {
         int indexX = (int)(boardX / ((_boardCircleRad) +
                 ((_extraCircle / (_numCircles - 1)) * _boardCircleRad)));
         if(indexX < _numCircles && indexX >= 0 && indexY < _numCircles && indexY >= 0){ // en tablero
-            activateCell(indexX, indexY, e.isRightMouse());
+            activateCell(indexX, indexY, e.isRightMouse(), true);
             System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
             check(true);
         }
@@ -101,7 +104,8 @@ public class OhnO_Game extends AbstractScene {
                 _engine.setScene(new OhnO_SelectSize());
             }
             else if (X >= 3*xOffset - _widthImages / 2 && X <= 3*xOffset + _widthImages / 2){
-                System.out.println("He pulsado deshacer movimiento");
+                //System.out.println("He pulsado deshacer movimiento");
+                undoMove();
             }
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
                 if(_hintedSquare == null) {
@@ -941,7 +945,7 @@ public class OhnO_Game extends AbstractScene {
         }
     }
 
-    private void activateCell(int indexX, int indexY, boolean leftMouse){
+    private void activateCell(int indexX, int indexY, boolean leftMouse, boolean recordMove){
         if(_hintedSquare != null) _hintedSquare = null;
         Square activated = board[indexY+1][indexX+1];
         if(activated.currentState == Square.SquareColor.Grey)//vamos a quitar un gris
@@ -959,9 +963,19 @@ public class OhnO_Game extends AbstractScene {
                 _numGreys++;
             countRow(activated.posX,true);
             countCol(activated.posY,true);
+            // Se añade un movimienot CONTRARIO (!leftMouse) al stack
+            if(recordMove)
+                oppositeMoves.add(new TouchEvent(TouchType.Press, indexX, indexY, 0, !leftMouse));
         }else{
             _showLock = !_showLock;
             //vibrar
+        }
+    }
+
+    private void undoMove(){
+        if(oppositeMoves.size() > 0) {
+            TouchEvent e = oppositeMoves.pop();
+            activateCell((int) e.getX(), (int) e.getY(), e.isRightMouse(), false);
         }
     }
 
