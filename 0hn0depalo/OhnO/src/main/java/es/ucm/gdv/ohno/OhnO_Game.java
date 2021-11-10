@@ -30,9 +30,10 @@ public class OhnO_Game extends AbstractScene {
 
     private List<Square> locked; // Las casillas lockeadas
     private Square _hintedSquare;
+    private Square _hintedSquareCircle;//para poder hacer el fadeOut de la pista
 
-    private int numGreys, startNumGrey;       //numero de casillas grises, para hacer el porcentaje
-    private boolean showLock;   //booleano para mostrar o no el candado en los rojos
+    private int _numGreys, _startNumGrey;       //numero de casillas grises, para hacer el porcentaje
+    private boolean _showLock;   //booleano para mostrar o no el candado en los rojos
 
     private float _widthImages, _heightImages;
 
@@ -50,7 +51,7 @@ public class OhnO_Game extends AbstractScene {
     public OhnO_Game(int num){
         _numCircles = num;
         initGame();
-        showLock = false;
+        _showLock = false;
     }
     @Override
     public void start() {
@@ -105,10 +106,12 @@ public class OhnO_Game extends AbstractScene {
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
                 if(_hintedSquare == null) {
                     _hintText = giveHint();
+                    _hintedSquareCircle = _hintedSquare;
                     _sizeTextFadeFactor = -1;
                     _hintTextFadeFactor = 1;
                 }
                 else{
+                    _hintedSquare = null;
                     _sizeTextFadeFactor = 1;
                     _hintTextFadeFactor = -1;
                 }
@@ -119,7 +122,7 @@ public class OhnO_Game extends AbstractScene {
     @Override
     public void update(float deltaTime) {
         // Texto del tamano del tablero
-        _sizeTextAlpha += _sizeTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
+        _sizeTextAlpha += 5*_sizeTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
 
         // Clamp
         _sizeTextAlpha = Math.max(0, _sizeTextAlpha);
@@ -127,7 +130,7 @@ public class OhnO_Game extends AbstractScene {
 
 
         // Texto de las hints
-        _hintTextAlpha += _hintTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
+        _hintTextAlpha += 5*_hintTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
 
         // Clamp
         _hintTextAlpha = Math.max(0, _hintTextAlpha);
@@ -167,9 +170,11 @@ public class OhnO_Game extends AbstractScene {
         float xPos = _xBoardOffset + (_boardCircleRad / 2);
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
-                if(_hintedSquare != null && _hintedSquare == board[i+1][j+1]) {
-                    _graphics.setColor(0, 0, 0, 255);
-                    _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2) *1.2f);
+                if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
+                    _graphics.setColor(0, 0, 0, (int)_hintTextAlpha);
+                    _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2) *1.1f);
+                    if(_hintTextAlpha == 0)
+                        _hintedSquareCircle=null;
                 }
                 if(board[i+1][j+1].currentState == Square.SquareColor.Blue)
                     _graphics.setColor(0, 0, 255, 255);
@@ -183,7 +188,7 @@ public class OhnO_Game extends AbstractScene {
                 _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2));
 
                 //candado en los rojos lockeados
-                if(showLock && board[i+1][j+1].lock &&
+                if(_showLock && board[i+1][j+1].lock &&
                         board[i+1][j+1].currentState == Square.SquareColor.Red){
                     //
                     im = _graphics.newImage("lock.png");
@@ -212,7 +217,7 @@ public class OhnO_Game extends AbstractScene {
         f.setSize(fontSize/1.5f);
         _graphics.setFont(f);
         _graphics.setColor(150,150,150,255);
-        float percent = 1 - ( (float)numGreys / startNumGrey);
+        float percent = 1 - ( (float) _numGreys / _startNumGrey);
         percent*=100;
         String num = (int)Math.ceil(percent) + "%";
         _graphics.drawText(num, (1f/2),(1/6f * 4.75f));
@@ -243,7 +248,7 @@ public class OhnO_Game extends AbstractScene {
                     board[i][j] = new Square();
                 }
             }
-            numGreys = _numCircles * _numCircles;
+            //_numGreys = _numCircles * _numCircles;
             Random rnd = new Random();
             locked = new ArrayList<>();
             for (int i = 0; i < board[0].length; ++i) {
@@ -299,7 +304,7 @@ public class OhnO_Game extends AbstractScene {
 
 
         reStart(true);
-        startNumGrey = numGreys;
+        _startNumGrey = _numGreys;
     }
 
     // Comprueba si se ha solucionado
@@ -319,7 +324,7 @@ public class OhnO_Game extends AbstractScene {
 
     // Metodo para reiniciar el nivel y dejarlo como al principio
     // si canFinish es false, significa que el nivel no se puede completar
-    // y hay que añadir mas casillas visibles al empezar
+    // y hay que añadir mas casillas visibles rojas al empezar
     public void reStart(Boolean canFinish){
 
         //añadir un rojo si no es posible completar el nivel
@@ -338,12 +343,13 @@ public class OhnO_Game extends AbstractScene {
             //System.out.println("Añadido rojo lockeado en "+(s.posX -1) + " "+ (s.posY -1));
 
         }//rojo añadido
-
+        _numGreys=0;
         //resetear valores
         for(int i = 1; i < board[0].length -1; ++i) {
             for (int j = 1; j < board[1].length - 1; ++j) {
                 if(!board[i][j].lock) {
                     board[i][j].currentState = Square.SquareColor.Grey;
+                    _numGreys++;
                 }
                 else if(board[i][j].solutionState == Square.SquareColor.Blue)
                     board[i][j].currentState = Square.SquareColor.Blue;
@@ -876,7 +882,7 @@ public class OhnO_Game extends AbstractScene {
                     locked.add(board[i][j]);
                     board[i][j].showInRow = true;
                     board[i][j].currentState = board[i][j].solutionState;
-                    numGreys--;
+                    //_numGreys--;
                 }
             }
             j++;
@@ -902,7 +908,7 @@ public class OhnO_Game extends AbstractScene {
                     locked.add(board[i][j]);
                     board[i][j].showInColumn = true;
                     board[i][j].currentState = board[i][j].solutionState;
-                    numGreys--;
+                    //_numGreys--;
                 }
             }
             i++;
@@ -923,7 +929,7 @@ public class OhnO_Game extends AbstractScene {
                     if(r.nextFloat() >=0.6f) {
                         board[i][j].lock = true;
                         board[i][j].currentState = Square.SquareColor.Red;
-                        numGreys--;
+                        //_numGreys--;
                     }
                 }
             }
@@ -938,18 +944,23 @@ public class OhnO_Game extends AbstractScene {
     private void activateCell(int indexX, int indexY, boolean leftMouse){
         if(_hintedSquare != null) _hintedSquare = null;
         Square activated = board[indexY+1][indexX+1];
+        if(activated.currentState == Square.SquareColor.Grey)//vamos a quitar un gris
+            _numGreys--;
+
         if(!activated.lock){
-            if(leftMouse) activated.currentState = Square.SquareColor.values()[
+            if(leftMouse) activated.currentState = Square.SquareColor.values()[//has pulsado con click izquierdo(en android siempre)
                     (activated.currentState.ordinal() + 1) % Square.SquareColor.values().length];
-            else{
+            else{//has pulsado con click derecho
                 int newIndex = activated.currentState.ordinal() - 1;
                 if(newIndex < 0) newIndex = Square.SquareColor.values().length - 1;
                 activated.currentState = Square.SquareColor.values()[newIndex];
             }
+            if(activated.currentState == Square.SquareColor.Grey)//hemos añadido un gris
+                _numGreys++;
             countRow(activated.posX,true);
             countCol(activated.posY,true);
         }else{
-            showLock = !showLock;
+            _showLock = !_showLock;
             //vibrar
         }
     }
