@@ -1,6 +1,7 @@
 package es.ucm.gdv.ohno;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -13,8 +14,20 @@ import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
 public class OhnO_Game extends AbstractScene {
-    private final float _aspectRatio = 2f/3f;
+    /**
+     * Clase para tener una casilla y su alpha para ser dibujado
+     * Solo la usamos aqui y por la unica razon de que no hay
+     * parejas mutables aqui asiq hacemos esto.
+     */
+    private class SquareAlpha{
+        public SquareAlpha(Square s, float f){
+            square = s; alpha = f;
+        }
+        public Square square;
+        public float alpha;
+    }
 
+    private final float _aspectRatio = 2f/3f;
 
     private Graphics _graphics;
     private Input _input;
@@ -38,7 +51,7 @@ public class OhnO_Game extends AbstractScene {
     private float _widthImages, _heightImages;
 
     // Tiempo que tardan los textos en hacer el fade
-    private float _textFadeTime = 1.0f;
+    private float _textFadeTime = 0.5f;
 
     private String _sizeText;
     private float _sizeTextAlpha = 0.0f;
@@ -47,6 +60,10 @@ public class OhnO_Game extends AbstractScene {
     private String _hintText;
     private float _hintTextAlpha = 0.0f;
     private int _hintTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
+
+    private float _squaresFadeTime = 1.0f;
+    private List<SquareAlpha> _fadingSquares;
+
 
     public OhnO_Game(int num){
         _numCircles = num;
@@ -62,6 +79,7 @@ public class OhnO_Game extends AbstractScene {
         _fontJose = _graphics.newFont("JosefinSans-Bold.ttf", _fontSize, false);
         _sizeText = _numCircles + " x " + _numCircles;
         _hintText = "";
+        _fadingSquares = new LinkedList<>();
     }
 
     @Override
@@ -119,22 +137,22 @@ public class OhnO_Game extends AbstractScene {
         }
     }
 
+    private float seconds = 0;
     @Override
     public void update(float deltaTime) {
         // Texto del tamano del tablero
-        _sizeTextAlpha += 5*_sizeTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
-
-        // Clamp
-        _sizeTextAlpha = Math.max(0, _sizeTextAlpha);
-        _sizeTextAlpha = Math.min(_sizeTextAlpha, 255);
+        _sizeTextAlpha += _sizeTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
+        _sizeTextAlpha = clamp(_sizeTextAlpha, 0.0f, 255.0f);
 
 
         // Texto de las hints
-        _hintTextAlpha += 5*_hintTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
+        _hintTextAlpha += _hintTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
+        _hintTextAlpha = clamp(_hintTextAlpha, 0.0f, 255.0f);
 
-        // Clamp
-        _hintTextAlpha = Math.max(0, _hintTextAlpha);
-        _hintTextAlpha = Math.min(_hintTextAlpha, 255);
+        // Casillas que se esten animando
+        for(SquareAlpha sa: _fadingSquares){
+           sa.alpha -= (deltaTime * (255.0f / _squaresFadeTime));
+        }
     }
 
     @Override
@@ -235,6 +253,23 @@ public class OhnO_Game extends AbstractScene {
         _heightImages = im.getCanvasHeight();
         _graphics.drawImage(im, 1.0f,1.0f,4*xOffset, yOffset);
 
+        // Dibujar el fade out de las casillas pulsadas
+        float cx, cy;
+        for(SquareAlpha sa: _fadingSquares){
+            cx = _xBoardOffset + (_boardCircleRad / 2) + (_boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad) * sa.square.posX;
+            cy = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2)
+                    + ((_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)) * sa.square.posY;
+
+            if(sa.square.currentState == Square.SquareColor.Blue)
+                _graphics.setColor(0, 0, 255, 255);
+            else if (sa.square.currentState == Square.SquareColor.Red)
+                _graphics.setColor(255, 0, 0, 255);
+            else
+                _graphics.setColor(180, 180, 180, 255);
+
+            _graphics.drawCircle(cx, cy,_boardCircleRad / 2);
+        }
+
     }
 
     //crear tablero inicial
@@ -306,6 +341,23 @@ public class OhnO_Game extends AbstractScene {
         reStart(true);
         _startNumGrey = _numGreys;
     }
+
+    /**
+     * Funcion auxiliar para restringir un valor
+     * dentro de unos limites
+     *
+     * @param value Valor que se quiere restringir
+     * @param min Valor minimo al que se limita el valor
+     * @param max Valor maximo al que se limita el valor
+     * @return El valor dentro de los limites
+     */
+    private float clamp(float value, float min, float max){
+        float ret = value;
+        ret = Math.max(min, ret);
+        ret = Math.min(ret, max);
+        return ret;
+    }
+
 
     // Comprueba si se ha solucionado
     public boolean check(boolean player){
