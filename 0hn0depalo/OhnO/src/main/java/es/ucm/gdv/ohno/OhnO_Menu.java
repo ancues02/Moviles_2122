@@ -17,8 +17,8 @@ public class OhnO_Menu extends AbstractScene {
     private Font _fontMolle, _fontJose;
     // Tiempo que tarda la escena en hacer fade
     private float _sceneFadeTime = 0.5f;
-    private float _sceneAlpha = 0.0f;
-    private int _sceneFadeFactor = 1;    // 1 = fadeIn // -1 = fadeOut
+    private float _sceneAlpha = 255.0f;
+    private int _sceneFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
 
     @Override
@@ -54,8 +54,11 @@ public class OhnO_Menu extends AbstractScene {
     }
     @Override
     public void update(float deltaTime) {
-        _sceneAlpha += _sceneFadeFactor * deltaTime * (255.0f / _sceneFadeTime);
-        _sceneAlpha = clamp(_sceneAlpha, 0.0f, 255.0f);
+        //fade-in al inicio
+        if(_sceneAlpha>0) {
+            _sceneAlpha += _sceneFadeFactor * deltaTime * (255.0f / _sceneFadeTime);
+            _sceneAlpha = clamp(_sceneAlpha, 0.0f, 255.0f);
+        }
 
     }
     /**
@@ -78,7 +81,7 @@ public class OhnO_Menu extends AbstractScene {
 
 
         //Nombre juego
-        _g.setColor(0, 0, 0, (int)_sceneAlpha);
+        _g.setColor(0, 0, 0, 255);
         _fontMolle.setSize((_fontSize));
         _g.setFont(_fontMolle);
 
@@ -92,7 +95,7 @@ public class OhnO_Menu extends AbstractScene {
         _g.drawText(name, 0.5f, 0.5f);
 
         //copiado
-        _g.setColor(180, 180, 180, (int)_sceneAlpha);
+        _g.setColor(180, 180, 180, 255);
 
         _fontJose.setSize(_fontSize/4);
         _g.setFont(_fontJose);
@@ -105,5 +108,12 @@ public class OhnO_Menu extends AbstractScene {
         Image im = _g.newImage("q42.png");
 
         _g.drawImage(im, 90,128, 0.5f, 0.87f);
+
+        //fade-in inicial de la escena, la tapamos entera
+        // y le bajamos el alpha del circulo que la tapa
+        if(_sceneAlpha>0) {
+            _g.setColor(255, 255, 255, (int) _sceneAlpha);
+            _g.fillCircle(0.5f, 0.5f, 1);
+        }
     }
 }

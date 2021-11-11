@@ -39,6 +39,7 @@ public class OhnO_Game extends AbstractScene {
     private float _fontSize;
     private Font _fontMolle, _fontJose;
     private int _numCircles;
+    private boolean _win = false;//si se ha ganado
 
     private Square[][] board;     // Tablero con todas las casillas
     private float _yBoardOffset;
@@ -65,6 +66,16 @@ public class OhnO_Game extends AbstractScene {
     private String _hintText;
     private float _hintTextAlpha = 0.0f;
     private int _hintTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
+
+    //para hacer fade-in al empezar la escena
+    private float _sceneFadeTime = 0.5f;
+    private float _sceneAlpha = 255.0f;
+    private int _sceneFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
+
+    //para hacer fade-out al ganar
+    private float _sceneOutFadeTime = 3.5f;
+    private float _sceneOutAlpha = 255.0f;
+    private int _sceneOutFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     private float _squaresFadeTime = 1.0f;
     private List<FadeOutSquare> _fadingSquares;
@@ -151,6 +162,22 @@ public class OhnO_Game extends AbstractScene {
 
     @Override
     public void update(float deltaTime) {
+        //fade-in al inicio
+        if(_sceneAlpha>0) {
+            _sceneAlpha += _sceneFadeFactor * deltaTime * (255.0f / _sceneFadeTime);
+            _sceneAlpha = clamp(_sceneAlpha, 0.0f, 255.0f);
+        }
+
+        if(_win ) {
+            _sceneOutAlpha += _sceneOutFadeFactor * deltaTime * (255.0f / _sceneOutFadeTime);
+            _sceneOutAlpha = clamp(_sceneOutAlpha, 0.0f, 255.0f);
+            if(_sceneOutAlpha <= 0){
+                _engine.setScene(new OhnO_SelectSize());
+            }
+        }
+
+
+
         // Texto del tamano del tablero
         _sizeTextAlpha += _sizeTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
         _sizeTextAlpha = clamp(_sizeTextAlpha, 0.0f, 255.0f);
@@ -175,9 +202,73 @@ public class OhnO_Game extends AbstractScene {
         _fadingSquaresToRemove.clear();
     }
 
+    private void renderWin(){
+
+        float fontSize= 75;
+
+        // Tamaño del tablero
+        Font f = _fontJose;
+        f.setBold(true);
+        f.setSize(fontSize);
+        _graphics.setFont(f);
+
+        // Escribe el texto de ganar
+        _graphics.setColor(0,0,0,255);
+        _graphics.drawText("Brillante", 1f/2, 0.1f);
+
+        // Dimensiones del tablero
+        _xBoardOffset = 0.1f; // 1 - _xStartOffset el final
+        _yBoardOffset = 0.2f;
+
+        // Dibujar tablero
+        _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
+        _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
+        Image im;
+        float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
+        float xPos = _xBoardOffset + (_boardCircleRad / 2);
+        Square boardSquare;
+        for (int i = 0; i < _numCircles; ++i) {
+            for (int j = 0; j < _numCircles; ++j) {
+
+                // Dibujar la casilla
+                boardSquare = board[i+1][j+1];
+                _graphics.setColor(boardSquare.currentState.getR(), boardSquare.currentState.getG(), boardSquare.currentState.getB(), (int)_sceneOutAlpha);
+                _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2));
+
+
+
+                // Dibujar los numeros en los azules lockeados
+                if( board[i+1][j+1].solutionState == Square.SquareColor.Blue){
+                    _graphics.setColor(255,255,255,(int)_sceneOutAlpha);
+
+                    String num = String.valueOf(board[i+1][j+1].total);
+                    _graphics.drawText(num, xPos, yPos);
+                }
+                xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
+            }
+            xPos = _xBoardOffset + (_boardCircleRad / 2);
+            yPos += (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio);
+
+        }//fin tablero
+
+        // Dibujar el porcentaje
+        f.setSize(fontSize/1.5f);
+        _graphics.setFont(f);
+        _graphics.setColor(150,150,150,(int)_sceneOutAlpha);
+        float percent = 1 - ( (float) _numGreys / _startNumGrey);
+        percent*=100;
+        String num = (int)Math.ceil(percent) + "%";
+        _graphics.drawText(num, (1f/2),(1/6f * 4.75f));
+    }
+
     @Override
     public void render() {
+        if (_win){
+            renderWin();
+            return;
+        }
         float fontSize= 75;
+
 
         // Tamaño del tablero
         Font f = _fontJose;
@@ -189,6 +280,8 @@ public class OhnO_Game extends AbstractScene {
         _graphics.setColor(0,0,0,(int)_sizeTextAlpha);
         _graphics.drawText(_sizeText, 1f/2, 0.1f);
 
+        f.setSize(fontSize/1.5f);
+        _graphics.setFont(f);
         // Escribe la pista
         _graphics.setColor(0,0,0,(int)_hintTextAlpha);
         _graphics.drawText(_hintText, 1f/2, 0.1f);
@@ -199,7 +292,7 @@ public class OhnO_Game extends AbstractScene {
         _yBoardOffset = 0.2f;
 
         // Dibujar tablero
-        f.setSize(fontSize/1f);
+        f.setSize(fontSize);
         _graphics.setFont(f);
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
@@ -271,6 +364,10 @@ public class OhnO_Game extends AbstractScene {
 
             _graphics.setColor(s.color.getR(), s.color.getG(), s.color.getB(), (int)s.alpha);
             _graphics.fillCircle(cx, cy,_boardCircleRad / 2);
+        }
+        if(_sceneAlpha>0) {
+            _graphics.setColor(255, 255, 255, (int) _sceneAlpha);
+            _graphics.fillCircle(0.5f, 0.5f, 1);
         }
 
     }
@@ -372,8 +469,10 @@ public class OhnO_Game extends AbstractScene {
             countRow(i,true);
             countCol(i,true);
         }
-        if(player)
-            _engine.setScene(new OhnO_SelectSize());
+        if(player) {
+            //_engine.setScene(new OhnO_SelectSize());
+            _win = true;
+        }
         return true;
     }
 
@@ -456,18 +555,16 @@ public class OhnO_Game extends AbstractScene {
         do{
             Square s = locked.get(i);
             if(hint1(s,false)){
-                System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 _hintedSquare = s;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
-                return Hint.CanClose.name();
+                return Hint.CanClose.getMsg();
             }
             else if(hint2(s,false)){
-                System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 _hintedSquare = s;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
-                return Hint.WouldSeeTooMuch.name();
+                return Hint.WouldSeeTooMuch.getMsg();
 
             }
             else if(hint3(s,false)){
@@ -475,7 +572,7 @@ public class OhnO_Game extends AbstractScene {
                 _hintedSquare = s;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
-                return Hint.WouldSeeTooLittle.name();
+                return Hint.WouldSeeTooLittle.getMsg();
 
             }
             else if(hint4(s)){
@@ -483,7 +580,7 @@ public class OhnO_Game extends AbstractScene {
                 _hintedSquare = s;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
-                return Hint.SeesTooMuch.name();
+                return Hint.SeesTooMuch.getMsg();
 
             }
             else if(hint5(s)){
@@ -491,7 +588,7 @@ public class OhnO_Game extends AbstractScene {
                 _hintedSquare = s;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
-                return Hint.SeesToLittle.name();
+                return Hint.SeesToLittle.getMsg();
 
             }
             i++;
@@ -508,8 +605,8 @@ public class OhnO_Game extends AbstractScene {
                                 + " " + (board[i][j].posY - 1));
 
                         if(board[i][j].currentState == Square.SquareColor.Blue)
-                            return Hint.MustBeRedBlue.name();
-                        return Hint.MustBeRedGrey.name();
+                            return Hint.MustBeRedBlue.getMsg();
+                        return Hint.MustBeRedGrey.getMsg();
                     }
 
             }

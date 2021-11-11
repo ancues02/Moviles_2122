@@ -27,8 +27,8 @@ public class OhnO_SelectSize extends AbstractScene {
     private float _extraCircle;
 
     private float _sceneFadeTime = 0.5f;
-    private float _sceneAlpha = 0.0f;
-    private int _sceneFadeFactor = 1;    // 1 = fadeIn // -1 = fadeOut
+    private float _sceneAlpha = 255.0f;
+    private int _sceneFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     @Override
     public void start() {
@@ -52,8 +52,11 @@ public class OhnO_SelectSize extends AbstractScene {
 
     @Override
     public void update(float deltaTime) {
-        _sceneAlpha += _sceneFadeFactor * deltaTime * (255.0f / _sceneFadeTime);
-        _sceneAlpha = clamp(_sceneAlpha, 0.0f, 255.0f);
+        //fade-in al inicio
+        if(_sceneAlpha>0) {
+            _sceneAlpha += _sceneFadeFactor * deltaTime * (255.0f / _sceneFadeTime);
+            _sceneAlpha = clamp(_sceneAlpha, 0.0f, 255.0f);
+        }
 
     }
     /**
@@ -78,7 +81,7 @@ public class OhnO_SelectSize extends AbstractScene {
         float fontSize= 120;
         //tamaño tablero
         Font f = _graphics.newFont("Molle-Regular.ttf", fontSize, false);
-        _graphics.setColor(0, 0, 0, (int)_sceneAlpha);
+        _graphics.setColor(0, 0, 0, 255);
         _graphics.setFont(f);
 
         String name = "Oh no";
@@ -108,12 +111,12 @@ public class OhnO_SelectSize extends AbstractScene {
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 3; ++j) {
                 if((j + i) % 2 == 1)
-                    _graphics.setColor(255,78,72, (int)_sceneAlpha);//rojo
+                    _graphics.setColor(255,78,72, 255);//rojo
                 else
-                    _graphics.setColor(10,180,235, (int)_sceneAlpha);//azul
+                    _graphics.setColor(10,180,235, 255);//azul
 
                 _graphics.fillCircle(xPos, yPos, _boardCircleRad / 2f);
-                _graphics.setColor(255,255,255,(int)_sceneAlpha);
+                _graphics.setColor(255,255,255,255);
 
 
                 String num = ""+(cont++);
@@ -138,6 +141,13 @@ public class OhnO_SelectSize extends AbstractScene {
         _numCircles = 3;
         _extraCircle = 1f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1 - _xBoardOffset * 2) / (_numCircles + _extraCircle);
+
+        //fade-in inicial de la escena, la tapamos entera
+        // y le bajamos el alpha del circulo que la tapa
+        if(_sceneAlpha>0) {
+            _graphics.setColor(255, 255, 255, (int) _sceneAlpha);
+            _graphics.fillCircle(0.5f, 0.5f, 1);
+        }
     }
 
     private void processInput(TouchEvent e){
