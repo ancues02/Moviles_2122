@@ -277,10 +277,11 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public void drawText(String text, float pX, float pY) {
-        pY+=0.02f; //para bajarlo un poco, queda mejor centrado
+
         float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(pY * _virtualY);
-
+        // TODO: quitar numero magico
+        rY +=_paint.getTextSize() / 6.f * _scale;
         _canvas.drawText(text, rX, rY, _paint);
     }
 
@@ -362,7 +363,7 @@ public class AndroidGraphics extends AbstractGraphics {
         //_canvas.drawColor(Color.RED);
         clear(255,255,255,255);
         app.render();
-        fillOffsets(Color.GRAY);
+        fillOffsets(Color.WHITE);
         _holder.unlockCanvasAndPost(_canvas);
     }
 

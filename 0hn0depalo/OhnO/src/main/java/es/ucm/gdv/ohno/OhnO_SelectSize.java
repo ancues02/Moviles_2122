@@ -18,6 +18,7 @@ public class OhnO_SelectSize extends AbstractScene {
     private Input _input;
     private float _fontSize;
     private Font _fontMolle, _fontJose;
+    private Image _img;
     private float _widthImages, _heightImages;
 
     private int _numCircles;
@@ -35,8 +36,9 @@ public class OhnO_SelectSize extends AbstractScene {
         _fontSize= 120;
         _graphics = _engine.getGraphics();
         _input = _engine.getInput();
-        _fontMolle = _graphics.newFont("Molle-Regular.ttf", _fontSize, false);
-        _fontJose = _graphics.newFont("JosefinSans-Bold.ttf", _fontSize, false);
+        _fontMolle = _graphics.newFont("assets/fonts/Molle-Regular.ttf", _fontSize, false);
+        _fontJose = _graphics.newFont("assets/fonts/JosefinSans-Bold.ttf", _fontSize, false);
+        _img = _graphics.newImage("assets/images/close.png");
 
     }
 
@@ -78,25 +80,26 @@ public class OhnO_SelectSize extends AbstractScene {
     @Override
     public void render() {
 
-        float fontSize= 120;
+        _fontSize= 120;
+        Font f = _fontMolle;
+        f.setSize(_fontSize);
         //tamaño tablero
-        Font f = _graphics.newFont("Molle-Regular.ttf", fontSize, false);
         _graphics.setColor(0, 0, 0, 255);
         _graphics.setFont(f);
 
         String name = "Oh no";
         _graphics.drawText(name, 0.5f, 0.25f);
 
-        fontSize /= 4;
-        f = _graphics.newFont("JosefinSans-Bold.ttf", fontSize, true);
-        f.setSize(fontSize);
+        _fontSize /= 4;
+        f = _fontJose;
+        f.setSize(_fontSize);
         _graphics.setFont(f);
 
         String tam = "Elige el tamaño a jugar";
         _graphics.drawText(tam, 0.5f, 0.333f);
 
         //---------------------pintar los circulos----------------------------
-        f.setSize(fontSize*2);
+        f.setSize(_fontSize*2);
         _graphics.setFont(f);
 
         _yBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
@@ -130,10 +133,10 @@ public class OhnO_SelectSize extends AbstractScene {
         //
         float yOffset = 5f * 0.1666f;
         float xOffset = 0.5f;
-        Image im = _graphics.newImage("close.png");
-        _widthImages = im.getCanvasWidth();
-        _heightImages = im.getCanvasHeight();
-        _graphics.drawImage(im, 1.0f,1.0f, xOffset, yOffset);
+
+        _widthImages = _img.getCanvasWidth();
+        _heightImages = _img.getCanvasHeight();
+        _graphics.drawImage(_img, 1.0f,1.0f, xOffset, yOffset);
 
         _yBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
         _xBoardOffset = (1 - 2 * _yBoardOffset);

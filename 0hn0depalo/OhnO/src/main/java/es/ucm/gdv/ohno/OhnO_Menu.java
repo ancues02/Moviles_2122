@@ -15,6 +15,7 @@ public class OhnO_Menu extends AbstractScene {
     private Input _input;
     private float _fontSize;
     private Font _fontMolle, _fontJose;
+    private Image _img;
     // Tiempo que tarda la escena en hacer fade
     private float _sceneFadeTime = 0.5f;
     private float _sceneAlpha = 255.0f;
@@ -26,8 +27,10 @@ public class OhnO_Menu extends AbstractScene {
         _fontSize= 120;
         _g = _engine.getGraphics();
         _input = _engine.getInput();
-        _fontMolle = _g.newFont("Molle-Regular.ttf", _fontSize, false);
-        _fontJose = _g.newFont("JosefinSans-Bold.ttf", _fontSize, false);
+        _fontMolle = _g.newFont("assets/fonts/Molle-Regular.ttf", _fontSize, false);
+        _fontJose = _g.newFont("assets/fonts/JosefinSans-Bold.ttf", _fontSize, false);
+        //imagen final
+        _img = _g.newImage("assets/images/q42.png");
     }
 
     @Override
@@ -105,9 +108,7 @@ public class OhnO_Menu extends AbstractScene {
         _g.drawText(name, 0.5f, 0.70f);
 
         //imagen final
-        Image im = _g.newImage("q42.png");
-
-        _g.drawImage(im, 90,128, 0.5f, 0.87f);
+        _g.drawImage(_img, 90,128, 0.5f, 0.87f);
 
         //fade-in inicial de la escena, la tapamos entera
         // y le bajamos el alpha del circulo que la tapa

@@ -1,6 +1,5 @@
 package es.ucm.gdv.engine.android;
 
-import android.text.method.Touch;
 import android.view.MotionEvent;
 import android.view.View;
 

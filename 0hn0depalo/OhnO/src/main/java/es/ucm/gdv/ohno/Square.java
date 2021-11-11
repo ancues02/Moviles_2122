@@ -1,8 +1,10 @@
 package es.ucm.gdv.ohno;
 
+import es.ucm.gdv.engine.Graphics;
+
 public class Square {
     public enum SquareColor {
-        Grey (180,180,180),
+        Grey (240,240,240),
         Blue (10,180,235),
         Red(255,78,72);
 
@@ -42,5 +44,9 @@ public class Square {
 
     public boolean showInRow = false;
     public boolean showInColumn = false;
+
+    public void render(Graphics g){
+
+    }
 
 }
