@@ -82,7 +82,7 @@ public class OhnO_Game extends AbstractScene {
     // TPVI efectivamente
     private List<Integer> _fadingSquaresToRemove;
 
-    private Stack<TouchEvent> oppositeMoves = new Stack<TouchEvent>();
+    private Stack<TouchEvent> _oppositeMoves = new Stack<TouchEvent>();
 
     public OhnO_Game(int num){
         _numCircles = num;
@@ -143,6 +143,7 @@ public class OhnO_Game extends AbstractScene {
             else if (X >= 3*xOffset - _widthImages / 2 && X <= 3*xOffset + _widthImages / 2){
                 //System.out.println("He pulsado deshacer movimiento");
                 undoMove();
+
             }
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
                 if(_hintedSquare == null) {
@@ -223,7 +224,8 @@ public class OhnO_Game extends AbstractScene {
         // Dibujar tablero
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
-        Image im;
+        f.setSize(fontSize*_boardCircleRad*5);
+        _graphics.setFont(f);
         float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
         float xPos = _xBoardOffset + (_boardCircleRad / 2);
         Square boardSquare;
@@ -292,10 +294,10 @@ public class OhnO_Game extends AbstractScene {
         _yBoardOffset = 0.2f;
 
         // Dibujar tablero
-        f.setSize(fontSize);
-        _graphics.setFont(f);
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
+        f.setSize(fontSize*_boardCircleRad*5);
+        _graphics.setFont(f);
         Image im;
         float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
         float xPos = _xBoardOffset + (_boardCircleRad / 2);
@@ -304,6 +306,10 @@ public class OhnO_Game extends AbstractScene {
             for (int j = 0; j < _numCircles; ++j) {
                 if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
                     _graphics.setColor(0, 0, 0, (int)_hintTextAlpha);
+                    _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2) *1.1f);
+                    if(_hintTextAlpha == 0)
+                        _hintedSquareCircle=null;
+                    _graphics.setColor(0, 0, 0, 255);
                     _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2) *1.1f);
                     if(_hintTextAlpha == 0)
                         _hintedSquareCircle=null;
@@ -1113,7 +1119,7 @@ public class OhnO_Game extends AbstractScene {
             countCol(activated.posY,true);
             // Se añade un movimienot CONTRARIO (!leftMouse) al stack
             if(recordMove)
-                oppositeMoves.add(new TouchEvent(TouchType.Press, indexX, indexY, 0, !leftMouse));
+                _oppositeMoves.add(new TouchEvent(TouchType.Press, indexX, indexY, 0, !leftMouse));
         }else{
             _showLock = !_showLock;
             //vibrar
@@ -1121,8 +1127,12 @@ public class OhnO_Game extends AbstractScene {
     }
 
     private void undoMove(){
-        if(oppositeMoves.size() > 0) {
-            TouchEvent e = oppositeMoves.pop();
+        if (_hintedSquare != null){
+            _hintedSquare = null;
+            _hintedSquareCircle = null;
+        }
+        else if(_oppositeMoves.size() > 0) {
+            TouchEvent e = _oppositeMoves.pop();
             activateCell((int) e.getX(), (int) e.getY(), e.isRightMouse(), false);
         }
     }
