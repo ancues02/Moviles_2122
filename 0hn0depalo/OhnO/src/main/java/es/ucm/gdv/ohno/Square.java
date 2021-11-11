@@ -3,8 +3,8 @@ package es.ucm.gdv.ohno;
 public class Square {
     public enum SquareColor {
         Grey (180,180,180),
-        Blue (0,0,255),
-        Red(255,0,0);
+        Blue (10,180,235),
+        Red(255,78,72);
 
         private final int r, g, b;
 

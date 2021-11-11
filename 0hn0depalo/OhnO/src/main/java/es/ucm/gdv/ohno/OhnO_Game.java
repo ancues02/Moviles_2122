@@ -177,7 +177,7 @@ public class OhnO_Game extends AbstractScene {
 
     @Override
     public void render() {
-        float fontSize= 45;
+        float fontSize= 75;
 
         // Tamaño del tablero
         Font f = _fontJose;
@@ -199,7 +199,7 @@ public class OhnO_Game extends AbstractScene {
         _yBoardOffset = 0.2f;
 
         // Dibujar tablero
-        f.setSize(fontSize/1.5f);
+        f.setSize(fontSize/1f);
         _graphics.setFont(f);
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
         _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);

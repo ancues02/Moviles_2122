@@ -26,6 +26,10 @@ public class OhnO_SelectSize extends AbstractScene {
     private float _boardCircleRad;
     private float _extraCircle;
 
+    private float _sceneFadeTime = 0.5f;
+    private float _sceneAlpha = 0.0f;
+    private int _sceneFadeFactor = 1;    // 1 = fadeIn // -1 = fadeOut
+
     @Override
     public void start() {
         _fontSize= 120;
@@ -48,7 +52,24 @@ public class OhnO_SelectSize extends AbstractScene {
 
     @Override
     public void update(float deltaTime) {
+        _sceneAlpha += _sceneFadeFactor * deltaTime * (255.0f / _sceneFadeTime);
+        _sceneAlpha = clamp(_sceneAlpha, 0.0f, 255.0f);
 
+    }
+    /**
+     * Funcion auxiliar para restringir un valor
+     * dentro de unos limites
+     *
+     * @param value Valor que se quiere restringir
+     * @param min Valor minimo al que se limita el valor
+     * @param max Valor maximo al que se limita el valor
+     * @return El valor dentro de los limites
+     */
+    private float clamp(float value, float min, float max){
+        float ret = value;
+        ret = Math.max(min, ret);
+        ret = Math.min(ret, max);
+        return ret;
     }
 
     @Override
@@ -57,7 +78,7 @@ public class OhnO_SelectSize extends AbstractScene {
         float fontSize= 120;
         //tamaño tablero
         Font f = _graphics.newFont("Molle-Regular.ttf", fontSize, false);
-        _graphics.setColor(0, 0, 0, 255);
+        _graphics.setColor(0, 0, 0, (int)_sceneAlpha);
         _graphics.setFont(f);
 
         String name = "Oh no";
@@ -72,6 +93,8 @@ public class OhnO_SelectSize extends AbstractScene {
         _graphics.drawText(tam, 0.5f, 0.333f);
 
         //---------------------pintar los circulos----------------------------
+        f.setSize(fontSize*2);
+        _graphics.setFont(f);
 
         _yBoardOffset = 0.4f;   //donde empieza a pintarse el tablero
         _xBoardOffset = (1 - 2 * _yBoardOffset);
@@ -84,15 +107,14 @@ public class OhnO_SelectSize extends AbstractScene {
         int cont = 4;
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 3; ++j) {
-                if((j + i) % 2 == 0)
-                    _graphics.setColor(255, 0, 0, 255);
+                if((j + i) % 2 == 1)
+                    _graphics.setColor(255,78,72, (int)_sceneAlpha);//rojo
                 else
-                    _graphics.setColor(0, 0, 255, 255);
-                _graphics.fillCircle(xPos, yPos, _boardCircleRad / 2f);
-                _graphics.setColor(255,255,255,255);
+                    _graphics.setColor(10,180,235, (int)_sceneAlpha);//azul
 
-                f.setSize(fontSize);
-                //g.setFont(f);
+                _graphics.fillCircle(xPos, yPos, _boardCircleRad / 2f);
+                _graphics.setColor(255,255,255,(int)_sceneAlpha);
+
 
                 String num = ""+(cont++);
                 _graphics.drawText(num, xPos, yPos);
@@ -154,7 +176,7 @@ public class OhnO_SelectSize extends AbstractScene {
         float xOffset = 0.5f;
         if(Y >= yOffset - _heightImages/2 && Y <= yOffset + _heightImages/2) {
             if (X >=  xOffset - _widthImages / 2 && X <=  xOffset + _widthImages / 2) {
-                System.out.println("He pulsado la X");//cerrar el juego o ir al menu principal
+                _engine.setScene(new OhnO_Menu());
 
             }
         }

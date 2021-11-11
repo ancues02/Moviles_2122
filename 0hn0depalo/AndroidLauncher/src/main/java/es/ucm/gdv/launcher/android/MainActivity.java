@@ -7,6 +7,7 @@ import android.os.Bundle;
 import es.ucm.gdv.engine.Scene;
 import es.ucm.gdv.engine.android.AndroidEngine;
 import es.ucm.gdv.ohno.OhnO;
+import es.ucm.gdv.ohno.OhnO_Menu;
 import es.ucm.gdv.ohno.OhnO_SelectSize;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
         _engine = new AndroidEngine(this, 600, 900);
-        Scene a = new OhnO_SelectSize();
+        Scene a = new OhnO_Menu();
         _engine.setScene(a);
         /*int w = _engine.getContentView().getWidth(),
             h = _engine.getContentView().getHeight();*/

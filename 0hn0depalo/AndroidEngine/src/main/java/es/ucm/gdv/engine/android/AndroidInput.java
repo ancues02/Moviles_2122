@@ -19,7 +19,7 @@ public class AndroidInput implements Input, View.OnTouchListener {
     public AndroidInput(AndroidGraphics aGraphics){
         _aGraphics = aGraphics;
         _aGraphics.getSurfaceView().setOnTouchListener(this);
-        _touchEventList = new ArrayList<TouchEvent>();
+        _touchEventList = new ArrayList();
     }
 
     @Override
@@ -29,16 +29,14 @@ public class AndroidInput implements Input, View.OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent mEvent) {
-        //TouchEvent event = new TouchEvent();
-        float posX = _aGraphics.realToVirtualX(mEvent.getX());
-        float posY = _aGraphics.realToVirtualY(mEvent.getY());
         if(mEvent.getAction() == MotionEvent.ACTION_DOWN) {
+            float posX = _aGraphics.realToVirtualX(mEvent.getX());
+            float posY = _aGraphics.realToVirtualY(mEvent.getY());
             TouchEvent event = new TouchEvent(TouchType.Press,
                     posX, posY,
                     mEvent.getActionIndex(),
-                    true);
+                    true);//en android siempre pulsamos con "click izquierdo"
             synchronized (this) {
-                System.out.println("hey");
                 _touchEventList.add(event);
             }
             return true;

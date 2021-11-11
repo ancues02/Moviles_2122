@@ -277,6 +277,7 @@ public class AndroidGraphics extends AbstractGraphics {
      */
     @Override
     public void drawText(String text, float pX, float pY) {
+        pY+=0.02f; //para bajarlo un poco, queda mejor centrado
         float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(pY * _virtualY);
 
