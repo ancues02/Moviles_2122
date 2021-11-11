@@ -1,7 +1,6 @@
 package es.ucm.gdv.ohno;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -32,7 +31,7 @@ public class OhnO_Game extends AbstractScene {
     private Square[][] board;     // Tablero con todas las casillas
     private float _yBoardOffset;
     private float _xBoardOffset;
-    private float _boardCircleRad;
+    private float _boardCircleDiam;
     private float _extraCircle;
 
     private List<Square> locked; // Las casillas lockeadas
@@ -108,10 +107,10 @@ public class OhnO_Game extends AbstractScene {
             //deteccion input en tablero
             float boardY = Y - _yBoardOffset; // La Y "en el tablero"
             float boardX = X - _xBoardOffset; // La X "en el tablero"
-            int indexY = (int) (boardY / ((_boardCircleRad * _aspectRatio) +
-                    ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio)));
-            int indexX = (int) (boardX / ((_boardCircleRad) +
-                    ((_extraCircle / (_numCircles - 1)) * _boardCircleRad)));
+            int indexY = (int) (boardY / ((_boardCircleDiam * _aspectRatio) +
+                    ((_extraCircle / (_numCircles - 1)) * _boardCircleDiam * _aspectRatio)));
+            int indexX = (int) (boardX / ((_boardCircleDiam) +
+                    ((_extraCircle / (_numCircles - 1)) * _boardCircleDiam)));
             if (indexX < _numCircles && indexX >= 0 && indexY < _numCircles && indexY >= 0) { // en tablero
                 activateCell(indexX, indexY, e.isRightMouse(), true);
                 System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
@@ -161,9 +160,16 @@ public class OhnO_Game extends AbstractScene {
             if(_sceneOutAlpha <= 0){
                 _engine.setScene(new OhnO_SelectSize());
             }
+
+
         }
 
-
+        // Actualizacion del alpha de las casillas
+        for (int i = 1; i < board[0].length - 1; ++i) {
+            for (int j = 1; j < board[1].length - 1; ++j){
+                board[i][j].update(deltaTime);
+            }
+        }
 
         // Texto del tamano del tablero
         _sizeTextAlpha += _sizeTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
@@ -198,33 +204,20 @@ public class OhnO_Game extends AbstractScene {
 
         // Dibujar tablero
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
-        _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
-        f.setSize(fontSize*_boardCircleRad*5);
+        _boardCircleDiam = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
+        f.setSize(fontSize* _boardCircleDiam *5);
         _graphics.setFont(f);
-        float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
-        float xPos = _xBoardOffset + (_boardCircleRad / 2);
-        Square boardSquare;
+        float yPos = _yBoardOffset + ((_boardCircleDiam * _aspectRatio) / 2);
+        float xPos = _xBoardOffset + (_boardCircleDiam / 2);
+
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
-
-                // Dibujar la casilla
-                boardSquare = board[i+1][j+1];
-                _graphics.setColor(boardSquare.currentState.getR(), boardSquare.currentState.getG(), boardSquare.currentState.getB(), (int)_sceneOutAlpha);
-                _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2));
-
-
-
-                // Dibujar los numeros en los azules lockeados
-                if( board[i+1][j+1].solutionState == Square.SquareColor.Blue){
-                    _graphics.setColor(255,255,255,(int)_sceneOutAlpha);
-
-                    String num = String.valueOf(board[i+1][j+1].total);
-                    _graphics.drawText(num, xPos, yPos);
-                }
-                xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
+                // Renderizar cada casilla
+                board[i+1][j+1].render(_graphics, xPos, yPos, _boardCircleDiam / 2);
+                xPos += _boardCircleDiam + (_extraCircle / (_numCircles - 1)) * _boardCircleDiam;
             }
-            xPos = _xBoardOffset + (_boardCircleRad / 2);
-            yPos += (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio);
+            xPos = _xBoardOffset + (_boardCircleDiam / 2);
+            yPos += (_boardCircleDiam * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleDiam * _aspectRatio);
 
         }//fin tablero
 
@@ -270,28 +263,27 @@ public class OhnO_Game extends AbstractScene {
 
         // Dibujar tablero
         _extraCircle = 0.5f;   // Círculo fantasma extra para el offset
-        _boardCircleRad = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
-        f.setSize(fontSize*_boardCircleRad*5);
+        _boardCircleDiam = (1f - _xBoardOffset * 2) / (_numCircles + _extraCircle);
+        f.setSize(fontSize* _boardCircleDiam *5);
         _graphics.setFont(f);
-        float yPos = _yBoardOffset + ((_boardCircleRad * _aspectRatio) / 2);
-        float xPos = _xBoardOffset + (_boardCircleRad / 2);
+        float yPos = _yBoardOffset + ((_boardCircleDiam * _aspectRatio) / 2);
+        float xPos = _xBoardOffset + (_boardCircleDiam / 2);
         Square boardSquare;
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
                 if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
                     _graphics.setColor(0, 0, 0, (int)_hintTextAlpha);
-                    _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2) *1.1f);
+                    _graphics.fillCircle(xPos, yPos, (_boardCircleDiam / 2) *1.1f);
                     if(_hintTextAlpha == 0)
                         _hintedSquareCircle=null;
                     _graphics.setColor(0, 0, 0, 255);
-                    _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2) *1.1f);
+                    _graphics.fillCircle(xPos, yPos, (_boardCircleDiam / 2) *1.1f);
                     if(_hintTextAlpha == 0)
                         _hintedSquareCircle=null;
                 }
                 // Dibujar la casilla
                 boardSquare = board[i+1][j+1];
-                _graphics.setColor(boardSquare.currentState.getR(), boardSquare.currentState.getG(), boardSquare.currentState.getB(), 255);
-                _graphics.fillCircle(xPos, yPos, (_boardCircleRad / 2));
+                boardSquare.render(_graphics, xPos, yPos, _boardCircleDiam / 2);
 
                 // Dibujar el candado en los rojos lockeados
                 if(_showLock && boardSquare.lock && boardSquare.currentState == Square.SquareColor.Red){
@@ -305,10 +297,10 @@ public class OhnO_Game extends AbstractScene {
                     String num = String.valueOf(board[i+1][j+1].total);
                     _graphics.drawText(num, xPos, yPos);
                 }
-                xPos += _boardCircleRad + (_extraCircle / (_numCircles - 1)) * _boardCircleRad;
+                xPos += _boardCircleDiam + (_extraCircle / (_numCircles - 1)) * _boardCircleDiam;
             }
-            xPos = _xBoardOffset + (_boardCircleRad / 2);
-            yPos += (_boardCircleRad * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleRad * _aspectRatio);
+            xPos = _xBoardOffset + (_boardCircleDiam / 2);
+            yPos += (_boardCircleDiam * _aspectRatio) + ((_extraCircle / (_numCircles - 1)) * _boardCircleDiam * _aspectRatio);
 
         }//fin tablero
 
@@ -438,6 +430,13 @@ public class OhnO_Game extends AbstractScene {
         }
         if(player) {
             //_engine.setScene(new OhnO_SelectSize());
+            for(int i = 1; i < board[0].length -1; ++i) {
+                for (int j = 1; j < board[1].length - 1; ++j) {
+                    board[i][j].lock = true;
+
+                }
+            }
+
             _win = true;
         }
         return true;
