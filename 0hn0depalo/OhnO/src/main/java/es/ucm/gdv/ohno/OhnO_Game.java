@@ -35,9 +35,10 @@ public class OhnO_Game extends AbstractScene {
     private float _extraCircle;
 
     private List<Square> locked; // Las casillas lockeadas
-    private Square _hintedSquare;
-    private Square _hintedSquareCircle;//para poder hacer el fadeOut de la pista
+    //private Square _hintedSquare;
+    //private Square _hintedSquareCircle;//para poder hacer el fadeOut de la pista
     private boolean _undoOnce; //para saber si se ha pulsado deshacer movimiento por primera vez
+    private Square _drawBlackSquare;
 
     private int _numGreys, _startNumGrey;       //numero de casillas grises, para hacer el porcentaje
     private boolean _showLock;   //booleano para mostrar o no el candado en los rojos
@@ -114,6 +115,10 @@ public class OhnO_Game extends AbstractScene {
                     ((_extraCircle / (_numCircles - 1)) * _boardCircleDiam)));
             if (indexX < _numCircles && indexX >= 0 && indexY < _numCircles && indexY >= 0) { // en tablero
                 activateCell(indexX, indexY, e.isRightMouse(), true);
+                if(_drawBlackSquare != null ) {
+                    _drawBlackSquare.drawBlack = false;
+                    _drawBlackSquare = null;
+                }
                 System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
                 check(true);
             }
@@ -123,23 +128,31 @@ public class OhnO_Game extends AbstractScene {
         float yOffset = 5.5f * 1f/6 ;
         float xOffset = 1f/6 ;
         if(Y >= yOffset - _heightImages/2 && Y <= yOffset + _heightImages/2){
+            //Volver atras
             if (X >= 2*xOffset - _widthImages / 2  && X <= 2*xOffset + _widthImages / 2){
                 _engine.setScene(new OhnO_SelectSize());
             }
+            //deshacer movimiento
             else if (X >= 3*xOffset - _widthImages / 2 && X <= 3*xOffset + _widthImages / 2){
                 undoMove();
 
             }
+            //pedir pista
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
                 if(_hintUndoText == ""/*_hintedSquare == null*/) {
                     _hintUndoText = giveHint();
-                    _hintedSquareCircle = _hintedSquare;
+                    //_hintedSquareCircle = _hintedSquare;
                     _sizeTextFadeFactor = -1;
                     _hintUndoTextFadeFactor = 1;
+
                 }
                 else{
                     _hintUndoText = "";
-                    _hintedSquare = null;
+                    if(_drawBlackSquare != null ) {
+                        _drawBlackSquare.drawBlack = false;
+                        _drawBlackSquare = null;
+                    }
+                    //_hintedSquare = null;
                     _sizeTextFadeFactor = 1;
                     _hintUndoTextFadeFactor = -1;
                 }
@@ -272,18 +285,21 @@ public class OhnO_Game extends AbstractScene {
         Square boardSquare;
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
-                if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
-                    _graphics.setColor(0, 0, 0, (int)_hintUndoTextAlpha);
-                    _graphics.fillCircle(xPos, yPos, (_boardCircleDiam / 2) *1.1f);
-                    if(_hintUndoTextAlpha == 0)
-                        _hintedSquareCircle=null;
-                    _graphics.setColor(0, 0, 0, 255);
-                    _graphics.fillCircle(xPos, yPos, (_boardCircleDiam / 2) *1.1f);
-                    if(_hintUndoTextAlpha == 0)
-                        _hintedSquareCircle=null;
-                }
-                // Dibujar la casilla
                 boardSquare = board[i+1][j+1];
+//                if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
+//
+//                    /*if(_drawBlackSquare != null && _drawBlackSquare != boardSquare)
+//                        _drawBlackSquare.drawBlack=false;
+//                    _drawBlackSquare =  boardSquare;
+//                    _drawBlackSquare.drawBlack = true;*/
+//                    if(_hintUndoTextAlpha == 0)
+//                        _hintedSquareCircle=null;
+//
+//                    if(_hintUndoTextAlpha == 0)
+//                        _hintedSquareCircle=null;
+//                }
+                // Dibujar la casilla
+
                 boardSquare.render(_graphics, xPos, yPos, _boardCircleDiam / 2);
 
                 // Dibujar el candado en los rojos lockeados
@@ -291,13 +307,6 @@ public class OhnO_Game extends AbstractScene {
                     _graphics.drawImage(_lockImg, 0.55f,0.55f, xPos, yPos);
                 }
 
-                // Dibujar los numeros en los azules lockeados
-                else if(boardSquare.lock && board[i+1][j+1].solutionState == Square.SquareColor.Blue){
-                    _graphics.setColor(255,255,255,255);
-
-                    String num = String.valueOf(board[i+1][j+1].total);
-                    _graphics.drawText(num, xPos, yPos);
-                }
                 xPos += _boardCircleDiam + (_extraCircle / (_numCircles - 1)) * _boardCircleDiam;
             }
             xPos = _xBoardOffset + (_boardCircleDiam / 2);
@@ -421,23 +430,34 @@ public class OhnO_Game extends AbstractScene {
 
     // Comprueba si se ha solucionado
     public boolean check(boolean player){
-        for(int i = 1; i < board[0].length -1; ++i) {
-            for (int j = 1; j < board[1].length - 1; ++j) {
-                if(board[i][j].currentState != board[i][j].solutionState)
-                    return false;
-            }
-            countRow(i,true);
-            countCol(i,true);
-        }
-        if(player) {
-            //_engine.setScene(new OhnO_SelectSize());
+        if(!player){
             for(int i = 1; i < board[0].length -1; ++i) {
                 for (int j = 1; j < board[1].length - 1; ++j) {
-                    board[i][j].lock = true;
+                    if(board[i][j].currentState != board[i][j].solutionState){
 
+                        return false;
+                    }
+                }
+                countRow(i,true);
+                countCol(i,true);
+            }
+        }
+        else {
+            if(_numGreys != 0) return false;
+            _hintUndoText = giveHint();
+            if (_hintUndoText != "") {
+                _sizeTextFadeFactor = -1;
+                _hintUndoTextFadeFactor = 1;
+                return false;
+            }
+            _sizeTextFadeFactor = 1;
+            _hintUndoTextFadeFactor = -1;
+
+            for (int i = 1; i < board[0].length - 1; ++i) {
+                for (int j = 1; j < board[1].length - 1; ++j) {
+                    board[i][j].lock = true;
                 }
             }
-
             _win = true;
         }
         return true;
@@ -522,13 +542,21 @@ public class OhnO_Game extends AbstractScene {
         do{
             Square s = locked.get(i);
             if(hint1(s,false)){
-                _hintedSquare = s;
+                //_hintedSquare = s;
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return Hint.CanClose.getMsg();
             }
             else if(hint2(s,false)){
-                _hintedSquare = s;
+                //_hintedSquare = s;
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return Hint.WouldSeeTooMuch.getMsg();
@@ -536,7 +564,11 @@ public class OhnO_Game extends AbstractScene {
             }
             else if(hint3(s,false)){
                 System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
-                _hintedSquare = s;
+                //_hintedSquare = s;
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return Hint.WouldSeeTooLittle.getMsg();
@@ -544,7 +576,11 @@ public class OhnO_Game extends AbstractScene {
             }
             else if(hint4(s)){
                 System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
-                _hintedSquare = s;
+                //_hintedSquare = s;
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return Hint.SeesTooMuch.getMsg();
@@ -552,7 +588,11 @@ public class OhnO_Game extends AbstractScene {
             }
             else if(hint5(s)){
                 System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
-                _hintedSquare = s;
+                //_hintedSquare = s;
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return Hint.SeesToLittle.getMsg();
@@ -567,7 +607,11 @@ public class OhnO_Game extends AbstractScene {
             for(int j = 1; j < board[1].length -1; ++j) {
                 if(!board[i][j].lock)
                     if(hint6_7(board[i][j], false)) {
-                        _hintedSquare = (board[i][j]);
+                        //_hintedSquare = (board[i][j]);
+                        if(_drawBlackSquare != null && _drawBlackSquare != board[i][j])
+                            _drawBlackSquare.drawBlack=false;
+                        _drawBlackSquare =  board[i][j];
+                        _drawBlackSquare.drawBlack = true;
                         System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
                                 + " " + (board[i][j].posY - 1));
 
@@ -578,7 +622,7 @@ public class OhnO_Game extends AbstractScene {
 
             }
         }
-        return "todo perfecto";
+        return "";
     }
 
     // Aplica pistas. Se usa para terminar de generar un nivel soluble
@@ -1061,7 +1105,7 @@ public class OhnO_Game extends AbstractScene {
     }
 
     private void activateCell(int indexX, int indexY, boolean leftMouse, boolean recordMove){
-        if(_hintedSquare != null) _hintedSquare = null;
+       // if(_hintedSquare != null) _hintedSquare = null;
         Square activated = board[indexY+1][indexX+1];
         if(activated.currentState == Square.SquareColor.Grey)//vamos a quitar un gris
             _numGreys--;
@@ -1084,11 +1128,14 @@ public class OhnO_Game extends AbstractScene {
         }else{
             _showLock = !_showLock;
             //vibrar
+
         }
     }
 
     private void undoMove(){
-        if (_hintedSquare != null){
+        if(_drawBlackSquare != null )
+            _drawBlackSquare.drawBlack=false;
+        /*if (_hintedSquare != null){
             _hintedSquare = null;
             _hintedSquareCircle = null;
             if(_hintUndoText != "") {
@@ -1098,7 +1145,7 @@ public class OhnO_Game extends AbstractScene {
             }
 
         }
-        else if(_oppositeMoves.size() > 0) {
+        else*/ if(_oppositeMoves.size() > 0) {
             TouchEvent e = _oppositeMoves.pop();
             activateCell((int) e.getX(), (int) e.getY(), e.isRightMouse(), false);
             _undoOnce = true;
@@ -1114,11 +1161,14 @@ public class OhnO_Game extends AbstractScene {
                     _hintUndoText = "Casilla vuelta gris";
                     break;
             }
+
+            _drawBlackSquare =  square;
+            _drawBlackSquare.drawBlack = true;
             _sizeTextFadeFactor = -1;
             _hintUndoTextFadeFactor = 1;
 
         }
-        else{
+        else if(_hintUndoText == ""){
             if(!_undoOnce) {
                 _hintUndoText = "Boton de deshacer";
                 _sizeTextFadeFactor = -1;
@@ -1126,16 +1176,26 @@ public class OhnO_Game extends AbstractScene {
             }
             else {
                 if(_hintUndoText == "") {
+                    if(_drawBlackSquare != null ) {
+                        _drawBlackSquare.drawBlack = false;
+                        _drawBlackSquare=null;
+                    }
+
                     _hintUndoText = "Nada que deshacer";
                     _sizeTextFadeFactor = -1;
                     _hintUndoTextFadeFactor = 1;
                 }
-                else{
-                    _hintUndoText = "";
-                    _sizeTextFadeFactor = 1;
-                    _hintUndoTextFadeFactor = -1;
-                }
+
             }
+        }
+        else{
+            _hintUndoText = "";
+            if(_drawBlackSquare != null ) {
+                _drawBlackSquare.drawBlack = false;
+                _drawBlackSquare=null;
+            }
+            _sizeTextFadeFactor = 1;
+            _hintUndoTextFadeFactor = -1;
         }
     }
 }

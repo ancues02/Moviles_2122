@@ -36,7 +36,8 @@ public class Square {
     public int total = 0;               //adyacentes totales (suma de row + column)
     public SquareColor solutionState;   //tiene que ser rojo para ganar
     public boolean lock = false;        //los que ve el jugador
-
+    //public boolean shake = false;       //para hacer la vibracion
+    public boolean drawBlack = false;   //para rodearlo de negro (pista, deshacer...)
 
     public int playerRow = 0;           //adyacentes en esa fila
     public int playerColumn = 0;        //adyacentes en esa columna
@@ -56,6 +57,12 @@ public class Square {
     }
 
     public void render(Graphics g, float px, float py, float rad){
+
+        if(drawBlack){
+            g.setColor(0, 0, 0, 255);
+            g.fillCircle(px, py, rad*1.1f);
+        }
+
         // draw prevState if fading
         int alphaVal = (int)alpha;
         if(alphaVal > 255) {
@@ -68,8 +75,12 @@ public class Square {
         g.fillCircle(px, py, rad);
 
         if(lock && solutionState == SquareColor.Blue){
+            g.setColor(255,255,255,255);
             g.drawText(String.valueOf(total), px, py);
         }
+
+
+
     }
 
 }
