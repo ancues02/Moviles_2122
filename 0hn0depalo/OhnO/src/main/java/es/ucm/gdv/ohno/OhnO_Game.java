@@ -135,7 +135,6 @@ public class OhnO_Game extends AbstractScene {
             //deshacer movimiento
             else if (X >= 3*xOffset - _widthImages / 2 && X <= 3*xOffset + _widthImages / 2){
                 undoMove();
-
             }
             //pedir pista
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){

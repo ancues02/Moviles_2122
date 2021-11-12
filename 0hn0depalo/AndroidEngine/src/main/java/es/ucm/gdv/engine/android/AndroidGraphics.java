@@ -1,6 +1,5 @@
 package es.ucm.gdv.engine.android;
 
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -24,6 +23,7 @@ public class AndroidGraphics extends AbstractGraphics {
     private SurfaceHolder _holder;  // TODO: esta referencia es innecesaria creo
     private Paint _paint;
     private Canvas _canvas;
+    Rect _textBounds;   // Para colocar el texto correctamente
 
     public AndroidGraphics(AppCompatActivity activity, int virtualWidth, int virtualHeight){
         super();
@@ -35,6 +35,8 @@ public class AndroidGraphics extends AbstractGraphics {
 
         _assetsManager = activity.getAssets();
         activity.setContentView(_view);
+
+        _textBounds = new Rect();
     }
 
     public void adjustCanvasToView(){
@@ -261,7 +263,6 @@ public class AndroidGraphics extends AbstractGraphics {
 
         AndroidFont af = (AndroidFont)font;
         _paint.setTypeface(af.get_font());
-        _paint.setTextAlign(Paint.Align.CENTER);
         _paint.setFakeBoldText(af.getBold());
         _paint.setTextSize(af.getSize()*_scale);
     }
@@ -280,9 +281,12 @@ public class AndroidGraphics extends AbstractGraphics {
 
         float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(pY * _virtualY);
-        // TODO: quitar numero magico
-        rY +=_paint.getTextSize() / 6.f * _scale;
-        _canvas.drawText(text, rX, rY, _paint);
+
+
+        _paint.getTextBounds(text, 0, text.length(), _textBounds);
+
+        //rY +=_paint.getTextSize() / 6.f * _scale;
+        _canvas.drawText(text, rX - _textBounds.exactCenterX(), rY - _textBounds.exactCenterY(), _paint);
     }
 
     /**
