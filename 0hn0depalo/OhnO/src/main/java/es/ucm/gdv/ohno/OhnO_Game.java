@@ -37,6 +37,7 @@ public class OhnO_Game extends AbstractScene {
     private List<Square> locked; // Las casillas lockeadas
     private Square _hintedSquare;
     private Square _hintedSquareCircle;//para poder hacer el fadeOut de la pista
+    private boolean _undoOnce; //para saber si se ha pulsado deshacer movimiento por primera vez
 
     private int _numGreys, _startNumGrey;       //numero de casillas grises, para hacer el porcentaje
     private boolean _showLock;   //booleano para mostrar o no el candado en los rojos
@@ -50,9 +51,9 @@ public class OhnO_Game extends AbstractScene {
     private float _sizeTextAlpha = 0.0f;
     private int _sizeTextFadeFactor = 1;    // 1 = fadeIn // -1 = fadeOut
 
-    private String _hintText;
-    private float _hintTextAlpha = 0.0f;
-    private int _hintTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
+    private String _hintUndoText;   //texto para las pistas o deshacer movimiento
+    private float _hintUndoTextAlpha = 0.0f;
+    private int _hintUndoTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     //para hacer fade-in al empezar la escena
     private float _sceneFadeTime = 0.5f;
@@ -84,7 +85,7 @@ public class OhnO_Game extends AbstractScene {
         _lockImg = _graphics.newImage("assets/images/lock.png");
 
         _sizeText = _numCircles + " x " + _numCircles;
-        _hintText = "";
+        _hintUndoText = "";
     }
 
     @Override
@@ -126,21 +127,21 @@ public class OhnO_Game extends AbstractScene {
                 _engine.setScene(new OhnO_SelectSize());
             }
             else if (X >= 3*xOffset - _widthImages / 2 && X <= 3*xOffset + _widthImages / 2){
-                //System.out.println("He pulsado deshacer movimiento");
                 undoMove();
 
             }
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
-                if(_hintedSquare == null) {
-                    _hintText = giveHint();
+                if(_hintUndoText == ""/*_hintedSquare == null*/) {
+                    _hintUndoText = giveHint();
                     _hintedSquareCircle = _hintedSquare;
                     _sizeTextFadeFactor = -1;
-                    _hintTextFadeFactor = 1;
+                    _hintUndoTextFadeFactor = 1;
                 }
                 else{
+                    _hintUndoText = "";
                     _hintedSquare = null;
                     _sizeTextFadeFactor = 1;
-                    _hintTextFadeFactor = -1;
+                    _hintUndoTextFadeFactor = -1;
                 }
             }
         }
@@ -177,8 +178,8 @@ public class OhnO_Game extends AbstractScene {
 
 
         // Texto de las hints
-        _hintTextAlpha += _hintTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
-        _hintTextAlpha = clamp(_hintTextAlpha, 0.0f, 255.0f);
+        _hintUndoTextAlpha += _hintUndoTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
+        _hintUndoTextAlpha = clamp(_hintUndoTextAlpha, 0.0f, 255.0f);
 
         // Casillas que se esten animando
 
@@ -253,8 +254,8 @@ public class OhnO_Game extends AbstractScene {
         f.setSize(fontSize/1.5f);
         _graphics.setFont(f);
         // Escribe la pista
-        _graphics.setColor(0,0,0,(int)_hintTextAlpha);
-        _graphics.drawText(_hintText, 1f/2, 0.1f);
+        _graphics.setColor(0,0,0,(int)_hintUndoTextAlpha);
+        _graphics.drawText(_hintUndoText, 1f/2, 0.1f);
 
 
         // Dimensiones del tablero
@@ -272,13 +273,13 @@ public class OhnO_Game extends AbstractScene {
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
                 if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
-                    _graphics.setColor(0, 0, 0, (int)_hintTextAlpha);
+                    _graphics.setColor(0, 0, 0, (int)_hintUndoTextAlpha);
                     _graphics.fillCircle(xPos, yPos, (_boardCircleDiam / 2) *1.1f);
-                    if(_hintTextAlpha == 0)
+                    if(_hintUndoTextAlpha == 0)
                         _hintedSquareCircle=null;
                     _graphics.setColor(0, 0, 0, 255);
                     _graphics.fillCircle(xPos, yPos, (_boardCircleDiam / 2) *1.1f);
-                    if(_hintTextAlpha == 0)
+                    if(_hintUndoTextAlpha == 0)
                         _hintedSquareCircle=null;
                 }
                 // Dibujar la casilla
@@ -1090,10 +1091,51 @@ public class OhnO_Game extends AbstractScene {
         if (_hintedSquare != null){
             _hintedSquare = null;
             _hintedSquareCircle = null;
+            if(_hintUndoText != "") {
+                _hintUndoText = "";
+                _sizeTextFadeFactor = 1;
+                _hintUndoTextFadeFactor = -1;
+            }
+
         }
         else if(_oppositeMoves.size() > 0) {
             TouchEvent e = _oppositeMoves.pop();
             activateCell((int) e.getX(), (int) e.getY(), e.isRightMouse(), false);
+            _undoOnce = true;
+            Square square = board[(int) e.getY()+1][(int) e.getX()+1];
+            switch (square.currentState){
+                case Red:
+                    _hintUndoText = "Casilla vuelta roja";
+                    break;
+                case Blue:
+                    _hintUndoText = "Casilla vuelta azul";
+                    break;
+                case Grey:
+                    _hintUndoText = "Casilla vuelta gris";
+                    break;
+            }
+            _sizeTextFadeFactor = -1;
+            _hintUndoTextFadeFactor = 1;
+
+        }
+        else{
+            if(!_undoOnce) {
+                _hintUndoText = "Boton de deshacer";
+                _sizeTextFadeFactor = -1;
+                _hintUndoTextFadeFactor = 1;
+            }
+            else {
+                if(_hintUndoText == "") {
+                    _hintUndoText = "Nada que deshacer";
+                    _sizeTextFadeFactor = -1;
+                    _hintUndoTextFadeFactor = 1;
+                }
+                else{
+                    _hintUndoText = "";
+                    _sizeTextFadeFactor = 1;
+                    _hintUndoTextFadeFactor = -1;
+                }
+            }
         }
     }
 }
