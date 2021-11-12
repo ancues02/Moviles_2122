@@ -94,8 +94,9 @@ public class OhnO_Game extends AbstractScene {
         List<TouchEvent> events = _input.getTouchEvents();
         while(events.size() > 0) {
             TouchEvent touchEvent = events.get(0);
-            events.remove(0);
             processInput(touchEvent);
+            _input.popEvent(touchEvent);
+            System.out.println("pop de evento");
         }
     }
 

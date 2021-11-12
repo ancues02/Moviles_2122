@@ -34,6 +34,11 @@ public class AndroidInput implements Input, View.OnTouchListener {
         return _touchEventList;
     }
 
+    @Override
+    public void popEvent(TouchEvent touchEvent) {
+
+    }
+
     /**
      * Analizamos el evento que llega o lo parseamos a lo que nos interesa.
      * Solo nos quedamos con eventos de pulsar, dejar de pulsar y mover.

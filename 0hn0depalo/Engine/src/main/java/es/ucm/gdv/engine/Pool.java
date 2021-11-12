@@ -9,6 +9,8 @@ public class Pool<T> {
 
     public Pool(int maxSize, Factory<T> factory){
         this._size = maxSize;
+        this._pool = (T[])new Object[_size];
+        this._free = new LinkedList<>();
         for(int i = 0; i < _size; i++){
             _pool[i] = factory.newInstance();
             _free.push(i);
@@ -16,7 +18,7 @@ public class Pool<T> {
     }
 
     public T obtain(){
-        if(!_free.isEmpty()){
+        if(_free.isEmpty()){
             System.err.println("Could not instantiate object, pool is full");
             return null;
         }
@@ -31,6 +33,7 @@ public class Pool<T> {
             if(_pool[i]==obj){
                 _free.add(i);
             }
+            i++;
         }
     }
 }

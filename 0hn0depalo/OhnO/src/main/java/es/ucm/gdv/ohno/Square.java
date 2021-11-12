@@ -50,7 +50,6 @@ public class Square extends FadeObject {
     public int total = 0;               //adyacentes totales (suma de row + column)
     public SquareColor solutionState;   //tiene que ser rojo para ganar
     public boolean lock = false;        //los que ve el jugador
-    //public boolean shake = false;       //para hacer la vibracion
     public boolean drawBlack = false;   //para rodearlo de negro (pista, deshacer...)
 
     public int playerRow = 0;           //adyacentes en esa fila
@@ -67,7 +66,7 @@ public class Square extends FadeObject {
 
     @Override
     public void update(float deltaTime) {
-        // Animar alpha
+        // Animar fadeOut
         if(alphaTime < animTime) {
             alphaTime += deltaTime;
             fadeOut(deltaTime);
@@ -79,8 +78,6 @@ public class Square extends FadeObject {
             wiggleTime = Math.min(wiggleTime, animWiggleTime); // para que no se pase
             sizeMult = (float)(0.2 * Math.sin(6.28319 * (wiggleTime / animWiggleTime)) + 1);
         }
-
-        // Función para que varíe en animTimes segundo de 1 a 1.2, a 1, a 0.8 y a 1 de nuevo
     }
 
     public void render(Graphics g, float px, float py, float rad){
