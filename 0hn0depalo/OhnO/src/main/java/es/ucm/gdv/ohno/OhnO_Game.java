@@ -194,8 +194,6 @@ public class OhnO_Game extends AbstractScene {
         _hintUndoTextAlpha += _hintUndoTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
         _hintUndoTextAlpha = clamp(_hintUndoTextAlpha, 0.0f, 255.0f);
 
-        // Casillas que se esten animando
-
     }
 
     private void renderWin(){
@@ -351,7 +349,7 @@ public class OhnO_Game extends AbstractScene {
             board = new Square[_numCircles + 2][_numCircles + 2];//tamaño +2 para bordear con rojos
             for (int i = 0; i < board[0].length; ++i) {
                 for (int j = 0; j < board[1].length; ++j) {
-                    board[i][j] = new Square();
+                    board[i][j] = new Square(255f, 0.2f, 0.5f);
                 }
             }
             //_numGreys = _numCircles * _numCircles;
@@ -1111,6 +1109,7 @@ public class OhnO_Game extends AbstractScene {
             _numGreys--;
 
         if(!activated.lock){
+            activated.prevState = activated.currentState;
             if(leftMouse) activated.currentState = Square.SquareColor.values()[//has pulsado con click izquierdo(en android siempre)
                     (activated.currentState.ordinal() + 1) % Square.SquareColor.values().length];
             else{//has pulsado con click derecho
@@ -1125,10 +1124,11 @@ public class OhnO_Game extends AbstractScene {
             // Se añade un movimienot CONTRARIO (!leftMouse) al stack
             if(recordMove)
                 _oppositeMoves.add(new TouchEvent(TouchType.Press, indexX, indexY, 0, !leftMouse));
+            activated.beginFading();
         }else{
             _showLock = !_showLock;
             //vibrar
-
+            activated.beginVibration();
         }
     }
 

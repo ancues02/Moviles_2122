@@ -2,7 +2,21 @@ package es.ucm.gdv.ohno;
 
 import es.ucm.gdv.engine.Graphics;
 
-public class Square {
+public class Square extends FadeObject {
+
+    public Square(){
+        super(255.0f, 0.2f);
+        this.alphaTime = animTime;
+        this.wiggleTime = this.animWiggleTime = 1f;
+    }
+
+    public Square(float iniAlpha, float animTime, float animWiggleTime){
+        super(iniAlpha, animTime);
+        this.alphaTime = animTime;
+        this.wiggleTime = this.animWiggleTime = animWiggleTime;
+    }
+
+
     public enum SquareColor {
         Grey (240,240,240),
         Blue (10,180,235),
@@ -46,41 +60,61 @@ public class Square {
     public boolean showInRow = false;
     public boolean showInColumn = false;
 
+    public float sizeMult = 1.0f;
+    private float animWiggleTime;
+    private float wiggleTime;
+    private float alphaTime;
 
-    public float sizeMult = 1.2f;
+    @Override
+    public void update(float deltaTime) {
+        // Animar alpha
+        if(alphaTime < animTime) {
+            alphaTime += deltaTime;
+            fadeOut(deltaTime);
+        }
 
-    public final float animTime = 1.0f;
-    public float alpha = 255.0f;
+        // Animar la vibracion
+        if(wiggleTime < animWiggleTime){
+            wiggleTime += deltaTime;
+            wiggleTime = Math.min(wiggleTime, animWiggleTime); // para que no se pase
+            sizeMult = (float)(0.2 * Math.sin(6.28319 * (wiggleTime / animWiggleTime)) + 1);
+        }
 
-    public void update(float deltaTime){
-        alpha -= deltaTime * (255.0f / animTime);
+        // Función para que varíe en animTimes segundo de 1 a 1.2, a 1, a 0.8 y a 1 de nuevo
     }
 
     public void render(Graphics g, float px, float py, float rad){
 
         if(drawBlack){
             g.setColor(0, 0, 0, 255);
-            g.fillCircle(px, py, rad*1.1f);
+            g.fillCircle(px, py, rad * sizeMult *1.1f);
         }
 
-        // draw prevState if fading
-        int alphaVal = (int)alpha;
-        if(alphaVal > 255) {
-            g.setColor(prevState.r, prevState.g, prevState.b, (int) alpha);
-            g.fillCircle(px, py, rad);
-        }
 
         // draw currentState
         g.setColor(currentState.r, currentState.g, currentState.b, 255);
-        g.fillCircle(px, py, rad);
+        g.fillCircle(px, py, rad * sizeMult);
+
+        // draw prevState if fading
+        if(alphaTime < animTime) {
+            g.setColor(prevState.r, prevState.g, prevState.b, (int) alpha);
+            g.fillCircle(px, py, rad * sizeMult);
+        }
 
         if(lock && solutionState == SquareColor.Blue){
             g.setColor(255,255,255,255);
             g.drawText(String.valueOf(total), px, py);
         }
-
-
-
     }
 
+    // Restea el timer de alpha para que se haga
+    public void beginFading(){
+        alphaTime = 0;
+        alpha = 255.0f;
+    }
+
+    // resetea el timer de vibración para que se haga
+    public void beginVibration(){
+        wiggleTime = 0;
+    }
 }
