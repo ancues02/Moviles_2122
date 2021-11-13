@@ -217,7 +217,6 @@ public class AndroidGraphics extends AbstractGraphics {
         float sY = (sizeY * _scale);
         int aux = (int)(rX  - (sX/2)), aux2=(int)(rY - (sY/2));
         ai.setCanvasWidthHeight(sX/getCanvasWidth()  ,sY/getCanvasHeight() );
-
         _canvas.drawBitmap(b,
                 null,
                 new Rect(aux,aux2, aux + (int)sX, aux2 + (int)sY),

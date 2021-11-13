@@ -9,8 +9,8 @@ public enum Hint {
     SeesTooMuch ("Ve demasiado"),
     SeesToLittle ("No ve suficiente"),
     // Pistas sobre cerradas
-    MustBeRedGrey("Tiene que ser rojo"),
-    MustBeRedBlue("Tiene que ser rojo");
+    MustBeRedGrey("Deberia ser facil..."),
+    MustBeRedBlue("No lo ve ningun azul");
 
     private final String msg;
     public String getMsg(){return this.msg;}

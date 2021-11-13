@@ -21,7 +21,7 @@ public class OhnO_Game extends AbstractScene {
     private float _fontSize;
 
     // Assets
-    private Font _fontMolle, _fontJose;
+    private Font  _fontJose;
     private Image _closeImg, _historyImg, _eyeImg, _lockImg;
 
 
@@ -46,7 +46,7 @@ public class OhnO_Game extends AbstractScene {
     private float _widthImages, _heightImages;
 
     // Tiempo que tardan los textos en hacer el fade
-    private float _textFadeTime = 0.5f;
+    private final float _textFadeTime = 0.5f;
 
     private String _sizeText;
     private float _sizeTextAlpha = 0.0f;
@@ -57,16 +57,24 @@ public class OhnO_Game extends AbstractScene {
     private int _hintUndoTextFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     //para hacer fade-in al empezar la escena
-    private float _sceneFadeTime = 0.5f;
+    private final float _sceneFadeTime = 0.5f;
     private float _sceneAlpha = 255.0f;
     private int _sceneFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     //para hacer fade-out al ganar
-    private float _sceneOutFadeTime = 3.5f;
+    private final float _sceneOutFadeTime = 3.5f;
     private float _sceneOutAlpha = 255.0f;
     private int _sceneOutFadeFactor = -1;    // 1 = fadeIn // -1 = fadeOut
 
     private Stack<TouchEvent> _oppositeMoves = new Stack<TouchEvent>();
+
+    //1 segundo de delay para comprobar si se ha ganado desde el ultimo input recibido
+    private final float _timeDelay = 1;
+    private float _timeToCheck; //tiempo que queda para poder comprobar si se ha ganado
+    private boolean _canCheck = false;
+
+    private final String []_winText ={"Brillante", "Increible", "WoooW", "Fantastico"};
+    private int _winTextInd;
 
     public OhnO_Game(int num){
         _numCircles = num;
@@ -78,13 +86,11 @@ public class OhnO_Game extends AbstractScene {
         _fontSize= 120;
         _graphics = _engine.getGraphics();
         _input = _engine.getInput();
-        _fontMolle = _graphics.newFont("assets/fonts/Molle-Regular.ttf", _fontSize, false);
         _fontJose = _graphics.newFont("assets/fonts/JosefinSans-Bold.ttf", _fontSize, false);
         _closeImg = _graphics.newImage("assets/images/close.png");
         _historyImg = _graphics.newImage("assets/images/history.png");
         _eyeImg = _graphics.newImage("assets/images/eye.png");
         _lockImg = _graphics.newImage("assets/images/lock.png");
-
         _sizeText = _numCircles + " x " + _numCircles;
         _hintUndoText = "";
     }
@@ -118,9 +124,12 @@ public class OhnO_Game extends AbstractScene {
                 if(_drawBlackSquare != null ) {
                     _drawBlackSquare.drawBlack = false;
                     _drawBlackSquare = null;
+                    _sizeTextFadeFactor = 1;
+                    _hintUndoTextFadeFactor = -1;
                 }
                 System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
-                check(true);
+                _timeToCheck = _timeDelay;//para no comprobar inmediatamente que se ha ganado
+                _canCheck = true;
             }
         }
 
@@ -138,9 +147,8 @@ public class OhnO_Game extends AbstractScene {
             }
             //pedir pista
             else if (X >= 4*xOffset - _widthImages / 2 && X <= 4*xOffset + _widthImages / 2){
-                if(_hintUndoText == ""/*_hintedSquare == null*/) {
+                if(_hintUndoText == "") {
                     _hintUndoText = giveHint();
-                    //_hintedSquareCircle = _hintedSquare;
                     _sizeTextFadeFactor = -1;
                     _hintUndoTextFadeFactor = 1;
 
@@ -151,7 +159,6 @@ public class OhnO_Game extends AbstractScene {
                         _drawBlackSquare.drawBlack = false;
                         _drawBlackSquare = null;
                     }
-                    //_hintedSquare = null;
                     _sizeTextFadeFactor = 1;
                     _hintUndoTextFadeFactor = -1;
                 }
@@ -173,8 +180,6 @@ public class OhnO_Game extends AbstractScene {
             if(_sceneOutAlpha <= 0){
                 _engine.setScene(new OhnO_SelectSize());
             }
-
-
         }
 
         // Actualizacion del alpha de las casillas
@@ -193,6 +198,11 @@ public class OhnO_Game extends AbstractScene {
         _hintUndoTextAlpha += _hintUndoTextFadeFactor * deltaTime * (255.0f / _textFadeTime);
         _hintUndoTextAlpha = clamp(_hintUndoTextAlpha, 0.0f, 255.0f);
 
+        if(_timeToCheck >= 0)
+            _timeToCheck-= deltaTime;
+        if(_timeToCheck < 0 && _canCheck)
+            check(true);
+
     }
 
     private void renderWin(){
@@ -207,7 +217,7 @@ public class OhnO_Game extends AbstractScene {
 
         // Escribe el texto de ganar
         _graphics.setColor(0,0,0,255);
-        _graphics.drawText("Brillante", 1f/2, 0.1f);
+        _graphics.drawText(_winText[_winTextInd], 1f/2, 0.1f);
 
         // Dimensiones del tablero
         _xBoardOffset = 0.1f; // 1 - _xStartOffset el final
@@ -283,18 +293,6 @@ public class OhnO_Game extends AbstractScene {
         for (int i = 0; i < _numCircles; ++i) {
             for (int j = 0; j < _numCircles; ++j) {
                 boardSquare = board[i+1][j+1];
-//                if(_hintedSquareCircle != null && _hintedSquareCircle == board[i+1][j+1]) {
-//
-//                    /*if(_drawBlackSquare != null && _drawBlackSquare != boardSquare)
-//                        _drawBlackSquare.drawBlack=false;
-//                    _drawBlackSquare =  boardSquare;
-//                    _drawBlackSquare.drawBlack = true;*/
-//                    if(_hintUndoTextAlpha == 0)
-//                        _hintedSquareCircle=null;
-//
-//                    if(_hintUndoTextAlpha == 0)
-//                        _hintedSquareCircle=null;
-//                }
                 // Dibujar la casilla
 
                 boardSquare.render(_graphics, xPos, yPos, _boardCircleDiam / 2);
@@ -362,13 +360,13 @@ public class OhnO_Game extends AbstractScene {
                         board[i][j].currentState = Square.SquareColor.Red;
                         board[i][j].lock = true;
                     } else {// rellenar con aleatorios rojos y azules
-                        if (rnd.nextFloat() < 0.5) {
+                        if (rnd.nextFloat() < 0.6) {
                             board[i][j].solutionState = Square.SquareColor.Blue;
-                            board[i][j].currentState = Square.SquareColor.Grey;
+
                         } else {
                             board[i][j].solutionState = Square.SquareColor.Red;
-                            board[i][j].currentState = Square.SquareColor.Grey;
                         }
+                        board[i][j].currentState = Square.SquareColor.Grey;
                     }
                     board[i][j].posX = i;
                     board[i][j].posY = j;
@@ -425,13 +423,20 @@ public class OhnO_Game extends AbstractScene {
     }
 
 
-    // Comprueba si se ha solucionado
+
+    /**
+     * Comprueba si el tablero esta resuelto.
+     *
+     *
+     * @param player true esta jugando el jugador, false es al intentar generar un nivel soluble
+     * @return Devuelve true si el nivel esta completo
+     */
     public boolean check(boolean player){
-        if(!player){
+        _canCheck = false;
+        if(!player){//generacion del nivel
             for(int i = 1; i < board[0].length -1; ++i) {
                 for (int j = 1; j < board[1].length - 1; ++j) {
                     if(board[i][j].currentState != board[i][j].solutionState){
-
                         return false;
                     }
                 }
@@ -439,9 +444,16 @@ public class OhnO_Game extends AbstractScene {
                 countCol(i,true);
             }
         }
-        else {
+        else {//ya esta jugando el jugador
             if(_numGreys != 0) return false;
-            _hintUndoText = giveHint();
+            _hintUndoText = giveHint();//para poner que square esta mal
+            for(int i= 1; i < board.length -1; ++i){
+                countRow(i,true);
+                countCol(i,true);
+            }
+            //animaciones de los textos
+
+            //entra aqui si ha encontrado una pista, es decir, algo estaba mal
             if (_hintUndoText != "") {
                 _sizeTextFadeFactor = -1;
                 _hintUndoTextFadeFactor = 1;
@@ -450,19 +462,29 @@ public class OhnO_Game extends AbstractScene {
             _sizeTextFadeFactor = 1;
             _hintUndoTextFadeFactor = -1;
 
+            //para el fadeout de la escena
             for (int i = 1; i < board[0].length - 1; ++i) {
                 for (int j = 1; j < board[1].length - 1; ++j) {
                     board[i][j].lock = true;
+                    board[i][j].animTime = _sceneOutFadeTime;
+                    board[i][j].beginFading2();
                 }
             }
             _win = true;
+            Random rnd = new Random();
+            _winTextInd = rnd.nextInt(_winText.length);
+
         }
         return true;
     }
 
-    // Metodo para reiniciar el nivel y dejarlo como al principio
-    // si canFinish es false, significa que el nivel no se puede completar
-    // y hay que añadir mas casillas visibles rojas al empezar
+    /**
+     * Metodo para reiniciar el nivel y dejarlo como al principio. Se llama al
+     * intentar completar el nivel al principio con las pistas
+     * si canFinish es false, significa que el nivel no se puede completar
+     * y hay que añadir mas casillas visibles rojas al empezar
+     * @param canFinish true se ha podido completar, false hay que añadir un rojo
+     */
     public void reStart(Boolean canFinish){
 
         //añadir un rojo si no es posible completar el nivel
@@ -504,6 +526,16 @@ public class OhnO_Game extends AbstractScene {
     }
 
     //encontrar un gris adyacente a square y cambiarlo a rojo
+
+    /**
+     * Se llama a este metodo cuando se intenta solucionar el nivel
+     * con las pistas en su creacion. Se llama cuando no ha sido posible
+     * completarlo asi que hay que poner un rojo mas visible al inicio.
+     * Busca un rojo "adyacente" al square que le pasan por parametro
+     * que al intentar solucionar el tablero se ha quedado como gris
+     * @param square el square sobre el que buscar un rojo. Deberia ser un azul locked
+     * @return devuelve el square a modificar. devuelve board[0][0] si no encuentra ninguno
+     */
     private Square mustBeRed(Square square){
         if (square == null )
             return board[0][0]; //programacion defensiva
@@ -529,7 +561,11 @@ public class OhnO_Game extends AbstractScene {
     }
 
 
-    //Devuelve una pista
+    /**
+     * Busca pistas en los azules lockeados. Siempre se aplican las pistas en el mismo orden
+     * pero el orden de los azules lockeados no.
+     * @return Devuelve el string de la pista, "" si no encuentra ninguna
+     */
     public String giveHint(){
         Random rnd = new Random();
         //para poder generar pistas en diferentes casillas cada vez que
@@ -538,62 +574,42 @@ public class OhnO_Game extends AbstractScene {
         int i= pos;
         do{
             Square s = locked.get(i);
-            if(hint1(s,false)){
-                //_hintedSquare = s;
+            if(hint1(s,false)){//ve suficiente como para cerrarlo
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
                 _drawBlackSquare.drawBlack = true;
-                countRow(s.posX,true);
-                countCol(s.posY,true);
                 return Hint.CanClose.getMsg();
             }
-            else if(hint2(s,false)){
-                //_hintedSquare = s;
+            else if(hint2(s,false)){//se puede cerrar un camino
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
                 _drawBlackSquare.drawBlack = true;
-                countRow(s.posX,true);
-                countCol(s.posY,true);
                 return Hint.WouldSeeTooMuch.getMsg();
 
             }
-            else if(hint3(s,false)){
-                System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
-                //_hintedSquare = s;
+            else if(hint5(s)){//tiene que ver mas
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
                 _drawBlackSquare.drawBlack = true;
-                countRow(s.posX,true);
-                countCol(s.posY,true);
+                return Hint.SeesToLittle.getMsg();
+            }
+            else if(hint3(s,false)){//puede poner en alguna direccion asegurada
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
                 return Hint.WouldSeeTooLittle.getMsg();
 
             }
-            else if(hint4(s)){
-                System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
-                //_hintedSquare = s;
+            else if(hint4(s)){//ve mas de lo que deberia
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
                 _drawBlackSquare.drawBlack = true;
-                countRow(s.posX,true);
-                countCol(s.posY,true);
                 return Hint.SeesTooMuch.getMsg();
-
-            }
-            else if(hint5(s)){
-                System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
-                //_hintedSquare = s;
-                if(_drawBlackSquare != null && _drawBlackSquare != s)
-                    _drawBlackSquare.drawBlack=false;
-                _drawBlackSquare =  s;
-                _drawBlackSquare.drawBlack = true;
-                countRow(s.posX,true);
-                countCol(s.posY,true);
-                return Hint.SeesToLittle.getMsg();
-
             }
             i++;
             i %= locked.size();
@@ -602,111 +618,112 @@ public class OhnO_Game extends AbstractScene {
         //Si no ha encontrado ninguna pista, se busca poner rojos obligatorios
         for( i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j) {
-                if(!board[i][j].lock)
-                    if(hint6_7(board[i][j], false)) {
-                        //_hintedSquare = (board[i][j]);
-                        if(_drawBlackSquare != null && _drawBlackSquare != board[i][j])
-                            _drawBlackSquare.drawBlack=false;
-                        _drawBlackSquare =  board[i][j];
-                        _drawBlackSquare.drawBlack = true;
-                        System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
-                                + " " + (board[i][j].posY - 1));
+                if(!board[i][j].lock && hint6_7(board[i][j], false))
+                    if(_drawBlackSquare != null && _drawBlackSquare != board[i][j])
+                        _drawBlackSquare.drawBlack=false;
+                    _drawBlackSquare =  board[i][j];
+                    _drawBlackSquare.drawBlack = true;
 
-                        if(board[i][j].currentState == Square.SquareColor.Blue)
-                            return Hint.MustBeRedBlue.getMsg();
-                        return Hint.MustBeRedGrey.getMsg();
-                    }
-
+                    if(board[i][j].currentState == Square.SquareColor.Blue)
+                        return Hint.MustBeRedBlue.getMsg();
+                    return Hint.MustBeRedGrey.getMsg();
             }
         }
         return "";
     }
 
-    // Aplica pistas. Se usa para terminar de generar un nivel soluble
+
+    /**
+     * Aplica pistas. Se usa para conseguir generar un nivel soluble
+     * @return Devuelve true si consigue aplicar una pista
+     */
     public boolean doHint(){
 
         for(Square s : locked){
             if(hint1(s,true)){
-                //System.out.println("Pista 1 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint2(s,true)){
-                //System.out.println("Pista 2 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint3(s,true)){
-                //System.out.println("Pista 3 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint4(s)){
-                //System.out.println("Pista 4 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
             else if(hint5(s)){
-                //System.out.println("Pista 5 aceptada en "+(s.posX -1) + " "+ (s.posY -1));
                 countRow(s.posX,true);
                 countCol(s.posY,true);
                 return true;
             }
-        }
+        }//ha terminado de aplicar las pistas
 
         //si alguno de los locked no estan completos, no se puede completar el nivel
         for(Square s : locked) {
             if (s.total != s.playerColumn + s.playerRow) {
                 return false;
-                //break;
             }
         }
 
         for(int i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j) {
-                if(!board[i][j].lock)
-                    if(hint6_7(board[i][j], true)) {
-                        //System.out.println("Pista 6/7 aceptada en " + (board[i][j].posX - 1)
-                        //+ " " + (board[i][j].posY - 1));
-                        countRow(board[i][j].posX,true);
-                        countCol(board[i][j].posY,true);
-                        return true;
-                    }
-
+                if(!board[i][j].lock && hint6_7(board[i][j], true)) {
+                    countRow(board[i][j].posX, true);
+                    countCol(board[i][j].posY, true);
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    //devuelve true si ve suficiente para cerrarlo y no esta cerrado.
-    private boolean hint1(Square square, boolean modify){
-        boolean check = square.total == square.playerColumn + square.playerRow;
-        if(check) {
-            for (Dirs d : Dirs.values()) {//buscar en todas las direcciones
-                int x = square.posX;
-                int y = square.posY;
 
-                while (board[x][y].currentState == Square.SquareColor.Blue) {
-                    x += d.getRow();
-                    y += d.getCol();
-                }//ha encontrado una casilla que no es azul
+    /**
+     * Si ve los azules necesarios, busca en todas las direcciones en busqueda de un gris
+     * si encuentra uno antes que un rojo es que se puede cerrar
+     * @param square el square a comprobar la pista
+     * @param modify si es true modifica el tablero, se usa para generar el nivel
+     * @return devuelve true si ve suficiente como para cerrarlo y no esta cerrado
+     */
+    private boolean hint1(Square square, boolean modify) {
+        if (square.total != square.playerColumn + square.playerRow) return false;
 
-                //si es gris se cumple la pista
-                if(board[x][y].currentState == Square.SquareColor.Grey){
-                    if(modify)
-                        board[x][y].currentState = Square.SquareColor.Red;
-                    return true;
-                }
+        for (Dirs d : Dirs.values()) {//buscar en todas las direcciones
+            int x = square.posX;
+            int y = square.posY;
+
+            while (board[x][y].currentState == Square.SquareColor.Blue) {
+                x += d.getRow();
+                y += d.getCol();
+            }//ha encontrado una casilla que no es azul
+
+            //si es gris se cumple la pista
+            if (board[x][y].currentState == Square.SquareColor.Grey) {
+                if (modify)
+                    board[x][y].currentState = Square.SquareColor.Red;
+                return true;
             }
         }
-        return  false;
+        return false;
     }
 
-    //devuelve true si veria demasiados. Es decir, tiene que poner un rojo en cierta direccion
+    /**
+     * Buscamos en todas las direcciones un square gris antes de llegar a uno rojo
+     * Si en esa direccion el siguiente es azul, comprobamos si veria
+     * demas al colocar el azul en la posicion gris
+     * @param square el square a comprobar la pista
+     * @param modify si es true modifica el tablero, se usa para generar el nivel
+     * @return devuelve si veria demasiados azules poniendo un azul en alguna direccion
+     */
     private boolean hint2(Square square, boolean modify){
         for (Dirs d : Dirs.values()) {//buscar en todas las direcciones
             int x = square.posX;
@@ -718,7 +735,6 @@ public class OhnO_Game extends AbstractScene {
 
             if(board[x][y].currentState == Square.SquareColor.Grey &&   // Hay un gris seguido de un azul
                     board[x + d.getRow()][y + d.getCol()].currentState == Square.SquareColor.Blue){
-                //x += d.getRow();y += d.getCol();
                 if(d == Dirs.UP || d == Dirs.DOWN){ // Columna
                     if((board[x+d.getRow()][y+d.getCol()].playerColumn + (square.playerRow + square.playerColumn + 1))
                             > (square.total)) {
@@ -742,6 +758,13 @@ public class OhnO_Game extends AbstractScene {
         return false;
     }
 
+    /**
+     * Mira en todas las direcciones en busca de una en la que por descarte
+     * tenga que poner un azul.
+     * @param square el square a comprobar la pista
+     * @param modify si es true modifica el tablero, se usa para generar el nivel
+     * @return devuelve si debe poner un azul en alguna direccion
+     */
     private boolean hint3(Square square, boolean modify){
         //guardamos los que puede ver y los que ya ve por cada direccion
         //vamos a guardar en las 4 direcciones los que pueden ser azules,
@@ -819,12 +842,18 @@ public class OhnO_Game extends AbstractScene {
         return count < square.total - posAdyCount[3][1];
     }
 
-    //Ve más de los que puede ver
+    /**
+     * @param square el square al que comprobar la pista
+     * @return devuelve si ve mas de los que deberia
+     */
     private boolean hint4(Square square){
         return square.total < square.playerColumn + square.playerRow;
     }
 
-    //Tiene que ver más y ya está cerrado
+    /**
+     * @param square el square a comprobar
+     * @return devuelve si tiene que ver mas y esta cerrado
+     */
     private boolean hint5(Square square){
         //si ves menos de los que deberias y al final de tus adyacentes azules hay un rojo
         if(square.total > square.playerColumn + square.playerRow){
@@ -845,8 +874,11 @@ public class OhnO_Game extends AbstractScene {
         return false;
     }
 
-    //devuelve si el square esta rodeado por rojos
-    //le tienen que llegar square azules o grises
+    /**
+     * @param square le tienen que llegar square azules o grises
+     * @param modify si es true modifica el tablero, se usa para generar el nivel
+     * @return devuelve si el square esta rodeado por rojos
+     */
     private boolean hint6_7(Square square, boolean modify){
         if(square.currentState == Square.SquareColor.Red ) return false;
         for(Dirs d: Dirs.values()){//buscar en todas direcciones que no haya un azul
@@ -1042,7 +1074,6 @@ public class OhnO_Game extends AbstractScene {
                     locked.add(board[i][j]);
                     board[i][j].showInRow = true;
                     board[i][j].currentState = board[i][j].solutionState;
-                    //_numGreys--;
                 }
             }
             j++;
@@ -1068,13 +1099,19 @@ public class OhnO_Game extends AbstractScene {
                     locked.add(board[i][j]);
                     board[i][j].showInColumn = true;
                     board[i][j].currentState = board[i][j].solutionState;
-                    //_numGreys--;
                 }
             }
             i++;
         }
     }
 
+    /**
+     * Se llama al generar el nivel
+     * Revela algunos rojos y ademas los azules encerrados por rojos los cambia a azules
+     * Revela los azules "necesarios", los que no han sido visto por otro azul de su fila
+     * ni por otro azul de su columna. Comprueba de derecha a izquierda y de arriba abajo.
+     * Por eso es mas probable que hayan azules revelados en las primeras filas y columnas
+     */
     private void reveal(){
         int size = board[0].length;
         Random r = new Random();
@@ -1086,10 +1123,9 @@ public class OhnO_Game extends AbstractScene {
                     board[i][j].solutionState = Square.SquareColor.Red;
                 }
                 if(board[i][j].solutionState == Square.SquareColor.Red){
-                    if(r.nextFloat() >=0.6f) {
+                    if(r.nextFloat() >=0.8f) {
                         board[i][j].lock = true;
                         board[i][j].currentState = Square.SquareColor.Red;
-                        //_numGreys--;
                     }
                 }
             }
@@ -1101,8 +1137,14 @@ public class OhnO_Game extends AbstractScene {
         }
     }
 
+    /**
+     * Activa la celda en cuestion, se llama desde el input
+     * @param indexX casilla j del tablero
+     * @param indexY casilla i del tablero
+     * @param leftMouse si se ha pulsado con el click izquierdo
+     * @param recordMove si hay que guardar el movimiento
+     */
     private void activateCell(int indexX, int indexY, boolean leftMouse, boolean recordMove){
-       // if(_hintedSquare != null) _hintedSquare = null;
         Square activated = board[indexY+1][indexX+1];
         if(activated.currentState == Square.SquareColor.Grey)//vamos a quitar un gris
             _numGreys--;
@@ -1131,20 +1173,20 @@ public class OhnO_Game extends AbstractScene {
         }
     }
 
+    /**
+     * Deshace el ultimo movimiento, modifica el texto en funcion del
+     * movimiento que deshace y pone un circulo negro al rededor del
+     * square modificado. Hace mas comprobaciones por si se ha pulsado
+     * una pista antes no se hace el deshacer movimiento y quita
+     * el circulo negro de la pista y quita el texto que ha generado
+     *...
+     */
     private void undoMove(){
-        if(_drawBlackSquare != null )
+        if(_drawBlackSquare != null )//si hay alun square remarcado con negro lo deja de hacer
             _drawBlackSquare.drawBlack=false;
-        /*if (_hintedSquare != null){
-            _hintedSquare = null;
-            _hintedSquareCircle = null;
-            if(_hintUndoText != "") {
-                _hintUndoText = "";
-                _sizeTextFadeFactor = 1;
-                _hintUndoTextFadeFactor = -1;
-            }
 
-        }
-        else*/ if(_oppositeMoves.size() > 0) {
+        //hay movimientos para deshacer
+        if(_oppositeMoves.size() > 0) {
             TouchEvent e = _oppositeMoves.pop();
             activateCell((int) e.getX(), (int) e.getY(), e.isRightMouse(), false);
             _undoOnce = true;
@@ -1160,37 +1202,30 @@ public class OhnO_Game extends AbstractScene {
                     _hintUndoText = "Casilla vuelta gris";
                     break;
             }
-
             _drawBlackSquare =  square;
             _drawBlackSquare.drawBlack = true;
             _sizeTextFadeFactor = -1;
             _hintUndoTextFadeFactor = 1;
-
         }
+        //no hay movimientos por deshacer y no hay texto
         else if(_hintUndoText == ""){
-            if(!_undoOnce) {
+            if(!_undoOnce) {//decir al jugador que boton es ese (no ha pulsado una square todavia)
                 _hintUndoText = "Boton de deshacer";
                 _sizeTextFadeFactor = -1;
                 _hintUndoTextFadeFactor = 1;
             }
-            else {
-                if(_hintUndoText == "") {
-                    if(_drawBlackSquare != null ) {
-                        _drawBlackSquare.drawBlack = false;
-                        _drawBlackSquare=null;
-                    }
-
-                    _hintUndoText = "Nada que deshacer";
-                    _sizeTextFadeFactor = -1;
-                    _hintUndoTextFadeFactor = 1;
+            else {//ya ha pulsado alguna casilla pero no hay nada que deshacer
+                if(_drawBlackSquare != null ) {
+                    _drawBlackSquare=null;
                 }
-
+                _hintUndoText = "Nada que deshacer";
+                _sizeTextFadeFactor = -1;
+                _hintUndoTextFadeFactor = 1;
             }
         }
-        else{
+        else{//quitar el texto que haya
             _hintUndoText = "";
             if(_drawBlackSquare != null ) {
-                _drawBlackSquare.drawBlack = false;
                 _drawBlackSquare=null;
             }
             _sizeTextFadeFactor = 1;
