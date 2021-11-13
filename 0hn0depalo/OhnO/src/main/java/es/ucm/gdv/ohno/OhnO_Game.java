@@ -20,6 +20,10 @@ public class OhnO_Game extends GenericScene {
     private Input _input;
     private float _fontSize;
 
+    //para que no se generen puzzles con muchos azules adyacentes
+    //maximo del ancho del tablero
+    private int _maxBlueAdy;
+
     // Assets
     private Font  _fontJose;
     private Image _closeImg, _historyImg, _eyeImg, _lockImg;
@@ -261,8 +265,7 @@ public class OhnO_Game extends GenericScene {
             return;
         }
         float fontSize= 75;
-
-
+        
         // Tamaño del tablero
         Font f = _fontJose;
         f.setBold(true);
@@ -345,13 +348,13 @@ public class OhnO_Game extends GenericScene {
         //rellenamos el tablero con azules y rojos de forma aleatoria
         //minimo un rojo y un azul que no este rodeado por rojos
         do {
+            _maxBlueAdy = 0;
             board = new Square[_numCircles + 2][_numCircles + 2];//tamaño +2 para bordear con rojos
             for (int i = 0; i < board[0].length; ++i) {
                 for (int j = 0; j < board[1].length; ++j) {
                     board[i][j] = new Square(255f, 0.2f, 0.5f);
                 }
             }
-            //_numGreys = _numCircles * _numCircles;
             Random rnd = new Random();
             locked = new ArrayList<>();
             for (int i = 0; i < board[0].length; ++i) {
@@ -362,7 +365,7 @@ public class OhnO_Game extends GenericScene {
                         board[i][j].currentState = Square.SquareColor.Red;
                         board[i][j].lock = true;
                     } else {// rellenar con aleatorios rojos y azules
-                        if (rnd.nextFloat() < 0.6) {
+                        if (rnd.nextFloat() < 0.7) {
                             board[i][j].solutionState = Square.SquareColor.Blue;
 
                         } else {
@@ -381,12 +384,16 @@ public class OhnO_Game extends GenericScene {
                 countRow(i, false);//cuenta los adyacentes azules que hay en esa fila
                 countCol(i, false);//cuenta los adyacentes azules que hay en esa columna
             }
-
+            outo:
             for (int i = 1; i < board[0].length - 1; ++i) {
                 for (int j = 1; j < board[0].length - 1; ++j) {
                     board[i][j].total = board[i][j].row + board[i][j].column;
+                    _maxBlueAdy = Math.max(board[i][j].total, _maxBlueAdy);
+                    if(_maxBlueAdy > _numCircles) break outo; // si nos pasamos del limite dejar generar el tablero
                 }
             }
+            // si nos pasamos del limite dejar generar el tablero
+            if(_maxBlueAdy > _numCircles) continue;
 
             reveal();
 
@@ -394,17 +401,17 @@ public class OhnO_Game extends GenericScene {
                 countRow(i, true);//cuenta los adyacentes azules que hay en esa fila
                 countCol(i, true);//cuenta los adyacentes azules que hay en esa columna
             }
-
-        } while (locked.size() == 0);//tablero con al menos dos azules juntos
+        //tablero con al menos dos azules juntos y un maximo de azules adyacentes del ancho del tablero
+        } while (locked.size() == 0 || _maxBlueAdy > _numCircles);
 
         do {//terminar de crear una solucion valida
             if (!doHint()) {//si no se ha completado el nivel y no se pueden aplicar mas pistas
-                reStart(false); //añade un rojo y resetea el nivel al principio
+                reStart(false); //añade un rojo visible y resetea el nivel al principio
             }
         } while (!check(false));
 
 
-        reStart(true);
+        reStart(true);//se ha podido pasar el nivel, poner valores iniciales para el jugador
         _startNumGrey = _numGreys;
     }
 
@@ -592,6 +599,14 @@ public class OhnO_Game extends GenericScene {
                 return Hint.WouldSeeTooMuch.getMsg();
 
             }
+            else if(hint5(s)){
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
+                return Hint.SeesToLittle.getMsg();
+
+            }
             else if(hint3(s,false)){
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
@@ -606,14 +621,6 @@ public class OhnO_Game extends GenericScene {
                 _drawBlackSquare =  s;
                 _drawBlackSquare.drawBlack = true;
                 return Hint.SeesTooMuch.getMsg();
-
-            }
-            else if(hint5(s)){
-                if(_drawBlackSquare != null && _drawBlackSquare != s)
-                    _drawBlackSquare.drawBlack=false;
-                _drawBlackSquare =  s;
-                _drawBlackSquare.drawBlack = true;
-                return Hint.SeesToLittle.getMsg();
 
             }
             i++;
@@ -1131,7 +1138,7 @@ public class OhnO_Game extends GenericScene {
                     board[i][j].solutionState = Square.SquareColor.Red;
                 }
                 if(board[i][j].solutionState == Square.SquareColor.Red){
-                    if(r.nextFloat() >=0.8f) {
+                    if(r.nextFloat() >=0.95f) {
                         board[i][j].lock = true;
                         board[i][j].currentState = Square.SquareColor.Red;
                     }
