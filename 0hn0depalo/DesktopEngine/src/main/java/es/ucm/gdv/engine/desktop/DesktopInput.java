@@ -34,12 +34,17 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
     }
 
     private void addEvent(MouseEvent mouseEvent, TouchType type){
-        float posX = _dGraphics.realToVirtualX(mouseEvent.getX());
-        float posY = _dGraphics.realToVirtualY(mouseEvent.getY());
         TouchEvent event = _eventPool.obtain();
-        event.set(type, posX, posY, mouseEvent.getID(), (mouseEvent.getButton() == MouseEvent.BUTTON1));
-        synchronized(this) {
-            _touchEventList.add(event);
+        if(event != null) {
+            float posX = _dGraphics.realToVirtualX(mouseEvent.getX());
+            float posY = _dGraphics.realToVirtualY(mouseEvent.getY());
+            event.set(type,
+                    posX, posY,
+                    mouseEvent.getID(),
+                    (mouseEvent.getButton() == MouseEvent.BUTTON1));
+            synchronized (this) {
+                _touchEventList.add(event);
+            }
         }
     }
 
