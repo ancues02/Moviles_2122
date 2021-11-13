@@ -274,10 +274,8 @@ public class AndroidGraphics extends AbstractGraphics {
         float rX = virtualToRealX(pX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(pY * _virtualY);
 
-
         _paint.getTextBounds(text, 0, text.length(), _textBounds);
-
-        //rY +=_paint.getTextSize() / 6.f * _scale;
+        
         _canvas.drawText(text, rX - _textBounds.exactCenterX(), rY - _textBounds.exactCenterY(), _paint);
     }
 
