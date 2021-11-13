@@ -1,13 +1,38 @@
 package es.ucm.gdv.engine.android;
 
-import es.ucm.gdv.engine.AbstractEngine;
+import es.ucm.gdv.engine.GenericEngine;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class AndroidEngine extends AbstractEngine implements Runnable{
+
+/**
+ * Clase que implementa el motor para Android.
+ *
+ * Se encarga de propocionar las instancias del motor
+ * de renderizado y el gestor de entrada. Ademas se ocupa
+ * de toda la gestion del bucle principal del juego en
+ * una hebra distinta y proporciona los metodos para
+ * gestionar esta hebra teniendo el cuenta el ciclo de vida
+ * de una actividad en android.
+ */
+public class AndroidEngine extends GenericEngine implements Runnable{
+    // Atributos
+
+    // Objeto Thread que ejecutara el bucle principal en una hebra distinta
     Thread _gameLoopTh;
+
+    // Flag que indica si se esta ejecutando el hilo del bucle principal.
+    // Se usa para sincronizacion entre threads y por eso es volatile.
     protected volatile boolean _running;
 
+    /**
+     * Constructor
+     * Crea las instancias del motor grafico y el gestor de entrada especificas de Android
+     *
+     * @param activity La actividad asociada. Necesaria para la creacion del motor grafico
+     * @param virtualHeight Anchura del canvas virtual deseado para la aplicacion
+     * @param virtualHeight Altura del canvas virtual deseado para la aplicacion
+     */
     public AndroidEngine(AppCompatActivity activity, int virtualWidth, int virtualHeight){
         super();
         _graphics = new AndroidGraphics(activity,virtualWidth,virtualHeight);
@@ -15,6 +40,10 @@ public class AndroidEngine extends AbstractEngine implements Runnable{
         _running = false;
     }
 
+    /**
+     * Método llamado para solicitar que se continue con el
+     * bucle principal del juego.
+     */
     public void resume(){
         if (!_running) {
             // Solo hacemos algo si no nos estábamos ejecutando ya
@@ -26,11 +55,16 @@ public class AndroidEngine extends AbstractEngine implements Runnable{
             _gameLoopTh = new Thread(this);
             _gameLoopTh.start();
 
-            System.out.println("GameLoopThread initiated");
-
+            //System.out.println("GameLoopThread initiated");
         }
     }
 
+    /**
+     * Método llamado para detener el bucle principal del juego.
+     *
+     * Se hace así intencionadamente, para bloquear la hebra de UI
+     * temporalmente y evitar potenciales situaciones de carrera.
+     */
     public void pause(){
         if (_running) {
             _running = false;
@@ -38,7 +72,7 @@ public class AndroidEngine extends AbstractEngine implements Runnable{
                 try {
                     _gameLoopTh.join();
                     _gameLoopTh = null;
-                    System.out.println("GameLoopThread terminated");
+                    //System.out.println("GameLoopThread terminated");
                     break;
                 } catch (InterruptedException ie) {
                     // Esto no debería ocurrir nunca...
@@ -47,7 +81,13 @@ public class AndroidEngine extends AbstractEngine implements Runnable{
         }
     }
 
+    // Metodo del interfaz Runnable
 
+    /**
+     * Método que implementa el bucle principal del juego y que será
+     * ejecutado en otra hebra.
+     * NO debe ser llamado desde el exterior.
+     */
     @Override
     public void run() {
         if (_gameLoopTh != Thread.currentThread()) {
@@ -56,6 +96,7 @@ public class AndroidEngine extends AbstractEngine implements Runnable{
         }
         while(_running && _graphics.getWidth() == 0)//sleep
             ;
+        // Cuando ya se ha inicializado la vista, ajustamos el canvas virtual
         ((AndroidGraphics)_graphics).adjustCanvasToView();
         // Ahora si podemos lanzar el bucle
         _lastFrameTime = System.nanoTime();

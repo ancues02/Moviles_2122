@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import es.ucm.gdv.engine.AbstractScene;
+import es.ucm.gdv.engine.GenericScene;
 import es.ucm.gdv.engine.Font;
 import es.ucm.gdv.engine.Graphics;
 import es.ucm.gdv.engine.Image;
@@ -13,7 +13,7 @@ import es.ucm.gdv.engine.Input;
 import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
-public class OhnO_Game extends AbstractScene {
+public class OhnO_Game extends GenericScene {
     private final float _aspectRatio = 2f/3f;
 
     private Graphics _graphics;

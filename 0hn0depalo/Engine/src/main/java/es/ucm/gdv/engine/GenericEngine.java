@@ -1,34 +1,34 @@
 package es.ucm.gdv.engine;
 
-
 /**
  * Clase abstracta que implementa Engine.
- * Tiene la funcionalidad comun que implementan los
- * motores de Pc y Android.
+ * Tiene la funcionalidad comun que implementan
+ * nuestros motores de Pc y Android.
+ * Esta funcionalidad es:
+ *   ·  El calculo a mano de las dimensiones
+ *      del canvas virtual en pantalla.
+ *   ·  Las instancias del motor grafico,
+ *      el gestor de entrada y la escena.
+ *   ·  El bucle principal y el calculo del deltaTime para
+ *      el update.
  */
-public abstract class AbstractEngine implements Engine{
-    protected AbstractGraphics _graphics;
-    protected Input _input;
+public abstract class GenericEngine implements Engine{
+    // Atributos
+
+    protected GenericGraphics _graphics;   // Instancia del motor grafico (tiene que tener un metodo render)
+    protected Input _input;                 // Instancia del gestor de entrada
     protected Scene _scene;
     protected long _lastFrameTime;
 
-    /**
-     * Cambia la escena sobra la que se ejecuta el bucle principal.
-     * El cambio se hara efectivo en la siguiente iteracion.
-     *
-     * @param scene La nueva escena
-     */
-    public void setScene(Scene scene){
-        _scene = scene;
-        _scene.setEngine(this);
-        _scene.start();
-    }
+
+    // Metodos del inerfaz Engine
 
     /**
      * Devuelve la instancia del "motor" grafico
      *
      * @return Graphics para gestionar el renderizado
      */
+    @Override
     public Graphics getGraphics(){
         return _graphics;
     };
@@ -38,9 +38,26 @@ public abstract class AbstractEngine implements Engine{
      *
      * @return Input para gestionar la entrada
      */
+    @Override
     public Input getInput(){
         return _input;
     };
+
+
+    /**
+     * Cambia la escena sobra la que se ejecuta el bucle principal.
+     * El cambio se hara efectivo en la siguiente iteracion.
+     *
+     * @param scene La nueva escena
+     */
+    @Override
+    public void setScene(Scene scene){
+        _scene = scene;
+        _scene.setEngine(this);
+        _scene.start();
+    }
+
+    // Metodos de la clase
 
     /**
      * Bucle ppal del motor.
@@ -57,7 +74,7 @@ public abstract class AbstractEngine implements Engine{
     /**
      * Calcula el deltaTime y se lo pasa al update de la aplicacion
      */
-    private void update(){
+    protected void update(){
         long currentTime = System.nanoTime();
         long nanoElapsedTime = currentTime - _lastFrameTime;
         _lastFrameTime = currentTime;

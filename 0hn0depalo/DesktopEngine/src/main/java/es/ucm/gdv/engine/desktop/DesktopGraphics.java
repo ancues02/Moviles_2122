@@ -13,7 +13,7 @@ import es.ucm.gdv.engine.*;
 
 import javax.swing.JFrame;
 
-public class DesktopGraphics extends AbstractGraphics {
+public class DesktopGraphics extends GenericGraphics {
     private JFrame _window;
     private BufferStrategy _strategy;
     private java.awt.Graphics _graphics;
@@ -220,7 +220,6 @@ public class DesktopGraphics extends AbstractGraphics {
 
     @Override
     public void fillCircle(float percentX, float percentY, float radius) {
-        //setColor(255, 0, 0, 255);
         float rX = virtualToRealX(percentX * _virtualX);     // Se ajusta a la escala puesta al canvas
         float rY = virtualToRealY(percentY * _virtualY);
         float radiusReal = radius  * _virtualX;

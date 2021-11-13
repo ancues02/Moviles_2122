@@ -3,7 +3,6 @@ package es.ucm.gdv.engine.android;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.SurfaceHolder;
@@ -11,12 +10,12 @@ import android.view.SurfaceView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import es.ucm.gdv.engine.AbstractGraphics;
+import es.ucm.gdv.engine.GenericGraphics;
 import es.ucm.gdv.engine.Scene;
 import es.ucm.gdv.engine.Font;
 import es.ucm.gdv.engine.Image;
 
-public class AndroidGraphics extends AbstractGraphics {
+public class AndroidGraphics extends GenericGraphics {
     private AssetManager _assetsManager;
 
     private SurfaceView _view;
@@ -35,7 +34,6 @@ public class AndroidGraphics extends AbstractGraphics {
 
         _assetsManager = activity.getAssets();
         activity.setContentView(_view);
-
         _textBounds = new Rect();
     }
 
@@ -54,17 +52,13 @@ public class AndroidGraphics extends AbstractGraphics {
         return (a << 24) | (r << 16) | (g << 8) | b << 0;
     }
 
-    /**
-     * Devuelve el ancho de la pantalla
-     */
+
     @Override
     public float getWidth() {
         return _view.getWidth();
     }
 
-    /**
-     * Devuelve el alto de la pantalla
-     */
+
     @Override
     public float getHeight() {
         return _view.getHeight();
@@ -80,9 +74,7 @@ public class AndroidGraphics extends AbstractGraphics {
         return _realY;
     }
 
-    /**
-     * Borra lo que haya en pantalla con el color de fondo indicado
-     */
+
     @Override
     public void clear(){
         _canvas.drawColor(colorBitshift(_bR, _bG, _bB, _bA));

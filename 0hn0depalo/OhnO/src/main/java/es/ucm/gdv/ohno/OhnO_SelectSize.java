@@ -2,7 +2,7 @@ package es.ucm.gdv.ohno;
 
 import java.util.List;
 
-import es.ucm.gdv.engine.AbstractScene;
+import es.ucm.gdv.engine.GenericScene;
 import es.ucm.gdv.engine.Font;
 import es.ucm.gdv.engine.Graphics;
 import es.ucm.gdv.engine.Image;
@@ -10,7 +10,7 @@ import es.ucm.gdv.engine.Input;
 import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
-public class OhnO_SelectSize extends AbstractScene {
+public class OhnO_SelectSize extends GenericScene {
     private final float _aspectRatio = 2f/3f;
 
 
