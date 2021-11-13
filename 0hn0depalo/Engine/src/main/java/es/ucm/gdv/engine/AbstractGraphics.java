@@ -19,10 +19,15 @@ public abstract class AbstractGraphics implements Graphics{
     protected float _scale = 1.0f;    // Multiplicador de tamaño del canvas virtual al real
     protected HashMap<String, Font> _fonts; //Fonts cargadas
     protected HashMap<String, Image> _images; //Imagenes cargadas
+    protected int _bR, _bG, _bB, _bA;
 
     protected AbstractGraphics(){
         _fonts = new HashMap<>();
         _images = new HashMap<>();
+        _bR = 255;
+        _bG = 255;
+        _bB = 255;
+        _bA = 255;
     }
 
     protected void setCanvasDimensions(float vX, float vY){
@@ -77,7 +82,12 @@ public abstract class AbstractGraphics implements Graphics{
         return rY / _virtualY;
     }
 
-    abstract public void render(Scene scene);
+    abstract public void render(Scene app);
 
-    //TODO: Color de clear y barras en el engine
+    public void setBackground(int r, int g, int b, int a){
+        _bR = r;
+        _bG = g;
+        _bB = b;
+        _bA = a;
+    }
 }

@@ -11,7 +11,7 @@ import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
 public class OhnO_Menu extends AbstractScene {
-    private Graphics _g;
+    private Graphics _graphics;
     private Input _input;
     private float _fontSize;
     private Font _fontMolle, _fontJose;
@@ -25,12 +25,13 @@ public class OhnO_Menu extends AbstractScene {
     @Override
     public void start() {
         _fontSize= 120;
-        _g = _engine.getGraphics();
+        _graphics = _engine.getGraphics();
         _input = _engine.getInput();
-        _fontMolle = _g.newFont("assets/fonts/Molle-Regular.ttf", _fontSize, false);
-        _fontJose = _g.newFont("assets/fonts/JosefinSans-Bold.ttf", _fontSize, false);
+        _fontMolle = _graphics.newFont("assets/fonts/Molle-Regular.ttf", _fontSize, false);
+        _fontJose = _graphics.newFont("assets/fonts/JosefinSans-Bold.ttf", _fontSize, false);
         //imagen final
-        _img = _g.newImage("assets/images/q42.png");
+        _img = _graphics.newImage("assets/images/q42.png");
+        _graphics.setBackground(255, 255, 255, 255);
     }
 
     @Override
@@ -52,7 +53,6 @@ public class OhnO_Menu extends AbstractScene {
         if(Y >= 0.44f && Y <= 0.58f ){
             if(X >= 0.25f && X <= 0.75f)
                 _engine.setScene(new OhnO_SelectSize());
-
         }
     }
     @Override
@@ -84,37 +84,37 @@ public class OhnO_Menu extends AbstractScene {
 
 
         //Nombre juego
-        _g.setColor(0, 0, 0, 255);
+        _graphics.setColor(0, 0, 0, 255);
         _fontMolle.setSize((_fontSize));
-        _g.setFont(_fontMolle);
+        _graphics.setFont(_fontMolle);
 
         String name = "Oh no";
-        _g.drawText(name, 0.5f, 0.25f);
+        _graphics.drawText(name, 0.5f, 0.25f);
 
         //Jugar
         _fontJose.setSize(_fontSize);
-        _g.setFont(_fontJose);
+        _graphics.setFont(_fontJose);
         name = "Jugar";
-        _g.drawText(name, 0.5f, 0.5f);
+        _graphics.drawText(name, 0.5f, 0.5f);
 
         //copiado
-        _g.setColor(180, 180, 180, 255);
+        _graphics.setColor(180, 180, 180, 255);
 
         _fontJose.setSize(_fontSize/4);
-        _g.setFont(_fontJose);
+        _graphics.setFont(_fontJose);
         name = "Un juego copiado a Q42";
-        _g.drawText(name, 0.5f, 0.65f);
+        _graphics.drawText(name, 0.5f, 0.65f);
         name = "Creado por Martin Kool";
-        _g.drawText(name, 0.5f, 0.70f);
+        _graphics.drawText(name, 0.5f, 0.70f);
 
         //imagen final
-        _g.drawImage(_img, 90,128, 0.5f, 0.87f);
+        _graphics.drawImage(_img, 90,128, 0.5f, 0.87f);
 
         //fade-in inicial de la escena, la tapamos entera
         // y le bajamos el alpha del circulo que la tapa
         if(_sceneAlpha>0) {
-            _g.setColor(255, 255, 255, (int) _sceneAlpha);
-            _g.fillCircle(0.5f, 0.5f, 1);
+            _graphics.setColor(255, 255, 255, (int) _sceneAlpha);
+            _graphics.fillCircle(0.5f, 0.5f, 1);
         }
     }
 }

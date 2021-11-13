@@ -81,6 +81,7 @@ public class OhnO_Game extends AbstractScene {
         initGame();
         _showLock = false;
     }
+
     @Override
     public void start() {
         _fontSize= 120;
@@ -93,6 +94,7 @@ public class OhnO_Game extends AbstractScene {
         _lockImg = _graphics.newImage("assets/images/lock.png");
         _sizeText = _numCircles + " x " + _numCircles;
         _hintUndoText = "";
+        _graphics.setBackground(255, 255, 255, 255);
     }
 
     @Override

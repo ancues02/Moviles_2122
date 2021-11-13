@@ -414,8 +414,6 @@ public class OhnO {
                     board[i][j].posY = j;
                 }
             }
-            //TODO: quitar esto y el metodo
-            //pruebas();
 
             //contar elementos adyacentes de la fila y columna
             //el tablero es cuadrado asi que se puede hacer asi
@@ -1099,75 +1097,6 @@ public class OhnO {
             showLock = !showLock;
             //vibrar
         }
-    }
-
-    private void pruebas(){
-        //para crear nuestro tablero si queremos, para hacer pruebas
-        for(int i = 0; i < board[0].length; ++i) {
-            for (int j = 0; j < board[1].length; ++j) {
-                //bordeamos de rojos
-                if (i == 0 || i == board[0].length - 1 || j == 0 || j == board[1].length - 1) {
-                    board[i][j].solutionState = Square.SquareColor.Red;
-                    board[i][j].currentState = Square.SquareColor.Red;
-                }
-                board[i][j].posX = i;
-                board[i][j].posY = j;
-            }
-        }
-        int x=1, y=1;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        //board[x][y].lock = true;
-        x=1; y=2;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=1; y=3;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=1; y=4;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=2; y=1;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=2; y=2;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=2; y=3;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        //board[x][y].lock = true;
-        x=2; y=4;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=3; y=1;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        //board[x][y].lock = true;
-        x=3; y=2;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        //board[x][y].lock = true;
-        x=3; y=3;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        //board[x][y].lock = true;
-        x=3; y=4;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=4; y=1;
-        board[x][y].solutionState = Square.SquareColor.Blue;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=4; y=2;
-        board[x][y].solutionState = Square.SquareColor.Blue;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=4; y=3;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        x=4; y=4;
-        board[x][y].solutionState = Square.SquareColor.Red;
-        board[x][y].currentState = Square.SquareColor.Grey;
-        //board[x][y].lock = true;
     }
 }
 

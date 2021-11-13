@@ -47,16 +47,9 @@ public class DesktopGraphics extends AbstractGraphics {
     }
 
     @Override
-    public void clear(int r, int g, int b, int a) {
-        _graphics.setColor(new Color(r, g, b, a));
+    public void clear() {
+        _graphics.setColor(new Color(_bR, _bG, _bB, _bA));
         _graphics.fillRect(0, 0, _window.getWidth(), _window.getHeight());
-
-        // TODO: Quitar esto para no ver el canvas virtual
-        /*float rX = virtualToRealX(0);     // Se ajusta a la escala puesta al canvas
-        float rY = virtualToRealY(0);
-        _graphics.setColor(new Color(180, 180, 180, 255));
-        _graphics.fillRect((int) rX, (int) rY,
-                (int) _realX, (int) _realY);*/
     }
 
     @Override
@@ -305,9 +298,9 @@ public class DesktopGraphics extends AbstractGraphics {
                 _graphics = _strategy.getDrawGraphics();
                 try {
                     //System.out.println(_window.getX() + " ahora height " + get_windowY());
-                    clear(255, 255, 255, 255);
+                    clear();
                     app.render();
-                    fillOffsets(Color.white);
+                    fillOffsets();
                 } finally {
                     _graphics.dispose();
                 }
@@ -324,7 +317,8 @@ public class DesktopGraphics extends AbstractGraphics {
         return _realY;
     }*/
 
-    private void fillOffsets(Color c){
+    private void fillOffsets(){
+        Color c = new Color(_bR, _bG, _bB, _bA);
         if(_verticalCompensation)
             fillVerticalOffsets(c);
         else

@@ -5,7 +5,7 @@ public interface Graphics {
     float getHeight();
     float getCanvasWidth();
     float getCanvasHeight();
-    void clear(int r, int g, int b, int a);
+    void clear();
 
     void translate(float x, int y);
     void scale(float x, float y);
@@ -25,4 +25,6 @@ public interface Graphics {
     void setColor(int r, int g, int b, int a);
     void drawCircle(float cx, float cy, float radius);
     void fillCircle(float cx, float cy, float radius);
+
+    public void setBackground(int r, int g, int b, int a);
 }

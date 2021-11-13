@@ -39,7 +39,7 @@ public class OhnO_SelectSize extends AbstractScene {
         _fontMolle = _graphics.newFont("assets/fonts/Molle-Regular.ttf", _fontSize, false);
         _fontJose = _graphics.newFont("assets/fonts/JosefinSans-Bold.ttf", _fontSize, false);
         _img = _graphics.newImage("assets/images/close.png");
-
+        _graphics.setBackground(255, 255, 255, 255);
     }
 
     @Override

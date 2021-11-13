@@ -81,16 +81,11 @@ public class AndroidGraphics extends AbstractGraphics {
     }
 
     /**
-     * Borra lo que haya en pantalla con el color indicado
-     *
-     * @param r Componente roja del color
-     * @param g Componente verde del color
-     * @param b Componente azul del color
-     * @param a Componente alpha del color
+     * Borra lo que haya en pantalla con el color de fondo indicado
      */
     @Override
-    public void clear(int r, int g, int b, int a){
-        _canvas.drawColor(colorBitshift(r,g,b,a));
+    public void clear(){
+        _canvas.drawColor(colorBitshift(_bR, _bG, _bB, _bA));
     }
 
     @Override
@@ -353,20 +348,9 @@ public class AndroidGraphics extends AbstractGraphics {
     public void render(Scene app){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
-        //_canvas.scale(_scale,_scale);
-        /*if(!_verticalCompensation) {
-            float aux = (_view.getWidth() - _virtualX) / 2.0f;
-            _canvas.translate(aux, 0);
-            //_canvas.scale(_scale * _aspectRatio * _realY, 1.0f);
-        }
-        else {
-            _canvas.translate((int) virtualToRealX(0), 0);
-            _canvas.scale(_scale * _aspectRatio * _realY, 1.0f);
-        }*/
-        //_canvas.drawColor(Color.RED);
-        clear(255,255,255,255);
+        clear();
         app.render();
-        fillOffsets(Color.WHITE);
+        fillOffsets();
         _holder.unlockCanvasAndPost(_canvas);
     }
 
@@ -380,7 +364,8 @@ public class AndroidGraphics extends AbstractGraphics {
         return _view;
     }
 
-    private void fillOffsets(int c){
+    private void fillOffsets(){
+        int c = colorBitshift(_bR, _bG, _bB, _bA);
         if(_verticalCompensation)
             fillVerticalOffsets(c);
         else
