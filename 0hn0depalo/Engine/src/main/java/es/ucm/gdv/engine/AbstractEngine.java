@@ -12,13 +12,6 @@ public abstract class AbstractEngine implements Engine{
     protected Scene _scene;
     protected long _lastFrameTime;
 
-    // TODO: mirar esto
-    // Flag para controlar la ejecucion del gameloop
-    // Tiene sentido que sea volatile para el android
-    // Engine, en el de desktop seria siempre true
-    // Se podria hacer de otra forma y evitar esta variable en Desktop
-    protected volatile boolean _running;
-
     /**
      * Cambia la escena sobra la que se ejecuta el bucle principal.
      * El cambio se hara efectivo en la siguiente iteracion.
@@ -50,17 +43,15 @@ public abstract class AbstractEngine implements Engine{
     };
 
     /**
-     * Lanza el bucle ppal del motor.
+     * Bucle ppal del motor.
+     * Pasamos la escena para que si hay un cambio de escena
+     * se termine la ejecucion del frame en la escena actual y se produzca
+     * el cambio de escena en el siguiente frame.
      */
-    public void launch(){
-        _lastFrameTime = System.nanoTime();
-        Scene currentScene;
-        while(_running) {
-            currentScene = _scene;
-            currentScene.handleInput();
-            update();
-            _graphics.render(currentScene);
-        }
+    public void mainLoop(Scene currentScene){
+        currentScene.handleInput();
+        update();
+        _graphics.render(currentScene);
     }
 
     /**

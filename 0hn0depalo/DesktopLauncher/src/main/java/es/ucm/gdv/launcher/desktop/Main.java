@@ -9,6 +9,6 @@ public class Main {
         e.setScene(a);//esto tiene que estar implementado en PC/AEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
         //No tiene sentido que este en la interfaz Engine porque en movil no se va a cambiar el tamaño de la ventana(no hay opcion xd).
         e.setSize(1080 / 3,1584 / 3);//esto tiene que estar implementado en PCEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
-        e.launch();
+        e.run();
     }
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class AndroidEngine extends AbstractEngine implements Runnable{
     Thread _gameLoopTh;
+    protected volatile boolean _running;
 
     public AndroidEngine(AppCompatActivity activity, int virtualWidth, int virtualHeight){
         super();
@@ -57,6 +58,9 @@ public class AndroidEngine extends AbstractEngine implements Runnable{
             ;
         ((AndroidGraphics)_graphics).adjustCanvasToView();
         // Ahora si podemos lanzar el bucle
-        launch();
+        _lastFrameTime = System.nanoTime();
+        while(_running) {
+            mainLoop(_scene);
+        }
     }
 }
