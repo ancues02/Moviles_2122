@@ -19,9 +19,9 @@ public class DesktopEngine extends GenericEngine {
      * @param virtualHeight Anchura del canvas virtual deseado para la aplicacion.
      * @param virtualHeight Altura del canvas virtual deseado para la aplicacion.
      */
-    public DesktopEngine(int width, int height, int virtualWidth, int virtualHeight){
+    public DesktopEngine(String windowName, int width, int height, int virtualWidth, int virtualHeight){
         super();
-        DesktopGraphics dg = new DesktopGraphics(width, height, virtualWidth, virtualHeight);
+        DesktopGraphics dg = new DesktopGraphics(windowName, width, height, virtualWidth, virtualHeight);
         _graphics = dg;
         _input = new DesktopInput(dg);
     }

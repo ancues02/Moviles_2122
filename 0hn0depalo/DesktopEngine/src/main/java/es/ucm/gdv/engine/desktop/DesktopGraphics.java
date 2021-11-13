@@ -1,31 +1,35 @@
 package es.ucm.gdv.engine.desktop;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
+import javax.swing.JFrame;
 
 import es.ucm.gdv.engine.*;
 
-import javax.swing.JFrame;
 
+/**
+ * Clase que implementa motor grafico en Pc
+ *
+ * //TODO Mencionar los porcentajes aqui
+ */
 public class DesktopGraphics extends GenericGraphics {
+    // Atributos
+
     private JFrame _window;
     private BufferStrategy _strategy;
     private java.awt.Graphics _graphics;
-    private AffineTransform _savedTransform;
 
-    public DesktopGraphics(int x, int y, int virtualX, int virtualY) {
+    public DesktopGraphics(String windowName, int x, int y, int virtualX, int virtualY) {
         super();
         setCanvasDimensions(virtualX,virtualY);
-        createWindow(x, y);
+        createWindow(windowName, x, y);
     }
 
-    // Metodos de la interfaz Graphics
+    // Metodos del interfaz Graphics
 
     @Override
     public float getWidth(){
@@ -52,6 +56,8 @@ public class DesktopGraphics extends GenericGraphics {
         _graphics.fillRect(0, 0, _window.getWidth(), _window.getHeight());
     }
 
+    // Metodos vacios porque no son necesarios para nuestra implementacion
+
     @Override
     public void translate(float x, int y) {
 
@@ -64,17 +70,12 @@ public class DesktopGraphics extends GenericGraphics {
 
     @Override
     public void save() {
-        _savedTransform = ((Graphics2D)_graphics).getTransform();
     }
 
     @Override
     public void restore() {
-        ((Graphics2D)_graphics).setTransform(_savedTransform);
     }
 
-    // Metodos sobre imagenes
-
-    // Metodo factoria que crea una imagen, devuelve null si no ha podido crearla
     @Override
     public Image newImage(String filename) {
         DesktopImage di = null;
@@ -101,7 +102,6 @@ public class DesktopGraphics extends GenericGraphics {
         drawImage(image, scaleX, scaleY, 0, 0);
     }
 
-    // Dibuja una imagen escalada con centro en la posicion dada
     @Override
     public void drawImage(Image image, float scaleX, float scaleY, float percentX, float percentY){
         if(image == null) return;
@@ -114,20 +114,14 @@ public class DesktopGraphics extends GenericGraphics {
         float sX = (bi.getWidth() * scaleX * _scale);
         float sY = (bi.getHeight() * scaleY * _scale);
 
-        //save();
-        //_graphics.translate((int)(rX  - (sX/2)), (int)(rY - (sY/2)));
         bi.setCanvasWidthHeight(sX/getCanvasWidth()  ,sY/getCanvasHeight() );
         _graphics.drawImage(bi.getBufferedImage(),
                 (int)(rX  - (sX/2)), (int)(rY - (sY/2)),
                 (int)(sX),
                 (int)(sY),
                 null);
-
-        //restore();
-        //_graphics.translate((int)-(rX  - (sX/2)), (int)-(rY - (sY/2)));
     }
 
-    // Dibuja una imagen del tamaño dado con centro en la posicion dada
     @Override
     public void drawImage(Image image, int sizeX, int sizeY, float percentX, float percentY){
         if(image == null) return;
@@ -146,12 +140,8 @@ public class DesktopGraphics extends GenericGraphics {
                 (int)(sY),
                 null);
 
-        //_graphics.translate((int) -(rX - (sizeX * _scale)/2), (int) -(rY - (sizeY * _scale)));
     }
 
-    // Metodos sobre fonts
-
-    // Metodo factoria que crea una font, devuelve null si no ha podido crearla
     @Override
     public Font newFont(String filename, float size, boolean isBold) {
         DesktopFont df = null;
@@ -168,7 +158,7 @@ public class DesktopGraphics extends GenericGraphics {
 
 
         df.setBold(isBold);
-        df.setSize(size /** _scale*/);
+        df.setSize(size);
         return df;
     }
 
@@ -230,8 +220,18 @@ public class DesktopGraphics extends GenericGraphics {
 
     // Metodos propios de la clase
 
-    public void createWindow(int x, int y) {
-        _window = new JFrame("0hn0 de palo");
+    /**
+     * Crea la ventana y el strategy buffer
+     * para el renderizado activo.
+     * Tambien se registra la ventana para que escuche
+     * los eventos de reescalado y pueda reaccionar a ellos.
+     *
+     * @param windowName Nombre de la ventana
+     * @param x Ancho de la ventana
+     * @param y Alto de la ventana
+     */
+    public void createWindow(String windowName, int x, int y) {
+        _window = new JFrame(windowName);
 
         _window.setSize(x, y);
         _window.setIgnoreRepaint(true);
@@ -253,8 +253,6 @@ public class DesktopGraphics extends GenericGraphics {
             return;
         }
 
-        //_window.addMouseListener(new DesktopInput(_window)) ;
-
         _strategy = _window.getBufferStrategy();
         adjustCanvasToSize(x, y);
 
@@ -275,6 +273,11 @@ public class DesktopGraphics extends GenericGraphics {
         });
     }
 
+    /**
+     * Devuelve la ventana
+     *
+     * @return La ventana
+     */
     public JFrame getWindow(){
         return _window;
     }
@@ -307,14 +310,6 @@ public class DesktopGraphics extends GenericGraphics {
             _strategy.show();
         } while (_strategy.contentsLost());
     }
-
-    /*public float getRealX(){
-        return _realX;
-    }
-
-    public float getRealY(){
-        return _realY;
-    }*/
 
     private void fillOffsets(){
         Color c = new Color(_bR, _bG, _bB, _bA);

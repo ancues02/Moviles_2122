@@ -15,15 +15,38 @@ import es.ucm.gdv.engine.Scene;
 import es.ucm.gdv.engine.Font;
 import es.ucm.gdv.engine.Image;
 
+
+/**
+ * Clase que implementa motor grafico en Android
+ *
+ * //TODO Mencionar los porcentajes aqui
+ */
 public class AndroidGraphics extends GenericGraphics {
+    // Manager de los assets para crear las imagenes y fuentes
     private AssetManager _assetsManager;
 
+    // Vista principal de la actividad
     private SurfaceView _view;
     private SurfaceHolder _holder;  // TODO: esta referencia es innecesaria creo
-    private Paint _paint;
-    private Canvas _canvas;
-    Rect _textBounds;   // Para colocar el texto correctamente
 
+    // Objeto para realizar las operaciones de
+    private Paint _paint;
+
+    // Canvas de android
+    private Canvas _canvas;
+
+    // Rect para colocar el texto correctamente
+    Rect _textBounds;
+
+    /**
+     * Constructor
+     * Crea los atributos y ajusta el canvas segun el canvas virtual indicado.
+     * Establece la vista principal de la actividad.
+     *
+     * @param activity La actividad asociada
+     * @param virtualHeight Anchura del canvas virtual deseado para la aplicacion.
+     * @param virtualHeight Altura del canvas virtual deseado para la aplicacion.
+     */
     public AndroidGraphics(AppCompatActivity activity, int virtualWidth, int virtualHeight){
         super();
         _view = new SurfaceView(activity);
@@ -36,22 +59,6 @@ public class AndroidGraphics extends GenericGraphics {
         activity.setContentView(_view);
         _textBounds = new Rect();
     }
-
-    public void adjustCanvasToView(){
-        adjustCanvasToSize(_view.getWidth(), _view.getHeight());
-    }
-
-    /**
-     * Funcion auxiliar para pasar el color a un int ARGB
-     * @param r, Componente rojo del color
-     * @param g, Componente verde del color
-     * @param b, Componente azul del color
-     * @param a, Componente alpha del color
-     */
-    private int colorBitshift(int r, int g, int b, int a){
-        return (a << 24) | (r << 16) | (g << 8) | b << 0;
-    }
-
 
     @Override
     public float getWidth() {
@@ -100,14 +107,6 @@ public class AndroidGraphics extends GenericGraphics {
 
     }
 
-    /**
-     * Devuelve una imagen. Solo la creamos una vez y la guardamos en un mapa
-     *
-     * @param filename Nombre del archivo de la imagen
-     *
-     * @return  Image Con la imagen indicada cargada
-     *          null Si la imagen no se pudo cargar
-     */
     @Override
     public Image newImage(String filename) {
         AndroidImage ai = null;
@@ -124,11 +123,6 @@ public class AndroidGraphics extends GenericGraphics {
         return ai;
     }
 
-    /**
-     * Dibuja una imagen en la posicion por defecto(0,0)
-     *
-     * @param image La imagen que se quiere dibujar
-     */
     @Override
     public void drawImage(Image image) {
         if(image == null) return;
@@ -138,27 +132,11 @@ public class AndroidGraphics extends GenericGraphics {
         _canvas.drawBitmap(ai.getBitmap(), 0, 0, _paint);
     }
 
-    /**
-     * Dibuja una imagen escalada en la posicion por defecto(0,0)
-     *
-     * @param image La imagen que se quiere dibujar
-     * @param scaleX La escala en X de la imagen
-     * @param scaleY la escala en Y de la imagen
-     */
     @Override
     public void drawImage(Image image, float scaleX, float scaleY) {
         drawImage(image, scaleX, scaleY, 0, 0);
     }
 
-    /**
-     * Dibuja una imagen escalada en la posicion dada
-     *
-     * @param image La imagen que se quiere dibujar
-     * @param scaleX La escala en X de la imagen
-     * @param scaleY la escala en Y de la imagen
-     * @param posX Coordenada x de la posicion en la que se quiere dibujar la imagen (left)
-     * @param posY Coordenada y de la posicion en la que se quiere dibujar la imagen (top)
-     */
     @Override
     public void drawImage(Image image, float scaleX, float scaleY, float posX, float posY) {
         if(image == null) return;
@@ -181,15 +159,6 @@ public class AndroidGraphics extends GenericGraphics {
                 _paint);
     }
 
-    /**
-     * Dibuja una imagen del tamaño indicado en la posicion dada
-     *
-     * @param image La imagen que se quiere dibujar
-     * @param sizeX El ancho de la imagen en pantalla
-     * @param sizeY El alto de la imagen en pantalla
-     * @param posX Coordenada x de la posicion en la que se quiere dibujar la imagen (left)
-     * @param posY Coordenada y de la posicion en la que se quiere dibujar la imagen (top)
-     */
     @Override
     public void drawImage(Image image, int sizeX, int sizeY, float posX, float posY) {
         if(image == null) return;
@@ -210,14 +179,6 @@ public class AndroidGraphics extends GenericGraphics {
                 _paint);
     }
 
-    /**
-     * Devuelve una fuente. Solo la creamos una vez y la guardamos en un mapa
-     *
-     * @param filename Nombre del archivo de la fuente
-     *
-     * @return  Font Con la fuente indicada cargada
-     *          null Si la fuente no se pudo cargar
-     */
     @Override
     public Font newFont(String filename, float size, boolean isBold) {
         AndroidFont af = null;
@@ -238,11 +199,6 @@ public class AndroidGraphics extends GenericGraphics {
         return af;
     }
 
-    /**
-     * Establece la fuente con la que se escribiran los textos
-     *
-     * @param font La nueva fuente que se utilizara
-     */
     @Override
     public void setFont(Font font) {
         if(font == null) return;
@@ -253,13 +209,6 @@ public class AndroidGraphics extends GenericGraphics {
         _paint.setTextSize(af.getSize()*_scale);
     }
 
-    /**
-     * Escribe el texto en pantalla usando la fuente establecida
-     *
-     * @param text El texto que se escribe en pantalla
-     * @param pX Coordenada x de la posicion en la que se quiere empezar a escribir (left)
-     * @param pY Coordenada y de la posicion en la que se quiere empezar a escribir (top)
-     */
     @Override
     public void drawText(String text, float pX, float pY) {
 
@@ -271,14 +220,6 @@ public class AndroidGraphics extends GenericGraphics {
         _canvas.drawText(text, rX - _textBounds.exactCenterX(), rY - _textBounds.exactCenterY(), _paint);
     }
 
-    /**
-     * Establece la el color con el que se realizaran las operaciones de pintado
-     *
-     * @param r, Componente rojo del color
-     * @param g, Componente verde del color
-     * @param b, Componente azul del color
-     * @param a, Componente alpha del color
-     */
     @Override
     public void setColor(int r, int g, int b, int a) {
         _paint.setColor(colorBitshift(r, g, b, a));
@@ -304,13 +245,7 @@ public class AndroidGraphics extends GenericGraphics {
         _paint.setStyle(prevStyle);
     }
 
-    /**
-     * Dibuja un circulo en pantalla
-     *
-     * @param percentX Coordenada x del centro del circulo
-     * @param percentY Coordenada y del centro del circulo
-     * @param radius Radio del circulo
-     */
+
     @Override
     public void fillCircle(float percentX, float percentY, float radius) {
         float rX = virtualToRealX(percentX * _virtualX);// Se ajusta a la escala puesta al canvas
@@ -326,18 +261,39 @@ public class AndroidGraphics extends GenericGraphics {
 
     }
 
+    // Metodos de la clase
+
+    /**
+     * Ajusta el canvas virtual a la vista principal
+     */
+    public void adjustCanvasToView(){
+        adjustCanvasToSize(_view.getWidth(), _view.getHeight());
+    }
+
+    /**
+     * Funcion auxiliar para pasar el color a un int ARGB
+     *
+     * @param r, Componente rojo del color
+     * @param g, Componente verde del color
+     * @param b, Componente azul del color
+     * @param a, Componente alpha del color
+     */
+    private int colorBitshift(int r, int g, int b, int a){
+        return (a << 24) | (r << 16) | (g << 8) | b << 0;
+    }
+
    /**
      * Gestiona los buffers de renderizado y el swap
      * para tener renderizado activo y renderizar el estado de la aplicacion.
      *
-     * @param app Aplicacion que se renderiza
+     * @param scene Escena que se renderiza
      */
     @Override
-    public void render(Scene app){
+    public void render(Scene scene){
         while (!_holder.getSurface().isValid());
         _canvas = _holder.lockCanvas();
         clear();
-        app.render();
+        scene.render();
         fillOffsets();
         _holder.unlockCanvasAndPost(_canvas);
     }
@@ -346,7 +302,7 @@ public class AndroidGraphics extends GenericGraphics {
      * Devuelve el SurfaceView que es la vista principal de la actividad
      * Lo usamos para que el engine establezca este view en la actividad
      *
-     * @return _view La vista principal
+     * @return La vista principal
      */
     SurfaceView getSurfaceView(){
         return _view;

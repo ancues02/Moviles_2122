@@ -6,9 +6,7 @@ import android.os.Bundle;
 
 import es.ucm.gdv.engine.Scene;
 import es.ucm.gdv.engine.android.AndroidEngine;
-import es.ucm.gdv.ohno.OhnO;
 import es.ucm.gdv.ohno.OhnO_Menu;
-import es.ucm.gdv.ohno.OhnO_SelectSize;
 
 public class MainActivity extends AppCompatActivity {
 

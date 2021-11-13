@@ -187,4 +187,27 @@ public abstract class GenericGraphics implements Graphics{
      * @param scene La escena que se renderiza
      */
     abstract public void render(Scene scene);
+
+
+    //TODO: Poner estos metodos aqui y quitarlos de cada implementacion
+    /**
+     * Rellena los margenes del color con el que
+     * se hace el clear para ajustar el canvas.
+     * Considera si hay que poner barras en los
+     * bordes horizontales o verticales.
+     *
+    abstract public void fillOffsets();
+
+    /**
+     * Rellena los margenes horizontales
+     *
+    abstract public void fillHorizontalOffsets();
+
+    /**
+     * Rellena los margenes verticales
+     *
+    abstract public void fillVerticalOffsets();
+     */
+
+
 }
