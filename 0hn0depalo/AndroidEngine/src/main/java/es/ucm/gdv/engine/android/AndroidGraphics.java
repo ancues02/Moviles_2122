@@ -275,7 +275,7 @@ public class AndroidGraphics extends AbstractGraphics {
         float rY = virtualToRealY(pY * _virtualY);
 
         _paint.getTextBounds(text, 0, text.length(), _textBounds);
-        
+
         _canvas.drawText(text, rX - _textBounds.exactCenterX(), rY - _textBounds.exactCenterY(), _paint);
     }
 
