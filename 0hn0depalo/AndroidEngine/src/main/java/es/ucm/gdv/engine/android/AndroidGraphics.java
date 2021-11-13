@@ -266,8 +266,6 @@ public class AndroidGraphics extends AbstractGraphics {
         _paint.setTextSize(af.getSize()*_scale);
     }
 
-    //TODO revisar
-
     /**
      * Escribe el texto en pantalla usando la fuente establecida
      *
