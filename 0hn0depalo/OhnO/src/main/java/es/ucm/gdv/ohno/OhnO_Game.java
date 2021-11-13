@@ -73,7 +73,7 @@ public class OhnO_Game extends AbstractScene {
     private float _timeToCheck; //tiempo que queda para poder comprobar si se ha ganado
     private boolean _canCheck = false;
 
-    private final String []_winText ={"Brillante", "Increible", "WoooW", "Fantastico"};
+    private final String []_winText ={"Brillante", "Increible", "WoooW", "Fantastico", "Magnifico", "Genio"};
     private int _winTextInd;
 
     public OhnO_Game(int num){
@@ -106,6 +106,8 @@ public class OhnO_Game extends AbstractScene {
     }
 
     private void processInput(TouchEvent e) {
+        if(_win ) return;//si has ganado descartamos el input
+
         if (e.getType() != TouchType.Press) return;
 
         float X = e.getX();
@@ -127,12 +129,10 @@ public class OhnO_Game extends AbstractScene {
                     _sizeTextFadeFactor = 1;
                     _hintUndoTextFadeFactor = -1;
                 }
-                System.out.println("PULSADO EN CASILLA ( " + indexX + ", " + indexY + " )");
                 _timeToCheck = _timeDelay;//para no comprobar inmediatamente que se ha ganado
                 _canCheck = true;
             }
         }
-
         //deteccion botones de abajo
         float yOffset = 5.5f * 1f/6 ;
         float xOffset = 1f/6 ;
@@ -445,12 +445,13 @@ public class OhnO_Game extends AbstractScene {
             }
         }
         else {//ya esta jugando el jugador
-            if(_numGreys != 0) return false;
-            _hintUndoText = giveHint();//para poner que square esta mal
             for(int i= 1; i < board.length -1; ++i){
                 countRow(i,true);
                 countCol(i,true);
             }
+            if(_numGreys != 0) return false;
+            _hintUndoText = giveHint();//para poner que square esta mal
+
             //animaciones de los textos
 
             //entra aqui si ha encontrado una pista, es decir, algo estaba mal
@@ -574,14 +575,14 @@ public class OhnO_Game extends AbstractScene {
         int i= pos;
         do{
             Square s = locked.get(i);
-            if(hint1(s,false)){//ve suficiente como para cerrarlo
+            if(hint1(s,false)){
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
                 _drawBlackSquare.drawBlack = true;
                 return Hint.CanClose.getMsg();
             }
-            else if(hint2(s,false)){//se puede cerrar un camino
+            else if(hint2(s,false)){
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
@@ -589,14 +590,7 @@ public class OhnO_Game extends AbstractScene {
                 return Hint.WouldSeeTooMuch.getMsg();
 
             }
-            else if(hint5(s)){//tiene que ver mas
-                if(_drawBlackSquare != null && _drawBlackSquare != s)
-                    _drawBlackSquare.drawBlack=false;
-                _drawBlackSquare =  s;
-                _drawBlackSquare.drawBlack = true;
-                return Hint.SeesToLittle.getMsg();
-            }
-            else if(hint3(s,false)){//puede poner en alguna direccion asegurada
+            else if(hint3(s,false)){
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
@@ -604,12 +598,21 @@ public class OhnO_Game extends AbstractScene {
                 return Hint.WouldSeeTooLittle.getMsg();
 
             }
-            else if(hint4(s)){//ve mas de lo que deberia
+            else if(hint4(s)){
                 if(_drawBlackSquare != null && _drawBlackSquare != s)
                     _drawBlackSquare.drawBlack=false;
                 _drawBlackSquare =  s;
                 _drawBlackSquare.drawBlack = true;
                 return Hint.SeesTooMuch.getMsg();
+
+            }
+            else if(hint5(s)){
+                if(_drawBlackSquare != null && _drawBlackSquare != s)
+                    _drawBlackSquare.drawBlack=false;
+                _drawBlackSquare =  s;
+                _drawBlackSquare.drawBlack = true;
+                return Hint.SeesToLittle.getMsg();
+
             }
             i++;
             i %= locked.size();
@@ -618,15 +621,18 @@ public class OhnO_Game extends AbstractScene {
         //Si no ha encontrado ninguna pista, se busca poner rojos obligatorios
         for( i = 1; i < board[0].length -1; ++i){
             for(int j = 1; j < board[1].length -1; ++j) {
-                if(!board[i][j].lock && hint6_7(board[i][j], false))
-                    if(_drawBlackSquare != null && _drawBlackSquare != board[i][j])
-                        _drawBlackSquare.drawBlack=false;
-                    _drawBlackSquare =  board[i][j];
-                    _drawBlackSquare.drawBlack = true;
+                if(!board[i][j].lock)
+                    if(hint6_7(board[i][j], false)) {
+                        if(_drawBlackSquare != null && _drawBlackSquare != board[i][j])
+                            _drawBlackSquare.drawBlack=false;
+                        _drawBlackSquare =  board[i][j];
+                        _drawBlackSquare.drawBlack = true;
 
-                    if(board[i][j].currentState == Square.SquareColor.Blue)
-                        return Hint.MustBeRedBlue.getMsg();
-                    return Hint.MustBeRedGrey.getMsg();
+                        if(board[i][j].currentState == Square.SquareColor.Blue)
+                            return Hint.MustBeRedBlue.getMsg();
+                        return Hint.MustBeRedGrey.getMsg();
+                    }
+
             }
         }
         return "";
