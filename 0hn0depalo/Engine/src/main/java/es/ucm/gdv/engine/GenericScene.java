@@ -7,6 +7,7 @@ package es.ucm.gdv.engine;
  * metodos y atributos del Engine desde la propia escena.
  */
 public abstract class GenericScene implements Scene {
+    // Atributos
     protected Engine _engine;
 
     @Override

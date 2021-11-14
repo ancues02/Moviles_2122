@@ -2,7 +2,6 @@ package es.ucm.gdv.engine.desktop;
 
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
-import java.util.List;
 
 import es.ucm.gdv.engine.GenericInput;
 import es.ucm.gdv.engine.Pool;
@@ -15,6 +14,14 @@ import es.ucm.gdv.engine.TouchType;
 public class DesktopInput extends GenericInput implements java.awt.event.MouseListener, java.awt.event.MouseMotionListener{
     private DesktopGraphics _dGraphics;
 
+    /**
+     * Constructor
+     *
+     * Crea la lista y el pool y se pone a escuchar
+     * los eventos de la ventana.
+     *
+     * @param dGraphics "Motor" grafico del que se adquiere la ventana
+     */
     public DesktopInput(DesktopGraphics dGraphics){
         super();
         _dGraphics = dGraphics;
@@ -24,6 +31,15 @@ public class DesktopInput extends GenericInput implements java.awt.event.MouseLi
         _eventPool = new Pool<TouchEvent>(50, () -> { return new TouchEvent(); } );
     }
 
+    /**
+     * Añade un evento a la lista de eventos
+     *
+     * Se sincroniza el acceso a la pool y a la lista
+     * para evitar accesos peligrosos en las diferentes hebras.
+     *
+     * @param mouseEvent Evento de raton detectado
+     * @param type Tipo de evento
+     */
     private void addEvent(MouseEvent mouseEvent, TouchType type){
         TouchEvent event;
         synchronized (this) {

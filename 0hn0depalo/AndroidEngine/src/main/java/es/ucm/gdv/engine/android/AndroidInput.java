@@ -14,9 +14,18 @@ import es.ucm.gdv.engine.TouchType;
  * Se encarga de recoger, analizar y devolver los eventos que ocurren en Android
  */
 public class AndroidInput extends GenericInput implements View.OnTouchListener {
+    // Atributos
 
     private AndroidGraphics _aGraphics;
 
+    /**
+     * Constructor
+     *
+     * Crea la lista y el pool y se pone a escuchar
+     * los eventos de la vista de la actividad.
+     *
+     * @param aGraphics "Motor" grafico del que se adquiere la ventana
+     */
     public AndroidInput(AndroidGraphics aGraphics){
         _aGraphics = aGraphics;
         _aGraphics.getSurfaceView().setOnTouchListener(this);
@@ -30,9 +39,11 @@ public class AndroidInput extends GenericInput implements View.OnTouchListener {
      * Lo hemos implementado para que detecte varias pulsaciones a la vez
      * Para ello cogemos el pointerId relativo a cada dedo y analizamos que tipo
      * de evento es. Tambien parseamos la posicion donde se ha pulsado a nuestro canvas.
-     * @param v
+     *
+     * @param v La vista de la actividad
      * @param mEvent el evento a analizar
-     * @return
+     *
+     * @return true si analizas el evento
      */
     @Override
     public boolean onTouch(View v, MotionEvent mEvent) {
@@ -77,15 +88,20 @@ public class AndroidInput extends GenericInput implements View.OnTouchListener {
 
     /**
      * Creamos un evento nuestro en funcion a los parametros que le llega
-     * y lo agregamos a la lista de eventos. Tiene que ser sincronizado
-     * porque la hebra de UI lo añade pero la  hebra de logica los recoge.
+     * y lo agregamos a la lista de eventos. El acceso al pool y
+     * a la lista tienen que ser sincronizados porque la hebra
+     * de UI lo añade pero la  hebra de logica los recoge.
+     *
      * @param posX posicion en x donde se ha pulsado, ya virtual
      * @param posY posicion en y donde se ha pulsado, ya virtual
      * @param pointerId el id del dedo que lo ha pulsado
      * @param type el tipo de pulsacion
      */
     private void addEvent(float posX, float posY, int pointerId,TouchType type ){
-        TouchEvent event = _eventPool.obtain();
+        TouchEvent event;
+        synchronized (this) {
+            event = _eventPool.obtain();
+        }
         if(event != null) {
             event.set(type,
                     posX, posY,

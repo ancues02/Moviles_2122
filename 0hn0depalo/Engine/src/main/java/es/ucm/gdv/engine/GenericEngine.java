@@ -5,8 +5,6 @@ package es.ucm.gdv.engine;
  * Tiene la funcionalidad comun que implementan
  * nuestros motores de Pc y Android.
  * Esta funcionalidad es:
- *   ·  El calculo a mano de las dimensiones
- *      del canvas virtual en pantalla.
  *   ·  Las instancias del motor grafico,
  *      el gestor de entrada y la escena.
  *   ·  El bucle principal y el calculo del deltaTime para

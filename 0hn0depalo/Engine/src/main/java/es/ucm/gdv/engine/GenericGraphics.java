@@ -6,6 +6,7 @@ import java.util.HashMap;
  * Clase abstracta que implementa Graphics.
  * Tiene la funcionalidad comun que implementan los
  * motores graficos de Pc y Android:
+ *  ·   El calculo a mano de las dimensiones del canvas virtual en pantalla.
  *  ·   Los atributos y metodos para el calculo del canvas virtual y el escalado.
  *  ·   HashMaps para mantener un registro de las imagenes y fuentes que estan cargadas.
  *  ·   Color con el que se hara el clear y las barras para el canvas virtual

@@ -1,15 +1,17 @@
 package es.ucm.gdv.engine;
 
 import java.util.LinkedList;
-
+/**
+ * Pool de objetos propia
+ */
 public class Pool<T> {
-    Object[] _pool;
+    T[] _pool;
     int _size;
     LinkedList<Integer> _free;
 
     public Pool(int maxSize, Factory<T> factory){
         this._size = maxSize;
-        this._pool = new Object[_size];
+        this._pool = (T[])new Object[_size];
         this._free = new LinkedList<>();
         for(int i = 0; i < _size; i++){
             _pool[i] = factory.newInstance();
@@ -23,7 +25,7 @@ public class Pool<T> {
             return null;
         }
         else{
-            return (T)_pool[_free.pop()];
+            return _pool[_free.pop()];
         }
     }
 

@@ -1,5 +1,8 @@
 package es.ucm.gdv.engine;
-
+/**
+ * Clase para manejar los eventos
+ * tanto en Android como en Pc.
+ */
 public class TouchEvent {
     public TouchEvent(){
         _typeOf = TouchType.None;
