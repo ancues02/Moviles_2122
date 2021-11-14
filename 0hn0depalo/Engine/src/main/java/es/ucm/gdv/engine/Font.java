@@ -5,5 +5,4 @@ public interface Font {
 
     void setBold(boolean bold);
     void setSize(float size);
-
 }

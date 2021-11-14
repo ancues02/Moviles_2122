@@ -6,6 +6,9 @@ import java.io.InputStream;
 
 import es.ucm.gdv.engine.Font;
 
+/**
+ * Clase que guarda la fuente en una Font de java junto al resto de atributos propios de una fuente
+ */
 public class DesktopFont implements Font {
     private java.awt.Font _font;
 

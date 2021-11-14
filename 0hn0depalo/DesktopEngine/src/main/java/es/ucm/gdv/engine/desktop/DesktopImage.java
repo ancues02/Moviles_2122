@@ -9,6 +9,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+/**
+ * Clase que guarda la imagen en una BufferedImage junto al resto de atributos propios de una imagen
+ */
 public class DesktopImage implements Image {
     String _name = null;
     BufferedImage _bufferedImage;
@@ -45,11 +48,11 @@ public class DesktopImage implements Image {
     }
 
     @Override
-    public float getCanvasHeight() {
+    public float getHeightInCanvas() {
         return _canvasHeight;
     }
     @Override
-    public float getCanvasWidth(){
+    public float getWidthInCanvas(){
         return _canvasWidth;
     }
     public void setCanvasWidthHeight(float width, float height){

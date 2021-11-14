@@ -23,12 +23,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
         _engine = new AndroidEngine(this, 600, 900);
         Scene a = new OhnO_Menu();
         _engine.setScene(a);
-        /*int w = _engine.getContentView().getWidth(),
-            h = _engine.getContentView().getHeight();*/
     }
 
     //--------------------------------------------------------------------

@@ -11,6 +11,9 @@ import java.io.InputStream;
 
 import es.ucm.gdv.engine.Image;
 
+/**
+ * Clase que guarda la iamgen en un Bitmap junto al resto de atributos propios de una imagen
+ */
 public class AndroidImage implements Image {
     String _name = null;
     Bitmap _bitmap;
@@ -48,11 +51,11 @@ public class AndroidImage implements Image {
     }
 
     @Override
-    public float getCanvasWidth() {
+    public float getWidthInCanvas() {
         return _canvasWidth;
     }
     @Override
-    public float getCanvasHeight() {
+    public float getHeightInCanvas() {
         return _canvasHeight;
     }
 

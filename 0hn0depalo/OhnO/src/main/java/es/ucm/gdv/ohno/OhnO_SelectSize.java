@@ -133,8 +133,8 @@ public class OhnO_SelectSize extends GenericScene {
         float yOffset = 5f * 0.1666f;
         float xOffset = 0.5f;
 
-        _widthImages = _img.getCanvasWidth();
-        _heightImages = _img.getCanvasHeight();
+        _widthImages = _img.getWidthInCanvas();
+        _heightImages = _img.getHeightInCanvas();
         _graphics.drawImage(_img, 1.0f,1.0f, xOffset, yOffset);
 
         _yBoardOffset = 0.4f;   //donde empieza a pintarse el tablero

@@ -63,7 +63,6 @@ public class AndroidGraphics extends GenericGraphics {
         return _view.getWidth();
     }
 
-
     @Override
     public float getHeight() {
         return _view.getHeight();
@@ -78,7 +77,6 @@ public class AndroidGraphics extends GenericGraphics {
     public float getCanvasHeight() {
         return _realY;
     }
-
 
     @Override
     public void clear(){
@@ -202,7 +200,7 @@ public class AndroidGraphics extends GenericGraphics {
         if(font == null) return;
 
         AndroidFont af = (AndroidFont)font;
-        _paint.setTypeface(af.get_font());
+        _paint.setTypeface(af.getFont());
         _paint.setFakeBoldText(af.getBold());
         _paint.setTextSize(af.getSize()*_scale);
     }

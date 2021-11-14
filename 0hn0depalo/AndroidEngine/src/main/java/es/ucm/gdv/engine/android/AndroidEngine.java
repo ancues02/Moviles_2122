@@ -4,7 +4,6 @@ import es.ucm.gdv.engine.GenericEngine;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
 /**
  * Clase que implementa el motor para Android.
  *

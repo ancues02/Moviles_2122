@@ -329,8 +329,8 @@ public class OhnO_Game extends GenericScene {
         float xOffset = 1f/6;
         _graphics.drawImage(_closeImg, 1.0f,1.0f, 2*xOffset, yOffset);
         _graphics.drawImage(_historyImg, 1.0f,1.0f,3*xOffset, yOffset);
-        _widthImages = _eyeImg.getCanvasWidth();
-        _heightImages = _eyeImg.getCanvasHeight();
+        _widthImages = _eyeImg.getWidthInCanvas();
+        _heightImages = _eyeImg.getHeightInCanvas();
         _graphics.drawImage(_eyeImg, 1.0f,1.0f,4*xOffset, yOffset);
 
         // Dibujar el fade out de las casillas pulsadas

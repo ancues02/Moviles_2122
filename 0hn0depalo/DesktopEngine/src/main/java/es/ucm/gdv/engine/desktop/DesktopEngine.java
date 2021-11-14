@@ -20,6 +20,7 @@ public class DesktopEngine extends GenericEngine {
     /**
      * Crea e inicializa las instancias del motor grafico y el gestor de entrada especificas de Pc
      *
+     * @param windowName Nombre de la ventana.
      * @param width Anchura de la ventana.
      * @param height Altura de la ventana.
      * @param virtualHeight Anchura del canvas virtual deseado para la aplicacion.

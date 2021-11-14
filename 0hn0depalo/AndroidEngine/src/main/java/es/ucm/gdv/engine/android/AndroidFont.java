@@ -1,7 +1,6 @@
 package es.ucm.gdv.engine.android;
 
 import android.content.res.AssetManager;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.util.Log;
 
@@ -10,6 +9,9 @@ import java.io.InputStream;
 
 import es.ucm.gdv.engine.Font;
 
+/**
+ * Clase que guarda la fuente en un Typeface junto al resto de atributos propios de una fuente
+ */
 public class AndroidFont implements Font{
     private Typeface _font;
     private String _filename;
@@ -30,7 +32,7 @@ public class AndroidFont implements Font{
         return true;
     }
 
-    public Typeface get_font(){
+    public Typeface getFont(){
         return _font;
     }
 

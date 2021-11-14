@@ -9,6 +9,9 @@ import es.ucm.gdv.engine.Pool;
 import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
+/**
+ * Se encarga de recoger, analizar y devolver los eventos que ocurren en PC
+ */
 public class DesktopInput implements Input,  java.awt.event.MouseListener, java.awt.event.MouseMotionListener{
     private DesktopGraphics _dGraphics;
     private List<TouchEvent> _touchEventList;

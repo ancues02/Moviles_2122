@@ -4,6 +4,6 @@ public interface Image {
     String getName();
     float getWidth();
     float getHeight();
-    float getCanvasHeight();
-    float getCanvasWidth();
+    float getHeightInCanvas();
+    float getWidthInCanvas();
 }
