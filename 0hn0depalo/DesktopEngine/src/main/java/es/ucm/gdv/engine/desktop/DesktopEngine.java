@@ -12,18 +12,25 @@ public class DesktopEngine extends GenericEngine {
 
     /**
      * Constructor
-     * Crea las instancias del motor grafico y el gestor de entrada especificas de Pc
+     */
+    public DesktopEngine(){
+        super();
+    }
+
+    /**
+     * Crea e inicializa las instancias del motor grafico y el gestor de entrada especificas de Pc
      *
      * @param width Anchura de la ventana.
      * @param height Altura de la ventana.
      * @param virtualHeight Anchura del canvas virtual deseado para la aplicacion.
      * @param virtualHeight Altura del canvas virtual deseado para la aplicacion.
      */
-    public DesktopEngine(String windowName, int width, int height, int virtualWidth, int virtualHeight){
-        super();
-        DesktopGraphics dg = new DesktopGraphics(windowName, width, height, virtualWidth, virtualHeight);
+    public boolean init(String windowName, int width, int height, int virtualWidth, int virtualHeight){
+        DesktopGraphics dg = new DesktopGraphics();
+        if(!dg.init(windowName, width, height, virtualWidth, virtualHeight)) return false;
         _graphics = dg;
         _input = new DesktopInput(dg);
+        return true;
     }
 
     /**

@@ -5,7 +5,9 @@ import es.ucm.gdv.ohno.OhnO_Menu;
 
 public class Main {
     public static void main(String[] args) {
-        DesktopEngine e = new DesktopEngine("0hn0 del palo",1920, 1080, 600, 900);
+        DesktopEngine e = new DesktopEngine();
+        // Si no se inicializa bien este motor, para la ejecución antes de que explote
+        if(!e.init("0hn0 del palo",1920, 1080, 600, 900)) return;
         Scene a = new OhnO_Menu();
         e.setScene(a);
         e.setSize(1080 / 3,1584 / 3); // Método no necesario anda mas que para que el profe vea que lo tenemos.

@@ -21,10 +21,24 @@ public class DesktopGraphics extends GenericGraphics {
     private BufferStrategy _strategy;
     private java.awt.Graphics _graphics;
 
-    public DesktopGraphics(String windowName, int x, int y, int virtualX, int virtualY) {
+    public DesktopGraphics() {
         super();
+    }
+
+    /**
+     * Llama a la creación de la ventana y establece
+     * las dimensiones del canvas.
+     *
+     * @param windowName Nombre de la ventana
+     * @param x Ancho de la ventana
+     * @param y Alto de la ventana
+     * @param virtualX Ancho del canvas virtual
+     * @param virtualY Alto del canvas virtual
+     * @return Devuelve si ha fallado o no la inicialización
+     */
+    public boolean init(String windowName, int x, int y, int virtualX, int virtualY){
         setCanvasDimensions(virtualX,virtualY);
-        createWindow(windowName, x, y);
+        return createWindow(windowName, x, y);
     }
 
     // Metodos del interfaz Graphics
@@ -38,6 +52,7 @@ public class DesktopGraphics extends GenericGraphics {
     public float getHeight(){
         return _window.getHeight();
     }
+
     @Override
     public float getCanvasWidth(){
         return _realX;
@@ -227,15 +242,15 @@ public class DesktopGraphics extends GenericGraphics {
      * @param windowName Nombre de la ventana
      * @param x Ancho de la ventana
      * @param y Alto de la ventana
+     * @return Devuelve si ha fallado o no la incialización
      */
-    public void createWindow(String windowName, int x, int y) {
+    public boolean createWindow(String windowName, int x, int y) {
         _window = new JFrame(windowName);
 
         _window.setSize(x, y);
         _window.setIgnoreRepaint(true);
         _window.setVisible(true);
         _window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 
         int intentos = 100;
         while(intentos-- > 0) {
@@ -248,7 +263,7 @@ public class DesktopGraphics extends GenericGraphics {
         } // while pidiendo la creación de la buffeStrategy
         if (intentos == 0) {
             System.err.println("No pude crear la BufferStrategy");
-            return;
+            return false;
         }
 
         _strategy = _window.getBufferStrategy();
@@ -269,6 +284,7 @@ public class DesktopGraphics extends GenericGraphics {
                 adjustCanvasToSize(nWidth, nHeight);
             }
         });
+        return true;
     }
 
     /**
