@@ -44,8 +44,9 @@ public class OhnO_SelectSize extends GenericScene {
     @Override
     public void handleInput() {
         List<TouchEvent> events = _input.getTouchEvents();
-        for(TouchEvent touchEvent: events){
-            processInput(touchEvent);
+        int i = events.size();
+        for(; i > 0; i--){
+            processInput(events.get(i - 1));
         }
     }
 

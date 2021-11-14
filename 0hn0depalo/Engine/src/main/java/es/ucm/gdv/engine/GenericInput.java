@@ -21,7 +21,7 @@ public class GenericInput implements Input{
      * Elimina un evento de input de la lista
      * y de la pool de eventos
      */
-    synchronized protected void popEvent(TouchEvent touchEvent) {
+    protected void popEvent(TouchEvent touchEvent) {
         _touchEventList.remove(touchEvent);
         _eventPool.release(touchEvent);
     }
@@ -32,12 +32,11 @@ public class GenericInput implements Input{
      */
      synchronized public void flushEvents() {
         TouchEvent touchEvent;
-
-        while (_touchEventList.size() > 0) {
-            touchEvent = _touchEventList.get(0);
-            _touchEventList.remove(touchEvent);
-            _eventPool.release(touchEvent);
+        int i = _touchEventList.size();
+        while (i > 0) {
+            i--;
+            _eventPool.release(_touchEventList.get(i));
+            _touchEventList.remove(i);
         }
-
     }
 }
