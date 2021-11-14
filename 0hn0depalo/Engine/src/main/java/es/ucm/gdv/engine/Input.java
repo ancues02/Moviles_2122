@@ -4,4 +4,5 @@ import java.util.List;
 
 public interface Input {
     List<TouchEvent> getTouchEvents();
+    void popEvent(TouchEvent touchEvent);
 }

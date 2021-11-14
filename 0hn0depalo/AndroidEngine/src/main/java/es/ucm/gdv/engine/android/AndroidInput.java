@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ucm.gdv.engine.Input;
+import es.ucm.gdv.engine.Pool;
 import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
@@ -17,11 +18,13 @@ public class AndroidInput implements Input, View.OnTouchListener {
 
     private AndroidGraphics _aGraphics;
     private List<TouchEvent> _touchEventList;
+    private Pool<TouchEvent> _eventPool;
 
     public AndroidInput(AndroidGraphics aGraphics){
         _aGraphics = aGraphics;
         _aGraphics.getSurfaceView().setOnTouchListener(this);
         _touchEventList = new ArrayList();
+        _eventPool = new Pool<TouchEvent>(50, () -> { return new TouchEvent(); } );
     }
 
     /**
@@ -32,6 +35,12 @@ public class AndroidInput implements Input, View.OnTouchListener {
     @Override
     synchronized public List<TouchEvent> getTouchEvents() {
         return _touchEventList;
+    }
+
+    @Override
+    public void popEvent(TouchEvent touchEvent) {
+        _touchEventList.remove(touchEvent);
+        _eventPool.release(touchEvent);
     }
 
     /**
@@ -95,12 +104,15 @@ public class AndroidInput implements Input, View.OnTouchListener {
      * @param type el tipo de pulsacion
      */
     private void addEvent(float posX, float posY, int pointerId,TouchType type ){
-        TouchEvent event = new TouchEvent(type,
-                posX, posY,
-                pointerId,
-                true);//en android siempre pulsamos con "click izquierdo"
-        synchronized (this) {
-            _touchEventList.add(event);
+        TouchEvent event = _eventPool.obtain();
+        if(event != null) {
+            event.set(type,
+                    posX, posY,
+                    pointerId,
+                    true);//en android siempre pulsamos con "click izquierdo"
+            synchronized (this) {
+                _touchEventList.add(event);
+            }
         }
     }
 }
