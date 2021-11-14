@@ -81,8 +81,6 @@ public class OhnO_Menu extends GenericScene {
     }
     @Override
     public void render() {
-
-
         //Nombre juego
         _graphics.setColor(0, 0, 0, 255);
         _fontMolle.setSize((_fontSize));

@@ -26,6 +26,11 @@ public interface Graphics {
     float getCanvasHeight();
 
     /**
+     * Devuelve el aspect ratio
+     */
+    float getAspectRatio();
+
+    /**
      * Borra lo que haya en pantalla.
      */
     void clear();

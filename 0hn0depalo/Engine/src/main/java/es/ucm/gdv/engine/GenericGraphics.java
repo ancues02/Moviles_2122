@@ -70,6 +70,10 @@ public abstract class GenericGraphics implements Graphics{
         _images = new HashMap<>();
     }
 
+    public float getAspectRatio(){
+        return _aspectRatio;
+    }
+
     /**
      * Establece las dimensiones del canvas virtual
      * y calcula el aspectRatio segun estas dimensiones

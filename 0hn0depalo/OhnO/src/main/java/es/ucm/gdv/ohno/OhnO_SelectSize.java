@@ -11,15 +11,13 @@ import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
 public class OhnO_SelectSize extends GenericScene {
-    private final float _aspectRatio = 2f/3f;
-
-
     private Graphics _graphics;
     private Input _input;
     private float _fontSize;
     private Font _fontMolle, _fontJose;
     private Image _img;
     private float _widthImages, _heightImages;
+    private float _aspectRatio;
 
     private int _numCircles;
     private float _yBoardOffset;
@@ -40,6 +38,7 @@ public class OhnO_SelectSize extends GenericScene {
         _fontJose = _graphics.newFont("assets/fonts/JosefinSans-Bold.ttf", _fontSize, false);
         _img = _graphics.newImage("assets/images/close.png");
         _graphics.setBackground(255, 255, 255, 255);
+        _aspectRatio = _graphics.getAspectRatio();
     }
 
     @Override

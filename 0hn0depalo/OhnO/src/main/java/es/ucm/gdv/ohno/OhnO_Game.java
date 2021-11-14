@@ -14,11 +14,10 @@ import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
 
 public class OhnO_Game extends GenericScene {
-    private final float _aspectRatio = 2f/3f;
-
     private Graphics _graphics;
     private Input _input;
     private float _fontSize;
+    private float _aspectRatio;
 
     //para que no se generen puzzles con muchos azules adyacentes
     //maximo del ancho del tablero
@@ -99,6 +98,7 @@ public class OhnO_Game extends GenericScene {
         _sizeText = _numCircles + " x " + _numCircles;
         _hintUndoText = "";
         _graphics.setBackground(255, 255, 255, 255);
+        _aspectRatio = _graphics.getAspectRatio();
     }
 
     @Override
