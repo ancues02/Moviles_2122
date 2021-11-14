@@ -104,10 +104,8 @@ public class OhnO_Game extends GenericScene {
     @Override
     public void handleInput() {
         List<TouchEvent> events = _input.getTouchEvents();
-        while(events.size() > 0) {
-            TouchEvent touchEvent = events.get(0);
+        for(TouchEvent touchEvent: events){
             processInput(touchEvent);
-            _input.popEvent(touchEvent);
         }
     }
 
