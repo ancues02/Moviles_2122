@@ -115,4 +115,11 @@ public class AndroidInput implements Input, View.OnTouchListener {
             }
         }
     }
+
+    public void flushEvents(){
+        while(_touchEventList.size() > 0) {
+            TouchEvent touchEvent = _touchEventList.get(0);
+            popEvent(touchEvent);
+        }
+    }
 }

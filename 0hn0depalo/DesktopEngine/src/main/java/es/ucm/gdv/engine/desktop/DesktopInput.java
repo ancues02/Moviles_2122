@@ -76,6 +76,10 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
     @Override
     public void mouseMoved(MouseEvent mouseEvent) {  }
 
-
-
+    public void flushEvents(){
+        while(_touchEventList.size() > 0) {
+            TouchEvent touchEvent = _touchEventList.get(0);
+            popEvent(touchEvent);
+        }
+    }
 }

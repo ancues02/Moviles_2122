@@ -25,6 +25,7 @@ public class DesktopEngine extends GenericEngine {
         _graphics = dg;
         _input = new DesktopInput(dg);
     }
+
     /**
      * Establece las dimensiones de la ventana
      *

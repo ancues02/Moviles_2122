@@ -46,8 +46,8 @@ public class OhnO_SelectSize extends GenericScene {
         List<TouchEvent> events = _input.getTouchEvents();
         while(events.size() > 0) {
             TouchEvent touchEvent = events.get(0);
-            events.remove(0);
             processInput(touchEvent);
+            _input.popEvent(touchEvent);
         }
     }
 

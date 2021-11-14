@@ -108,7 +108,6 @@ public class OhnO_Game extends GenericScene {
             TouchEvent touchEvent = events.get(0);
             processInput(touchEvent);
             _input.popEvent(touchEvent);
-            System.out.println("pop de evento");
         }
     }
 

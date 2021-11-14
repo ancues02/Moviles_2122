@@ -67,6 +67,7 @@ public abstract class GenericEngine implements Engine{
      */
     public void mainLoop(Scene currentScene){
         currentScene.handleInput();
+        _input.flushEvents();
         update();
         _graphics.render(currentScene);
     }

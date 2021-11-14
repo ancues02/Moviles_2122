@@ -8,8 +8,7 @@ public class Main {
         DesktopEngine e = new DesktopEngine("0hn0 del palo",1920, 1080, 600, 900);
         Scene a = new OhnO_Menu();
         e.setScene(a);
-        //No tiene sentido que este en la interfaz Engine porque en movil no se va a cambiar el tamaño de la ventana.
-        e.setSize(1080 / 3,1584 / 3);//esto tiene que estar implementado en PCEngine, no en la interfaz Engine. La razon es que la logica no se va a usar.
+        e.setSize(1080 / 3,1584 / 3); // Método no necesario anda mas que para que el profe vea que lo tenemos.
         e.run();
     }
 }

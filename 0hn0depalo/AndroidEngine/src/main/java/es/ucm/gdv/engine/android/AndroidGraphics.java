@@ -18,8 +18,6 @@ import es.ucm.gdv.engine.Image;
 
 /**
  * Clase que implementa motor grafico en Android
- *
- * //TODO Mencionar los porcentajes aqui
  */
 public class AndroidGraphics extends GenericGraphics {
     // Manager de los assets para crear las imagenes y fuentes
@@ -27,7 +25,7 @@ public class AndroidGraphics extends GenericGraphics {
 
     // Vista principal de la actividad
     private SurfaceView _view;
-    private SurfaceHolder _holder;  // TODO: esta referencia es innecesaria creo
+    private SurfaceHolder _holder;
 
     // Objeto para realizar las operaciones de
     private Paint _paint;
@@ -308,17 +306,18 @@ public class AndroidGraphics extends GenericGraphics {
         return _view;
     }
 
-    private void fillOffsets(){
-        int c = colorBitshift(_bR, _bG, _bB, _bA);
+    @Override
+    protected void fillOffsets(){
+        _paint.setColor(colorBitshift(_bR, _bG, _bB, _bA));
         if(_verticalCompensation)
-            fillVerticalOffsets(c);
+            fillVerticalOffsets();
         else
-            fillHorizontalOffsets(c);
+            fillHorizontalOffsets();
     }
 
     //Rellena de blanco por los lados
-    private void fillHorizontalOffsets(int c){
-        _paint.setColor(c);
+    @Override
+    protected void fillHorizontalOffsets(){
         _canvas.drawRect(0,0,(int) virtualToRealX(0),
                 _canvas.getHeight(),
                 _paint);
@@ -331,9 +330,8 @@ public class AndroidGraphics extends GenericGraphics {
 
     }
 
-    private void fillVerticalOffsets(int c){
-
-        _paint.setColor(c);
+    @Override
+    protected void fillVerticalOffsets(){
         _canvas.drawRect(0,0,_canvas.getWidth(),
                 (int) virtualToRealY(0),
                 _paint);

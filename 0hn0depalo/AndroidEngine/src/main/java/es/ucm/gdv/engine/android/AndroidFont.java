@@ -3,6 +3,7 @@ package es.ucm.gdv.engine.android;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,8 +23,7 @@ public class AndroidFont implements Font{
             _font = Typeface.createFromAsset(as, s);
         }
         catch (IOException e) {
-            //TODO: usar Logcat?
-            System.err.println("Error cargando la fuente: " + e);
+            Log.e("ERROR", "No se pudo cargar la fuente: " + e);
             return false;
         }
         _filename = s;

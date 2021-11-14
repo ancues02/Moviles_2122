@@ -13,8 +13,6 @@ import es.ucm.gdv.engine.*;
 
 /**
  * Clase que implementa motor grafico en Pc
- *
- * //TODO Mencionar los porcentajes aqui
  */
 public class DesktopGraphics extends GenericGraphics {
     // Atributos
@@ -311,17 +309,18 @@ public class DesktopGraphics extends GenericGraphics {
         } while (_strategy.contentsLost());
     }
 
-    private void fillOffsets(){
-        Color c = new Color(_bR, _bG, _bB, _bA);
+    @Override
+    protected void fillOffsets(){
+        _graphics.setColor(new Color(_bR, _bG, _bB, _bA));
         if(_verticalCompensation)
-            fillVerticalOffsets(c);
+            fillVerticalOffsets();
         else
-            fillHorizontalOffsets(c);
+            fillHorizontalOffsets();
     }
 
     //Rellena de blanco por los lados
-    private void fillHorizontalOffsets(Color c){
-        _graphics.setColor(c);
+    @Override
+    protected void fillHorizontalOffsets(){
         _graphics.fillRect(0, 0,
                 (int) virtualToRealX(0),
                 _window.getHeight());
@@ -329,8 +328,8 @@ public class DesktopGraphics extends GenericGraphics {
                 _window.getWidth(), _window.getHeight());
     }
 
-    private void fillVerticalOffsets(Color c){
-        _graphics.setColor(c);
+    @Override
+    protected void fillVerticalOffsets(){
         _graphics.fillRect(0, 0,
                 _window.getWidth(),
                 (int) virtualToRealY(0));

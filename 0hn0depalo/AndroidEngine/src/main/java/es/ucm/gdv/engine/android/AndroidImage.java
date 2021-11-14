@@ -3,6 +3,7 @@ package es.ucm.gdv.engine.android;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +23,7 @@ public class AndroidImage implements Image {
             _bitmap = BitmapFactory.decodeStream(is);
         }
         catch (IOException e) {
-            //TODO: usar Logcat?
-            System.err.println("Error cargando la imagen: " + e);
+            Log.e("Error", "No se pudo cargar la imagen: " + e);
             return false;
         }
         _name = s;

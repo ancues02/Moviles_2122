@@ -21,6 +21,9 @@ import java.util.HashMap;
  *  Como hacemos los calculos para el canvas virtual a mano, no implementamos
  *  los metodos translate, scale, save y restore porque no son necesarios.
  *
+ *  Los parámetros de coordenadas en los métodos de dibujo son recibidos en forma de
+ *  procentaje, y luego ajustados a píxeles según el canvas virtual, su relación de aspecto
+ *  y su escala en la ventana actual.
  */
 public abstract class GenericGraphics implements Graphics{
     // Atributos
@@ -199,19 +202,16 @@ public abstract class GenericGraphics implements Graphics{
      * se hace el clear para ajustar el canvas.
      * Considera si hay que poner barras en los
      * bordes horizontales o verticales.
-     *
-    abstract public void fillOffsets();
+     */
+    abstract protected void fillOffsets();
 
     /**
      * Rellena los margenes horizontales
-     *
-    abstract public void fillHorizontalOffsets();
+     */
+    abstract protected void fillHorizontalOffsets();
 
     /**
      * Rellena los margenes verticales
-     *
-    abstract public void fillVerticalOffsets();
      */
-
-
+    abstract protected void fillVerticalOffsets();
 }

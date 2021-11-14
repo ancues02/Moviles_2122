@@ -158,7 +158,6 @@ public interface Graphics {
      */
     void setColor(int r, int g, int b, int a);
 
-    //TODO: ¿Usamos este metodo?
     /**
      * Dibuja una circunferencia en pantalla
      *
