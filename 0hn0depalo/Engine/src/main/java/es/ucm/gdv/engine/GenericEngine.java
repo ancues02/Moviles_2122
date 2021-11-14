@@ -16,7 +16,7 @@ public abstract class GenericEngine implements Engine{
     // Atributos
 
     protected GenericGraphics _graphics;   // Instancia del motor grafico (tiene que tener un metodo render)
-    protected Input _input;                 // Instancia del gestor de entrada
+    protected GenericInput _input;         // Instancia del gestor de entrada
     protected Scene _scene;
     protected long _lastFrameTime;
 

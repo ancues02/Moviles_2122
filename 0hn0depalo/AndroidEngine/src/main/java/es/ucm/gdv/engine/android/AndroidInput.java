@@ -4,9 +4,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import es.ucm.gdv.engine.Input;
+import es.ucm.gdv.engine.GenericInput;
 import es.ucm.gdv.engine.Pool;
 import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
@@ -14,33 +13,15 @@ import es.ucm.gdv.engine.TouchType;
 /**
  * Se encarga de recoger, analizar y devolver los eventos que ocurren en Android
  */
-public class AndroidInput implements Input, View.OnTouchListener {
+public class AndroidInput extends GenericInput implements View.OnTouchListener {
 
     private AndroidGraphics _aGraphics;
-    private List<TouchEvent> _touchEventList;
-    private Pool<TouchEvent> _eventPool;
 
     public AndroidInput(AndroidGraphics aGraphics){
         _aGraphics = aGraphics;
         _aGraphics.getSurfaceView().setOnTouchListener(this);
         _touchEventList = new ArrayList();
         _eventPool = new Pool<TouchEvent>(50, () -> { return new TouchEvent(); } );
-    }
-
-    /**
-     * Tiene que ser sincronizado porque la hebra de UI lo añade
-     * pero la  hebra de logica los recoge.
-     * @return Devuelve la lista de eventos
-     */
-    @Override
-    synchronized public List<TouchEvent> getTouchEvents() {
-        return _touchEventList;
-    }
-
-    @Override
-    public void popEvent(TouchEvent touchEvent) {
-        _touchEventList.remove(touchEvent);
-        _eventPool.release(touchEvent);
     }
 
     /**
@@ -113,13 +94,6 @@ public class AndroidInput implements Input, View.OnTouchListener {
             synchronized (this) {
                 _touchEventList.add(event);
             }
-        }
-    }
-
-    public void flushEvents(){
-        while(_touchEventList.size() > 0) {
-            TouchEvent touchEvent = _touchEventList.get(0);
-            popEvent(touchEvent);
         }
     }
 }

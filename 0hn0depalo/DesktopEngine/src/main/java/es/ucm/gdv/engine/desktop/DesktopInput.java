@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
 
-import es.ucm.gdv.engine.Input;
+import es.ucm.gdv.engine.GenericInput;
 import es.ucm.gdv.engine.Pool;
 import es.ucm.gdv.engine.TouchEvent;
 import es.ucm.gdv.engine.TouchType;
@@ -12,12 +12,11 @@ import es.ucm.gdv.engine.TouchType;
 /**
  * Se encarga de recoger, analizar y devolver los eventos que ocurren en PC
  */
-public class DesktopInput implements Input,  java.awt.event.MouseListener, java.awt.event.MouseMotionListener{
+public class DesktopInput extends GenericInput implements java.awt.event.MouseListener, java.awt.event.MouseMotionListener{
     private DesktopGraphics _dGraphics;
-    private List<TouchEvent> _touchEventList;
-    private Pool<TouchEvent> _eventPool;
 
     public DesktopInput(DesktopGraphics dGraphics){
+        super();
         _dGraphics = dGraphics;
         _dGraphics.getWindow().addMouseListener(this);
         _dGraphics.getWindow().addMouseMotionListener(this);
@@ -25,19 +24,11 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
         _eventPool = new Pool<TouchEvent>(50, () -> { return new TouchEvent(); } );
     }
 
-    @Override
-    synchronized public List<TouchEvent> getTouchEvents() {
-        return _touchEventList;
-    }
-
-    @Override
-    public void popEvent(TouchEvent touchEvent) {
-        _touchEventList.remove(touchEvent);
-        _eventPool.release(touchEvent);
-    }
-
     private void addEvent(MouseEvent mouseEvent, TouchType type){
-        TouchEvent event = _eventPool.obtain();
+        TouchEvent event;
+        synchronized (this) {
+            event = _eventPool.obtain();
+        }
         if(event != null) {
             float posX = _dGraphics.realToVirtualX(mouseEvent.getX());
             float posY = _dGraphics.realToVirtualY(mouseEvent.getY());
@@ -79,10 +70,4 @@ public class DesktopInput implements Input,  java.awt.event.MouseListener, java.
     @Override
     public void mouseMoved(MouseEvent mouseEvent) {  }
 
-    public void flushEvents(){
-        while(_touchEventList.size() > 0) {
-            TouchEvent touchEvent = _touchEventList.get(0);
-            popEvent(touchEvent);
-        }
-    }
 }

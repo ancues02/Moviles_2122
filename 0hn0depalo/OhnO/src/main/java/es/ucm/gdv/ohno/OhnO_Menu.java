@@ -37,10 +37,9 @@ public class OhnO_Menu extends GenericScene {
     @Override
     public void handleInput() {
         List<TouchEvent> events = _input.getTouchEvents();
-        while(events.size() > 0) {
-            TouchEvent touchEvent = events.get(0);
-            processInput(touchEvent);
-            _input.popEvent(touchEvent);
+        int i = events.size();
+        for(; i > 0; i--){
+            processInput(events.get(i - 1));
         }
     }
 
