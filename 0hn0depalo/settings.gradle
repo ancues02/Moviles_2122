@@ -1,7 +1,0 @@
-rootProject.name = "0h n0 de palo"
-include ':Engine'
-include ':AndroidEngine'
-include ':DesktopEngine'
-include ':DesktopLauncher'
-include ':AndroidLauncher'
-include ':OhnO'
