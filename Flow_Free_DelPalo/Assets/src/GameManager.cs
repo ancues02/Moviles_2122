@@ -10,10 +10,21 @@ namespace FlowFree
         public LevelManager lvlManger;
         public MenuManager menuManager;
 
+        /*[System.Serializable]
+        public struct Level
+        {
+            public string name;
+            public TextAsset map;
+        }*/
+        public LevelPack[] levels;
+
+
         private void Awake()
         {
             Debug.Log(getInstance());
         }
+
+
         private GameManager()
         {
             // initialize your game manager here. Do not reference to GameObjects here (i.e. GameObject.Find etc.)
@@ -38,6 +49,9 @@ namespace FlowFree
                 _instance.lvlManger = lvlManger;
                 _instance.menuManager = menuManager;
             }
+
+            //levels.ToString();
+            //levels[0].packName...
         }
 
     }
