@@ -16,8 +16,6 @@ namespace FlowFree
 
         //private ConnectionType[] sidesType;
 
-        public int numSides;
-        private bool[] connections;
 
         [Tooltip("Si es inicio/fin de tuberia")]
         public bool isMain;
@@ -36,12 +34,16 @@ namespace FlowFree
             if (renderSprite == null)
                 Debug.LogError("Espabila, que te falta una referencia");
             
-            if(numSides > 0)
-                connections = new bool[numSides];
-            renderSprite.color = Color.red;
-            renderSprite.sprite = sprites[numSides];
-            
 
+            renderSprite.color = Color.red;
+            renderSprite.sprite = sprites[0];
+           
+
+        }
+
+        public void ChangeColor(Color color)
+        {
+            renderSprite.color = color;
         }
 
     }
