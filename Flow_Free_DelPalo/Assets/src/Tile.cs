@@ -39,6 +39,7 @@ namespace FlowFree
 
             //renderSprite.color = Color.red;
             renderSprite.sprite = sprites[0];
+            //renderSprite.color = Color.black;
            
 
         }
@@ -47,6 +48,8 @@ namespace FlowFree
         {
             renderSprite.color = color;
         }
+
+
 
         public void setVisible(bool visible)
         {

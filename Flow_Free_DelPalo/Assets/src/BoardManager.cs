@@ -27,10 +27,10 @@ namespace FlowFree
             colors = new List<Color>();
             colors.Add(Color.red);
             colors.Add(Color.blue);
-            colors.Add(Color.white);
             colors.Add(Color.green);
             colors.Add(Color.yellow);
             colors.Add(Color.cyan);
+            colors.Add(Color.white);
 
             //esto no deberia llamarse aqui
             setMap(new Logic.Map());
@@ -45,23 +45,32 @@ namespace FlowFree
             map = m;
             m.Parse("");
             _tiles = new Tile[m.Width, m.Height];
+            int contColor = 0;
             for(int i = 0; i< m.Width; ++i)
             {
                 for (int j = 0; j < m.Height; ++j)
                 {
                     // Esta bien colocado por el pivot del sprite
-                    _tiles[i, j] = Instantiate(TilePrefab, new Vector2(i, j), Quaternion.identity, transform).GetComponent<Tile>();
-                    if (map.IsFlow(i, j))
+                    _tiles[i, j] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity, transform).GetComponent<Tile>();
+                    _tiles[i,j].name=$"Tile {i} {j}";
+                    if (map.IsFlow(i, j))//si eres inicio o fin de una tuberia
                     {
                         _tiles[i, j].setIsMain(true);
-                        _tiles[i, j].ChangeColor(colors[i]);
+                        //devuelve el color que tiene la tuberia (negro default)
+                        Color c = map.InitialColor(i, j, colors[contColor]);
+                        if (c != Color.black)//es la primera vez que encuentra esta tuberia
+                        {
+                            _tiles[i, j].ChangeColor(colors[contColor++]);
+                        }
+                        else
+                            _tiles[i, j].ChangeColor(c);
                     }
                     else
                         _tiles[i, j].setVisible(false);
                         //para mostrar los inicios/fin de las tuberias
                 }
             }
-            transform.Translate(new Vector2(-m.Width / 2f, -m.Height / 2f));
+            transform.Translate(new Vector2(-m.Width / 2f, (-m.Height / 2f)+m.Height));
         }
 
        

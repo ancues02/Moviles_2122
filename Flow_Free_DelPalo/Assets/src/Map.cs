@@ -32,16 +32,7 @@ namespace FlowFree.Logic
         public List<int> Bridges { get => bridges;  }
         public List<int> Voids { get => voids; }
         public List<int> Walls { get => walls;  }
-        private List<Flow> Flows { get => flows;  }
 
-        //punto en el tablero (podria ser Vector2D)
-        /*public struct Point
-        {
-            public int i,//la fila
-                j;//la columna
-
-
-        }*/
 
 
         //Tuberia, contiene una lista de puntos que es la solucion a esa tuberia
@@ -50,7 +41,12 @@ namespace FlowFree.Logic
         {
             public List<Vector2> flowPoints;
             public Vector2 start, end;
+            public Color color;
             //poner el color
+            public void setColor(Color c) {
+                this.color = c; 
+            }
+            public Color getColor() { return color; }
         }
 
         //Le llega un entero y lo parsea a fila/columna del nivel
@@ -85,6 +81,7 @@ namespace FlowFree.Logic
             {
                 flow = new Flow();
                 flow.flowPoints = new List<Vector2>();
+                flow.color = Color.black;
                 flowPoints = lvl[i].Split(',');
 
                 //inicio de una tuberia
@@ -104,7 +101,8 @@ namespace FlowFree.Logic
                 flow.flowPoints.Add(pos);
                 flow.end = pos;
 
-                Flows.Add(flow);//añadir el nuevo flow con todas sus posiciones en el mapa
+                flows.Add(flow);//añadir el nuevo flow con todas sus posiciones en el mapa
+                
             }
             return true;
         }
@@ -144,9 +142,36 @@ namespace FlowFree.Logic
             Vector2 index = new Vector2(i, j);
             foreach(Flow f in flows)
             {
-                if (f.end == index || f.start == index) return true;
+                if (f.end == index || f.start == index)
+                {
+                    return true;
+                }
             }
             return false;
+        }
+
+        //Pone un color a esa tuberia, 
+        //si no tiene devuelve true , si ya tiene devuelve false
+        //se usa para poner colores a los inicios/fines de tuberias
+        public Color InitialColor(int i, int j, Color c)
+        {
+            Vector2 index = new Vector2(i, j);
+            for (int k =0; k < flows.Count; ++k)
+            {
+
+                if (flows[k].end == index || flows[k].start == index)//si es la tuberia que estamos buscando
+                {
+                    if (flows[k].getColor() == Color.black)//si no se ha puesto color todavia
+                    {
+                        flows[k].setColor(c);
+                        return c;
+                    }
+                    return Color.black;
+
+                }
+            }
+            return Color.black;
+
         }
     }
 }
