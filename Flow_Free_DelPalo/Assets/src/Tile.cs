@@ -17,9 +17,11 @@ namespace FlowFree
         //private ConnectionType[] sidesType;
 
 
-        [Tooltip("Si es inicio/fin de tuberia")]
-        public bool isMain;
 
+        bool isMain = false;
+
+        public bool getIsMain() { return isMain; }
+        public void setIsMain(bool isFlow) { isMain = isFlow; }
         public List<Sprite> sprites;
 
         public Sprite hintedSprite;
@@ -35,7 +37,7 @@ namespace FlowFree
                 Debug.LogError("Espabila, que te falta una referencia");
             
 
-            renderSprite.color = Color.red;
+            //renderSprite.color = Color.red;
             renderSprite.sprite = sprites[0];
            
 
@@ -44,6 +46,11 @@ namespace FlowFree
         public void ChangeColor(Color color)
         {
             renderSprite.color = color;
+        }
+
+        public void setVisible(bool visible)
+        {
+            renderSprite.enabled = visible;
         }
 
     }

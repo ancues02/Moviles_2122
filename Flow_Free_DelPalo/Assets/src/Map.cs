@@ -34,25 +34,34 @@ namespace FlowFree.Logic
         public List<int> Walls { get => walls;  }
         private List<Flow> Flows { get => flows;  }
 
-        struct Point
+        //punto en el tablero (podria ser Vector2D)
+        /*public struct Point
         {
             public int i,//la fila
                 j;//la columna
-        }
+
+
+        }*/
+
+
+        //Tuberia, contiene una lista de puntos que es la solucion a esa tuberia
+        //tiene dos puntos, el inicio y el fin
         struct Flow
         {
-            public List<Point> flowPoints;
-            public Point start, end;
+            public List<Vector2> flowPoints;
+            public Vector2 start, end;
             //poner el color
         }
 
-        Point parsePoint(int pos)
+        //Le llega un entero y lo parsea a fila/columna del nivel
+        Vector2 parsePoint(int pos)
         {
-            Point p = new Point();
-            p.i = pos / Width;
-            p.j = pos % Height;
+            Vector2 p = new Vector2();
+            p.x = pos / Width;
+            p.y = pos % Height;
             return p;
         }
+
         /*
          * Le llega una cadena que es el nivel
          */ 
@@ -75,12 +84,12 @@ namespace FlowFree.Logic
             for (int i= 1; i <= FlowNumber; ++i)//recorre todos los flows
             {
                 flow = new Flow();
-                flow.flowPoints = new List<Point>();
+                flow.flowPoints = new List<Vector2>();
                 flowPoints = lvl[i].Split(',');
 
                 //inicio de una tuberia
                 int tmp = int.Parse(flowPoints[0]);
-                Point pos = parsePoint(tmp);
+                Vector2 pos = parsePoint(tmp);
                 flow.flowPoints.Add(pos);
                 flow.start = pos;
 
@@ -130,10 +139,14 @@ namespace FlowFree.Logic
         }
 
         //devuelve si es inicio o fin de una tuberia
-        public bool IsFlow()
+        public bool IsFlow(int i, int j)
         {
-
-            return true;
+            Vector2 index = new Vector2(i, j);
+            foreach(Flow f in flows)
+            {
+                if (f.end == index || f.start == index) return true;
+            }
+            return false;
         }
     }
 }
