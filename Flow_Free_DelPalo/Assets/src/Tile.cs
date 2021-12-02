@@ -6,15 +6,16 @@ namespace FlowFree
 {
     public class Tile : MonoBehaviour
     {
-        //public enum ConnectionType
-        //{
-        //    Normal,
-        //    Wall,
-        //    Portal,
-        //    Void
-        //}
-
-        //private ConnectionType[] sidesType;
+        public enum ConnectionType
+        {
+            Normal,
+            Wall,
+            Void
+        }
+        struct Connection
+        {
+            ConnectionType[] sidesType;
+        }
 
 
 
@@ -29,11 +30,13 @@ namespace FlowFree
         [Tooltip("Sprite del circulo")]
         public SpriteRenderer renderSprite;
 
-       
+        [Tooltip("Hijos del tile")]
+        public GameObject[] childrens;
+
 
         void Start()
         {
-            if (renderSprite == null)
+            if (renderSprite == null) 
                 Debug.LogError("Espabila, que te falta una referencia");
             
 
@@ -54,6 +57,16 @@ namespace FlowFree
         public void setVisible(bool visible)
         {
             renderSprite.enabled = visible;
+        }
+
+        public void activeTop()
+        {
+            childrens[3].SetActive(true);
+        }
+
+        public void activeLeft()
+        {
+            childrens[2].SetActive(true);
         }
 
     }

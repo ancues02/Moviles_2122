@@ -44,38 +44,50 @@ namespace FlowFree
         {
             map = m;
             m.Parse("");
+            
             _tiles = new Tile[m.Width, m.Height];
-            int contColor = 0;
+
             for(int i = 0; i< m.Width; ++i)
             {
                 for (int j = 0; j < m.Height; ++j)
                 {
                     // Esta bien colocado por el pivot del sprite
                     _tiles[i, j] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity, transform).GetComponent<Tile>();
-                    _tiles[i,j].name=$"Tile {i} {j}";
-                    if (map.IsFlow(i, j))//si eres inicio o fin de una tuberia
-                    {
-                        _tiles[i, j].setIsMain(true);
-                        //devuelve el color que tiene la tuberia (negro default)
-                        Color c = map.InitialColor(i, j, colors[contColor]);
-                        if (c != Color.black)//es la primera vez que encuentra esta tuberia
-                        {
-                            _tiles[i, j].ChangeColor(colors[contColor++]);
-                        }
-                        else
-                            _tiles[i, j].ChangeColor(c);
-                    }
-                    else
-                        _tiles[i, j].setVisible(false);
-                        //para mostrar los inicios/fin de las tuberias
+                    _tiles[i, j].name=$"Tile {i} {j}";
+                    _tiles[i, j].setVisible(false);
+
+                    if (j == 0)
+                        _tiles[i, j].activeLeft();
+                    
+                    if (i == 0)
+                        _tiles[i, j].activeTop();
                 }
             }
-            transform.Translate(new Vector2(-m.Width / 2f, (-m.Height / 2f)+m.Height));
+            setMainTiles();
+            transform.Translate(new Vector2(-m.Width / 2f +0.5f, (-m.Height / 2f)+m.Height - 0.5f) );
         }
 
-       
+        private void setMainTiles()
+        {
+            List<Logic.Map.Flow> flows = map.Flows;
+            int i = 0;
+            foreach(Logic.Map.Flow f in map.Flows){
+                _tiles[f.start.x, f.start.y].setIsMain(true);
+                _tiles[f.start.x, f.start.y].setVisible(true);
+                _tiles[f.start.x, f.start.y].ChangeColor(colors[i]);
+
+
+                _tiles[f.end.x, f.end.y].setIsMain(true);
+                _tiles[f.end.x, f.end.y].setVisible(true);
+                _tiles[f.end.x, f.end.y].ChangeColor(colors[i]);
+
+                i++;
+            }
+        }
 
         
 
+
     }
+
 }

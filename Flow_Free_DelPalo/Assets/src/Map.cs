@@ -18,12 +18,12 @@ namespace FlowFree.Logic
         //opcionales
         List<int> bridges;//separadas por dos puntos son sus ubicaciones
         List<int> voids;//separadas por dos puntos son sus ubicaciones
-        List<int> walls;//separadas por dos puntos son sus ubicaciones, cada muro viene dado por dos casillas 2|9 
+        List<Vector2Int> walls;//separadas por dos puntos son sus ubicaciones, cada muro viene dado por dos casillas 2|9 
 
 
         List<Flow> flows;//las tuberias
 
-
+        public List<Flow> Flows { get => flows; }
         public int Width { get => width; }
         public int Height { get => height; }
         public int Reserved { get => reserved;  }
@@ -31,28 +31,23 @@ namespace FlowFree.Logic
         public int FlowNumber { get => flowNumber;  }
         public List<int> Bridges { get => bridges;  }
         public List<int> Voids { get => voids; }
-        public List<int> Walls { get => walls;  }
+        public List<Vector2Int> Walls { get => walls;  }
 
 
 
         //Tuberia, contiene una lista de puntos que es la solucion a esa tuberia
         //tiene dos puntos, el inicio y el fin
-        struct Flow
+        public struct Flow
         {
-            public List<Vector2> flowPoints;
-            public Vector2 start, end;
-            public Color color;
-            //poner el color
-            public void setColor(Color c) {
-                this.color = c; 
-            }
-            public Color getColor() { return color; }
+            public List<Vector2Int> flowPoints;
+            public Vector2Int start, end;
+
         }
 
         //Le llega un entero y lo parsea a fila/columna del nivel
-        Vector2 parsePoint(int pos)
+        Vector2Int parsePoint(int pos)
         {
-            Vector2 p = new Vector2();
+            Vector2Int p = new Vector2Int();
             p.x = pos / Width;
             p.y = pos % Height;
             return p;
@@ -64,7 +59,7 @@ namespace FlowFree.Logic
         public bool Parse(string str)
         {
             
-            str = "5,0,1,5;" +
+            str = "5,0,1,5;" +//, (puentes) , (vacio) 5:4:6:23, (paredes) 2|7:3|8,
                 "18,17,12;" +
                 "21,16,11,6;" +
                 "3,4,9;" +
@@ -80,13 +75,12 @@ namespace FlowFree.Logic
             for (int i= 1; i <= FlowNumber; ++i)//recorre todos los flows
             {
                 flow = new Flow();
-                flow.flowPoints = new List<Vector2>();
-                flow.color = Color.black;
+                flow.flowPoints = new List<Vector2Int>();
                 flowPoints = lvl[i].Split(',');
 
                 //inicio de una tuberia
                 int tmp = int.Parse(flowPoints[0]);
-                Vector2 pos = parsePoint(tmp);
+                Vector2Int pos = parsePoint(tmp);
                 flow.flowPoints.Add(pos);
                 flow.start = pos;
 
@@ -100,7 +94,6 @@ namespace FlowFree.Logic
                 pos = parsePoint(tmp);
                 flow.flowPoints.Add(pos);
                 flow.end = pos;
-
                 flows.Add(flow);//añadir el nuevo flow con todas sus posiciones en el mapa
                 
             }
@@ -116,11 +109,13 @@ namespace FlowFree.Logic
             reserved = int.Parse(attr[1]);
             levelNumber = int.Parse(attr[2]);
             flowNumber = int.Parse(attr[3]);
-            if(attr.Length > 4)//checkear opcionales
+            if(attr.Length > 5)//checkear opcionales
             {
-                
+                //int.Parse(attr[4]);//puentes que no queremos
+                getVoids(attr[5]);
+                if (attr.Length > 6)
+                    getWalls(attr[6]);
             }
-
         }
 
         //Pone el tamanio del tablero
@@ -136,10 +131,33 @@ namespace FlowFree.Logic
             }
         }
 
+        void getVoids(string str)
+        {
+            string[] attr = str.Split(':');
+            for(int i = 0; i < attr.Length; ++i)
+            {
+                voids.Add(int.Parse(attr[i]));
+            }
+
+        }
+
+        void getWalls(string str)
+        {
+            string[] attr = str.Split(':');
+            string[] wall;
+            for (int i = 0; i < attr.Length; ++i)
+            {
+                wall = attr[i].Split('|');
+                walls.Add(new Vector2Int(int.Parse(wall[0]), int.Parse(wall[1])));
+            }
+
+        }
+
+
         //devuelve si es inicio o fin de una tuberia
         public bool IsFlow(int i, int j)
         {
-            Vector2 index = new Vector2(i, j);
+            Vector2Int index = new Vector2Int(i, j);
             foreach(Flow f in flows)
             {
                 if (f.end == index || f.start == index)
@@ -150,28 +168,5 @@ namespace FlowFree.Logic
             return false;
         }
 
-        //Pone un color a esa tuberia, 
-        //si no tiene devuelve true , si ya tiene devuelve false
-        //se usa para poner colores a los inicios/fines de tuberias
-        public Color InitialColor(int i, int j, Color c)
-        {
-            Vector2 index = new Vector2(i, j);
-            for (int k =0; k < flows.Count; ++k)
-            {
-
-                if (flows[k].end == index || flows[k].start == index)//si es la tuberia que estamos buscando
-                {
-                    if (flows[k].getColor() == Color.black)//si no se ha puesto color todavia
-                    {
-                        flows[k].setColor(c);
-                        return c;
-                    }
-                    return Color.black;
-
-                }
-            }
-            return Color.black;
-
-        }
     }
 }

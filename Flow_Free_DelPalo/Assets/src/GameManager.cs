@@ -21,7 +21,7 @@ namespace FlowFree
 
         private void Awake()
         {
-            Debug.Log(getInstance());
+
         }
 
         private GameManager()
