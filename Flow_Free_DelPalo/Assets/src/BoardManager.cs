@@ -14,6 +14,8 @@ namespace FlowFree
 
         Vector2 vectorOffset;
         Color pressedColor = Color.black;
+        Tile lastKnownTile;
+        Tile currentTile;
 
         private List<Color> colors;
 
@@ -59,6 +61,7 @@ namespace FlowFree
                     _tiles[i, j] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity, transform).GetComponent<Tile>();
                     _tiles[i, j].name=$"Tile {i} {j}";
                     _tiles[i, j].setVisible(false);
+                    _tiles[i, j].setBoardPos(new Vector2Int(i, j));
 
                     if (j == 0)
                         _tiles[i, j].activeLeft();
@@ -99,13 +102,43 @@ namespace FlowFree
             {
                 Tile activatedTile = _tiles[boardPos.y, boardPos.x];
                 if (activatedTile.getColor() != Color.black)
+                {
                     pressedColor = activatedTile.getColor();
+                    currentTile = activatedTile;
+                }
             }
         }
 
         void ReleaseInput(Vector2 pos)
         {
+            lastKnownTile = null;
             pressedColor = Color.black;
+        }
+
+        void DragInput(Vector2 pos)
+        {
+            Vector2Int boardPos = new Vector2Int(Mathf.FloorToInt((pos - vectorOffset).x),
+                Mathf.FloorToInt(-(pos - vectorOffset).y));
+            if (boardPos.x >= 0 && boardPos.x < _height &&
+                boardPos.y >= 0 && boardPos.y < _width)
+            {
+                currentTile =  _tiles[boardPos.y, boardPos.x];
+            }
+        }
+
+        void PorcessTileChange()
+        {
+            if(lastKnownTile != null && 
+                currentTile != lastKnownTile)
+            {
+                // Compare positions
+            }
+            lastKnownTile = currentTile;
+        }
+
+        private void OnMouseDrag()
+        {
+            DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         }
 
         private void Update()

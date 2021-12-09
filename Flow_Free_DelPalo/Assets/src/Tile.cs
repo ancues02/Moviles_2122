@@ -17,6 +17,10 @@ namespace FlowFree
             ConnectionType[] sidesType;
         }
 
+        Vector2Int boardPos;
+
+        Color tileColor;
+
         bool isMain = false;
 
         public bool getIsMain() { return isMain; }
@@ -46,18 +50,28 @@ namespace FlowFree
 
         public void ChangeColor(Color color)
         {
+            tileColor = color;
             renderSprite.color = color;
         }
 
         public Color getColor()
         {
-            return renderSprite.color;
+            return tileColor;
         }
-
 
         public void setVisible(bool visible)
         {
             renderSprite.enabled = visible;
+        }
+
+        public void setBoardPos(Vector2Int pos)
+        {
+            boardPos = pos;
+        }
+
+        public Vector2Int getBoardPos()
+        {
+            return boardPos;
         }
 
         public void activeTop()
