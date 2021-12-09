@@ -6,13 +6,12 @@ namespace FlowFree
 {
     public class LevelManager : MonoBehaviour
     {
+        int levelIndex;
 
         void Start()
         {
-            
+            GameManager gameManager = GameManager.getInstance();
+            //levelIndex = gameManager.getLevel();
         }
-        //pasar al gamermanagar el nivel que se va a jugar
-        //y el gamanager se lo pasa a boardmanager
-
     }
 }

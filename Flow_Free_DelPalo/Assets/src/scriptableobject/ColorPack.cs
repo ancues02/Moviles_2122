@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Esto son las skins que no creo que usemos
 namespace FlowFree
 {
     [CreateAssetMenu(fileName = "PackColor",

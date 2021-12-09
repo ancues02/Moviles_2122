@@ -10,9 +10,9 @@ namespace FlowFree
 
         private Tile[,] _tiles;
         private int _width, _height;
-        private Logic.Map map;
-        
 
+        // Obtenerlos del GameManager
+        private Logic.Map map;
         private List<Color> colors;
 
         /**

@@ -1,27 +1,31 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FlowFree
 {
     public class GameManager : MonoBehaviour
     {
-        private static GameManager _instance;
+        // Categorias que contienen los lotes que estan en el juego
+        public Category[] categories;
+
+        // Referencia al levelManager para 
         public LevelManager lvlManger;
         public MenuManager menuManager;
 
-        /*[System.Serializable]
-        public struct Level
-        {
-            public string name;
-            public TextAsset map;
-        }*/
-        public LevelPack[] levels;
+        private static GameManager _instance;
+
+
+        Category selectedCategory;
+        LevelPack selectedLevelPack;
+
 
 
         private void Awake()
         {
-
+            
         }
 
         private GameManager()
@@ -29,6 +33,7 @@ namespace FlowFree
             // initialize your game manager here. Do not reference to GameObjects here (i.e. GameObject.Find etc.)
             // because the game manager will be created before the objects
         }
+
 
         public static GameManager getInstance()
         {
@@ -47,11 +52,26 @@ namespace FlowFree
             {
                 _instance.lvlManger = lvlManger;
                 _instance.menuManager = menuManager;
+                Destroy(gameObject);
             }
-            
+           
+        }
 
-            //levels.ToString();
-            //levels[0].packName...
+        public void ChangeScene(string sceneName)
+        {
+            Scene sceneToChange = SceneManager.GetSceneByName(sceneName);
+            if (sceneToChange.IsValid())
+                SceneManager.SetActiveScene(sceneToChange);
+        }
+
+        public LevelPack getSelectedPack()
+        {
+            return selectedLevelPack;
+        }
+
+        public Logic.Map getLevel(int levelIndex)
+        {
+            return selectedLevelPack.Maps[levelIndex];
         }
 
     }
