@@ -11,7 +11,9 @@ namespace FlowFree
         private Tile[,] _tiles;
         private int _width, _height;
         private Logic.Map map;
-        
+
+        Vector2 vectorOffset;
+        Color pressedColor = Color.black;
 
         private List<Color> colors;
 
@@ -46,6 +48,8 @@ namespace FlowFree
             m.Parse("");
             
             _tiles = new Tile[m.Width, m.Height];
+            _width = m.Width;
+            _height = m.Height;
 
             for(int i = 0; i< m.Width; ++i)
             {
@@ -64,7 +68,8 @@ namespace FlowFree
                 }
             }
             setMainTiles();
-            transform.Translate(new Vector2(-m.Width / 2f +0.5f, (-m.Height / 2f)+m.Height - 0.5f) );
+            vectorOffset = new Vector2(-m.Width / 2f, (-m.Height / 2f) + m.Height);
+            transform.Translate(new Vector2(vectorOffset.x + 0.5f, vectorOffset.y - 0.5f));
         }
 
         private void setMainTiles()
@@ -85,9 +90,38 @@ namespace FlowFree
             }
         }
 
-        
+        void PressInput(Vector2 pos)
+        {
+            Vector2Int boardPos = new Vector2Int(Mathf.FloorToInt((pos - vectorOffset).x), 
+                Mathf.FloorToInt(-(pos - vectorOffset).y));
+            if (boardPos.x >= 0 && boardPos.x < _height &&
+                boardPos.y >= 0 && boardPos.y < _width)
+            {
+                Tile activatedTile = _tiles[boardPos.y, boardPos.x];
+                if (activatedTile.getColor() != Color.black)
+                    pressedColor = activatedTile.getColor();
+            }
+        }
 
+        void ReleaseInput(Vector2 pos)
+        {
+            pressedColor = Color.black;
+        }
 
+        private void Update()
+        {
+#if UNITY_EDITOR
+            if (Input.GetMouseButtonDown(0))
+                PressInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            if (Input.GetMouseButtonUp(0))
+                ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+#else
+            foreach(Input inp in Input.touches)
+            {
+                
+            }
+#endif
+        }
     }
 
 }

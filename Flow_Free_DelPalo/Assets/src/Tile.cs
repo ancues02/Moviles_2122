@@ -17,8 +17,6 @@ namespace FlowFree
             ConnectionType[] sidesType;
         }
 
-
-
         bool isMain = false;
 
         public bool getIsMain() { return isMain; }
@@ -44,7 +42,6 @@ namespace FlowFree
             renderSprite.sprite = sprites[0];
             //renderSprite.color = Color.black;
            
-
         }
 
         public void ChangeColor(Color color)
@@ -52,6 +49,10 @@ namespace FlowFree
             renderSprite.color = color;
         }
 
+        public Color getColor()
+        {
+            return renderSprite.color;
+        }
 
 
         public void setVisible(bool visible)
