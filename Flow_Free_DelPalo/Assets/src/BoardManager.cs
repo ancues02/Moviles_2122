@@ -12,6 +12,13 @@ namespace FlowFree
         private int _width, _height;
         private Logic.Map map;
 
+        //los caminos que hay en el tablero durante el juego
+        //cada fila guarda un flow diferente. Siempre tienen como minimo el incio y fin de un flow
+        private List<Tile>[] _flows;
+        private int _flowsIndex;//el indice de la tuberia que se esta modificando
+
+        private List<Tile>[] _tmpFlows;//flows que se han cortado mientras estas pulsando
+
         Vector2 vectorOffset;
         Color pressedColor = Color.black;
         Tile lastKnownTile;
@@ -53,8 +60,10 @@ namespace FlowFree
             _tiles = new Tile[m.Width, m.Height];
             _width = m.Width;
             _height = m.Height;
+            _flows = new List<Tile>[m.FlowNumber];
+            _tmpFlows = new List<Tile>[m.FlowNumber];
 
-            for(int i = 0; i< m.Width; ++i)
+            for (int i = 0; i< m.Width; ++i)
             {
                 for (int j = 0; j < m.Height; ++j)
                 {
@@ -76,19 +85,24 @@ namespace FlowFree
             transform.Translate(new Vector2(vectorOffset.x + 0.5f, vectorOffset.y - 0.5f));
         }
 
+        // Dice que Tiles son main, es decir, los circulos grandes,
+        // les pone su color y tambien en los añadimos a los flows del boardManager
         private void setMainTiles()
         {
             List<Logic.Map.Flow> flows = map.Flows;
             int i = 0;
             foreach(Logic.Map.Flow f in map.Flows){
+                _tiles[f.start.x, f.start.y].ChangeColor(colors[i]);
                 _tiles[f.start.x, f.start.y].setIsMain(true);
                 _tiles[f.start.x, f.start.y].setVisible(true);
-                _tiles[f.start.x, f.start.y].ChangeColor(colors[i]);
+                _flows[i] = new List<Tile>();
+                _tmpFlows[i] = new List<Tile>();
+                _flows[i].Add(_tiles[f.start.x, f.start.y]);
 
-
+                _tiles[f.end.x, f.end.y].ChangeColor(colors[i]);
                 _tiles[f.end.x, f.end.y].setIsMain(true);
                 _tiles[f.end.x, f.end.y].setVisible(true);
-                _tiles[f.end.x, f.end.y].ChangeColor(colors[i]);
+                _flows[i].Add(_tiles[f.end.x, f.end.y]);
 
                 i++;
             }
@@ -114,6 +128,11 @@ namespace FlowFree
         {
             lastKnownTile = null;
             pressedColor = Color.black;
+            // quitar informacion de tuberias cortadas
+            for(int i = 0; i < _tmpFlows.Length; ++i)
+            {
+                _tmpFlows[i].Clear();
+            }
         }
 
         void DragInput(Vector2 pos)
@@ -123,67 +142,124 @@ namespace FlowFree
             if (boardPos.x >= 0 && boardPos.x < _height &&
                 boardPos.y >= 0 && boardPos.y < _width)
             {
-                Debug.Log(boardPos);
                 currentTile =  _tiles[boardPos.y, boardPos.x];
                 
             }
         }
 
+       private void deactivateMain(Logic.Directions dir)
+       {
+            //desactivamos todas las tiles de la tuberia menos la nueva
+            
+            if (_flows[_flowsIndex][0] == lastKnownTile)
+            {
+                _flows[_flowsIndex][_flows[_flowsIndex].Count-1].deactiveAll();
+                _flows[_flowsIndex][0].notDeactivateAll(dir);
+            }
+            else
+            {
+                _flows[_flowsIndex][0].deactiveAll();
+                _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].notDeactivateAll(dir);
+            }
+            
+            while (_flows[_flowsIndex].Count > 2)
+            {
+                _flows[_flowsIndex][1].deactiveAll();
+                _flows[_flowsIndex].RemoveAt(1);
+            }
+            
+       }
+
+        // Desactiva el camino de una tuberia
+        private void deactivate(Logic.Directions dir)
+        {
+            /*
+                
+                // buscamos donde guardar la nueva tuberia cortada
+                int j = 0;
+                while (_tmpFlows[j].Count != 0)
+                {
+                    j++;
+                }
+                //desactivamos todas las tiles de la tuberia y las aniadimos a la lista de tuberias cortadas
+                while (_flows[_flowsIndex].Count > 2)
+                {
+                    _tmpFlows[j].Add(_flows[i][1]);
+                    _flows[_flowsIndex][1].deactive();
+                    _flows[_flowsIndex].RemoveAt(1);
+                }*/
+
+            
+        }
+
+        // Comprueba si hay que cambiar el color de una tuberia
         private bool canActivate()
         {
             return lastKnownTile != null && currentTile != lastKnownTile &&
                 (!currentTile.getIsMain() ||
-                currentTile.getIsMain() && currentTile.getColor() == pressedColor) 
+                currentTile.getIsMain() && currentTile.getColor() == pressedColor)
                 && lastKnownTile.getColor() != Color.black;
-        }
-
-        private void deactivate()
-        {
-
         }
 
         void ProcessTileChange()
         {
             if(canActivate())
             {
+                int i = 0;
+                while( i < _flows.Length)
+                {
+                    if (_flows[i].Contains(lastKnownTile))
+                        break;
+                    i++;
+                }
+                _flowsIndex = i;
                 bool deActivate = false;
                 // Compare positions
                 Vector2Int lastPos = lastKnownTile.getBoardPos(),
                     newPos = currentTile.getBoardPos();
+
+                Logic.Directions fromDir = Logic.Directions.Right;
+                Logic.Directions toDir = Logic.Directions.Right;
                 if (lastPos.y == newPos.y - 1 && lastPos.x == newPos.x)//has ido a la derecha
                 {
-                    lastKnownTile.active(Logic.Directions.Right);
+                    lastKnownTile.modify(toDir = Logic.Directions.Right, true);
                     currentTile.ChangeColor(pressedColor);
-                    deActivate = currentTile.active(Logic.Directions.Left);
+                    deActivate = currentTile.modify(fromDir = Logic.Directions.Left, true);
 
                 }
                 else if (lastPos.y == newPos.y + 1 && lastPos.x == newPos.x)//has ido a la izquierda
                 {
-                    lastKnownTile.active(Logic.Directions.Left);
+                    lastKnownTile.modify(toDir = Logic.Directions.Left, true);
                     currentTile.ChangeColor(pressedColor);
-                    deActivate = currentTile.active(Logic.Directions.Right);
+                    deActivate = currentTile.modify(fromDir = Logic.Directions.Right, true);
 
                 }
                 else if(lastPos.x == newPos.x + 1 && lastPos.y == newPos.y)//has ido arriba
                 {
-                    lastKnownTile.active(Logic.Directions.Up);
+                    lastKnownTile.modify(toDir = Logic.Directions.Up, true);
                     currentTile.ChangeColor(pressedColor);
-                    deActivate = currentTile.active(Logic.Directions.Down);
+                    deActivate = currentTile.modify(fromDir = Logic.Directions.Down, true);
                 }
                 else if (lastPos.x == newPos.x - 1 && lastPos.y == newPos.y)//has ido abajo
                 {
-                    lastKnownTile.active(Logic.Directions.Down);
+                    lastKnownTile.modify(toDir = Logic.Directions.Down, true);
                     currentTile.ChangeColor(pressedColor);
-                    deActivate = currentTile.active(Logic.Directions.Up);
+                    deActivate = currentTile.modify(fromDir = Logic.Directions.Up, true);
 
                 }
+
 
                 // Si entra aqui es que la tile tenia un color diferente al nuevo
                 // y hay que "borrar" el camino que tenia esa tuberia, se ha cortado el flujo
                 if (deActivate)
                 {
-                    deactivate();
+                    deactivate(fromDir);
                 }
+                else if (lastKnownTile.getIsMain())
+                    deactivateMain(toDir);
+                if(!currentTile.getIsMain())
+                _flows[_flowsIndex].Insert(_flows[_flowsIndex].Count-1, currentTile);
+
             }
             lastKnownTile = currentTile;
         }

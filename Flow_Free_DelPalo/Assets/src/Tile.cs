@@ -24,7 +24,10 @@ namespace FlowFree
         bool isMain = false;
 
         public bool getIsMain() { return isMain; }
-        public void setIsMain(bool isFlow) { isMain = isFlow; }
+        public void setIsMain(bool isFlow) {
+            isMain = isFlow;
+            renderSprite.color = tileColor;
+        }
         public List<Sprite> sprites;
 
         public Sprite hintedSprite;
@@ -57,7 +60,7 @@ namespace FlowFree
         public void ChangeColor(Color color)
         {
             tileColor = color;
-            renderSprite.color = color;
+            
         }
 
         // Devuelve el color que tiene en ese momento el tile
@@ -133,7 +136,7 @@ namespace FlowFree
 
         // Activa un camino en funcion la direccion que le pasan
         // Devuelve true si ha tenido que desactivar algun camino
-        public bool active(Logic.Directions dir)
+        private bool active(Logic.Directions dir)
         {
             SpriteRenderer sR = null;
             switch (dir)
@@ -163,9 +166,92 @@ namespace FlowFree
                     break;
                 
             }
-            //TODO hacer algo si tiene muchos caminos
-            return checkDifferentColor(sR) /*|| checkManyPaths()*/ ;
+
+            return checkDifferentColor(sR); /*|| checkManyPaths()*/;
         }
+
+        // Desactiva todos los caminos que tiene
+        public void deactiveAll()
+        {
+           foreach(SpriteRenderer sp in childrensPaths)
+                    sp.enabled = false;
+            
+        }
+
+        /// <summary>
+        /// Desactiva todos los caminos menos el que recibe
+        /// </summary>
+        public void notDeactivateAll(Logic.Directions dir)
+        {
+            SpriteRenderer SpriteR = null;
+            switch (dir)
+            {
+                case Logic.Directions.Right:
+                    SpriteR = childrensPaths[0];
+                    break;
+
+                case Logic.Directions.Down:
+                    SpriteR = childrensPaths[1];
+                    break;
+
+                case Logic.Directions.Left:
+                    SpriteR = childrensPaths[2];
+                    break;
+
+                case Logic.Directions.Up:
+                    SpriteR = childrensPaths[3];
+                    break;
+
+            }
+            foreach (SpriteRenderer sp in childrensPaths)
+                if(sp != SpriteR)
+                    sp.enabled = false;
+        }
+
+        // Desactiva en esa direccion
+        private void deactive(Logic.Directions dir)
+        {
+            switch (dir)
+            {
+                case Logic.Directions.Right:
+                    childrensPaths[0].enabled = false;
+                    break;
+
+                case Logic.Directions.Down:
+                    childrensPaths[1].enabled = false;
+                    break;
+
+                case Logic.Directions.Left:
+                    childrensPaths[2].enabled = false;
+                    break;
+
+                case Logic.Directions.Up:
+                    childrensPaths[3].enabled = false;
+                    break;
+
+            }
+        }
+
+
+        /// <summary>
+        ///  Modifica un camino en funcion a la direccion que recibe.
+        /// </summary>
+        /// <param name="dir"> Direccion a comprobar</param>
+        /// <param name="active_">  Si es true lo activa, si es false lo desactiva </param>
+        /// <returns> Devuelve true si ha activado un camino y tiene que desactivar otro 
+        /// ya sea por cambio de color, tres direcciones ...</returns>        
+        public bool modify(Logic.Directions dir, bool active_)
+        {
+
+            if (!active_)
+            {
+                deactive(dir);
+                return false;
+            }
+            else
+                return active(dir);
+        }
+
 
     }
 }
