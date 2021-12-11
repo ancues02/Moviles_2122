@@ -63,9 +63,9 @@ namespace FlowFree
                     _tiles[i, j].name=$"Tile {i} {j}";
                     _tiles[i, j].setVisible(false);
                     _tiles[i, j].setBoardPos(new Vector2Int(i, j));
-
+                    _tiles[i, j].ChangeColor(Color.black);
                     if (j == 0)
-                        _tiles[i, j].activeLeft();
+                        _tiles[i, j].activeLeftLimit();
                     
                     if (i == 0)
                         _tiles[i, j].activeTop();
@@ -123,16 +123,67 @@ namespace FlowFree
             if (boardPos.x >= 0 && boardPos.x < _height &&
                 boardPos.y >= 0 && boardPos.y < _width)
             {
+                Debug.Log(boardPos);
                 currentTile =  _tiles[boardPos.y, boardPos.x];
+                
             }
         }
 
-        void PorcessTileChange()
+        private bool canActivate()
         {
-            if(lastKnownTile != null && 
-                currentTile != lastKnownTile)
+            return lastKnownTile != null && currentTile != lastKnownTile &&
+                (!currentTile.getIsMain() ||
+                currentTile.getIsMain() && currentTile.getColor() == pressedColor) 
+                && lastKnownTile.getColor() != Color.black;
+        }
+
+        private void deactivate()
+        {
+
+        }
+
+        void ProcessTileChange()
+        {
+            if(canActivate())
             {
+                bool deActivate = false;
                 // Compare positions
+                Vector2Int lastPos = lastKnownTile.getBoardPos(),
+                    newPos = currentTile.getBoardPos();
+                if (lastPos.y == newPos.y - 1 && lastPos.x == newPos.x)//has ido a la derecha
+                {
+                    lastKnownTile.active(Logic.Directions.Right);
+                    currentTile.ChangeColor(pressedColor);
+                    deActivate = currentTile.active(Logic.Directions.Left);
+
+                }
+                else if (lastPos.y == newPos.y + 1 && lastPos.x == newPos.x)//has ido a la izquierda
+                {
+                    lastKnownTile.active(Logic.Directions.Left);
+                    currentTile.ChangeColor(pressedColor);
+                    deActivate = currentTile.active(Logic.Directions.Right);
+
+                }
+                else if(lastPos.x == newPos.x + 1 && lastPos.y == newPos.y)//has ido arriba
+                {
+                    lastKnownTile.active(Logic.Directions.Up);
+                    currentTile.ChangeColor(pressedColor);
+                    deActivate = currentTile.active(Logic.Directions.Down);
+                }
+                else if (lastPos.x == newPos.x - 1 && lastPos.y == newPos.y)//has ido abajo
+                {
+                    lastKnownTile.active(Logic.Directions.Down);
+                    currentTile.ChangeColor(pressedColor);
+                    deActivate = currentTile.active(Logic.Directions.Up);
+
+                }
+
+                // Si entra aqui es que la tile tenia un color diferente al nuevo
+                // y hay que "borrar" el camino que tenia esa tuberia, se ha cortado el flujo
+                if (deActivate)
+                {
+                    deactivate();
+                }
             }
             lastKnownTile = currentTile;
         }
@@ -140,6 +191,9 @@ namespace FlowFree
         private void OnMouseDrag()
         {
             DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            ProcessTileChange();
+            if (currentTile.getIsMain())
+                pressedColor = currentTile.getColor();
         }
 
         private void Update()
@@ -149,6 +203,8 @@ namespace FlowFree
                 PressInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             if (Input.GetMouseButtonUp(0))
                 ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            if (Input.GetMouseButton(0))
+                OnMouseDrag();
 #else
             foreach(Input inp in Input.touches)
             {
