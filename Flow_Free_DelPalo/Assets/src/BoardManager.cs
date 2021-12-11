@@ -120,6 +120,18 @@ namespace FlowFree
                 {
                     pressedColor = activatedTile.getColor();
                     currentTile = activatedTile;
+                    if (currentTile.getIsMain())
+                    {
+                        int i = 0;
+                        while (i < _flows.Length)
+                        {
+                            if (_flows[i].Contains(currentTile))
+                                break;
+                            i++;
+                        }
+                        _flowsIndex = i;
+                        deactivateMain();
+                    }
                 }
             }
         }
@@ -142,33 +154,27 @@ namespace FlowFree
             if (boardPos.x >= 0 && boardPos.x < _height &&
                 boardPos.y >= 0 && boardPos.y < _width)
             {
-                currentTile =  _tiles[boardPos.y, boardPos.x];
+                /*if(!_tiles[boardPos.y, boardPos.x].getIsMain() ||
+                    (_tiles[boardPos.y, boardPos.x].getIsMain() &&
+                    _tiles[boardPos.y, boardPos.x].getColor() == pressedColor))*/
+                    currentTile =  _tiles[boardPos.y, boardPos.x];
                 
             }
         }
 
-       private void deactivateMain(Logic.Directions dir)
-       {
-            //desactivamos todas las tiles de la tuberia menos la nueva
-            
-            if (_flows[_flowsIndex][0] == lastKnownTile)
-            {
-                _flows[_flowsIndex][_flows[_flowsIndex].Count-1].deactiveAll();
-                _flows[_flowsIndex][0].notDeactivateAll(dir);
-            }
-            else
-            {
-                _flows[_flowsIndex][0].deactiveAll();
-                _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].notDeactivateAll(dir);
-            }
-            
+        // Si se pulsa en un Tile main, se desactiva todo el flow que tenia
+        private void deactivateMain()
+        {
+            //desactivamos todas las tiles de la tuberia           
+            _flows[_flowsIndex][0].deactiveAll();
             while (_flows[_flowsIndex].Count > 2)
             {
                 _flows[_flowsIndex][1].deactiveAll();
                 _flows[_flowsIndex].RemoveAt(1);
             }
-            
-       }
+            _flows[_flowsIndex][1].deactiveAll();
+
+        }
 
         // Desactiva el camino de una tuberia
         private void deactivate(Logic.Directions dir)
@@ -191,6 +197,7 @@ namespace FlowFree
 
             
         }
+
 
         // Comprueba si hay que cambiar el color de una tuberia
         private bool canActivate()
@@ -255,8 +262,6 @@ namespace FlowFree
                 {
                     deactivate(fromDir);
                 }
-                else if (lastKnownTile.getIsMain())
-                    deactivateMain(toDir);
                 if(!currentTile.getIsMain())
                 _flows[_flowsIndex].Insert(_flows[_flowsIndex].Count-1, currentTile);
 
