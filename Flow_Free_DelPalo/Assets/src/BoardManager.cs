@@ -264,12 +264,12 @@ namespace FlowFree
             lastKnownTile = currentTile;
         }
 
-        private void OnMouseDrag()
+        private void DragInput()
         {
             DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             ProcessTileChange();
-            if (currentTile.getIsMain())
-                pressedColor = currentTile.getColor();
+            //if (currentTile.getIsMain())
+            //    pressedColor = currentTile.getColor();
         }
 
         private void Update()
@@ -280,7 +280,7 @@ namespace FlowFree
             if (Input.GetMouseButtonUp(0))
                 ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             if (Input.GetMouseButton(0))
-                OnMouseDrag();
+                DragInput();
 #else
             foreach(Input inp in Input.touches)
             {
