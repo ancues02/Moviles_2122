@@ -225,6 +225,14 @@ namespace FlowFree
 
         }
 
+        public void deactiveOut()
+        {            
+            if (outIndex != -1)
+                childrensPaths[outIndex].enabled = false;
+            outIndex = -1;
+
+        }
+
         /// <summary>
         /// Desactiva todos los caminos menos el que recibe
         /// </summary>

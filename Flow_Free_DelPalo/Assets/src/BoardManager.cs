@@ -23,6 +23,7 @@ namespace FlowFree
         Color pressedColor = Color.black;
         Tile currentTile;
         Tile lastConnectedTile;
+        bool colorConflict = false;
 
         // Obtenerlos del GameManager
         private List<Color> colors;
@@ -96,12 +97,10 @@ namespace FlowFree
                 _tiles[f.start.x, f.start.y].setVisible(true);
                 _flows[i] = new List<Tile>();
                 _tmpFlows[i] = new List<Tile>();
-                _flows[i].Add(_tiles[f.start.x, f.start.y]);
 
                 _tiles[f.end.x, f.end.y].ChangeColor(colors[i]);
                 _tiles[f.end.x, f.end.y].setIsMain(true);
                 _tiles[f.end.x, f.end.y].setVisible(true);
-                _flows[i].Add(_tiles[f.end.x, f.end.y]);
 
                 i++;
             }
@@ -118,19 +117,12 @@ namespace FlowFree
                 if (activatedTile.getColor() != Color.black)
                 {
                     pressedColor = activatedTile.getColor();
-                    lastConnectedTile=currentTile = activatedTile;
+                    lastConnectedTile = currentTile = activatedTile;
                     if (currentTile.getIsMain())
                     {
-                       
-                        int i = 0;
-                        while (i < _flows.Length)
-                        {
-                            if (_flows[i].Contains(currentTile))
-                                break;
-                            i++;
-                        }
-                        _flowsIndex = i;
+                        _flowsIndex = getColorIndex(currentTile.getColor());
                         deactivateMain();
+                        _flows[_flowsIndex].Add(currentTile);
                     }
                 }
             }
@@ -158,50 +150,49 @@ namespace FlowFree
                 //    (_tiles[boardPos.y, boardPos.x].getIsMain() &&
                 //    _tiles[boardPos.y, boardPos.x].getColor() == pressedColor)) 
 
-                    currentTile = _tiles[boardPos.y, boardPos.x];
-               
-                
-            }
-           
+                currentTile = _tiles[boardPos.y, boardPos.x];
+            } 
         }
 
         // Si se pulsa en un Tile main, se desactiva todo el flow que tenia
         private void deactivateMain()
         {
             //desactivamos todas las tiles de la tuberia           
-            _flows[_flowsIndex][0].deactiveAll();
-            while (_flows[_flowsIndex].Count > 2)
+            while (_flows[_flowsIndex].Count > 0)
             {
-                _flows[_flowsIndex][1].deactiveAll();
-                _flows[_flowsIndex].RemoveAt(1);
+                _flows[_flowsIndex][0].deactiveAll();
+                _flows[_flowsIndex].RemoveAt(0);
             }
-            _flows[_flowsIndex][1].deactiveAll();
-
         }
 
         // Desactiva el camino de una tuberia
         private void deactivate(Logic.Directions dir)
         {
 
-            if (lastConnectedTile.getColor() == currentTile.getColor()){
+            if (lastConnectedTile.getColor() == currentTile.getColor() && !colorConflict){
                 // buscamos donde guardar la nueva tuberia cortada
                 
                 //desactivamos todas las tiles de la tuberia y las aniadimos a la lista de tuberias cortadas
-                int index = _flows[_flowsIndex].IndexOf(lastConnectedTile);
-                
-                
-                _flows[_flowsIndex][index].notDeactiveIn();
-                index++;
-                while (_flows[_flowsIndex].Count > 2 + (index - 1))
-                {
+                int index = _flows[_flowsIndex].IndexOf(currentTile);
 
-                    _flows[_flowsIndex][index].deactiveAll();
-                    _flows[_flowsIndex].RemoveAt(index);
+                for (int i = index +1; i < _flows[_flowsIndex].Count;){
+                    _flows[_flowsIndex][i].deactiveAll();
+                    _flows[_flowsIndex].RemoveAt(i);
                 }
+                //while (_flows[_flowsIndex].Count > index + 1)
+                //{
+                //    _flows[_flowsIndex][index].deactiveAll();
+                //    _flows[_flowsIndex].RemoveAt(index);
+                //}
 
+                _flows[_flowsIndex][index].notDeactiveIn();
             }
             else//un color a cortado a otro
             {
+                //TODO hacer esto
+                //buscar el currentIndex en otro _flow que no sea el _flowIndex
+                //ver en el index dentro de ese flow y quitar hacia un lado en funcion de la longuitud
+
                 int j = 0;
                 while (_tmpFlows[j].Count != 0)
                 {
@@ -209,6 +200,10 @@ namespace FlowFree
                 }
 
                 //_tmpFlows[j].Add(_flows[_flowsIndex][index]);
+
+
+
+                colorConflict = false;
             }
             
         }
@@ -240,34 +235,42 @@ namespace FlowFree
                 Vector2Int lastPos = lastConnectedTile.getBoardPos(),
                     newPos = currentTile.getBoardPos();
 
+                bool legalMove = false;
+               
                 Logic.Directions fromDir = Logic.Directions.Right;
                 Logic.Directions toDir = Logic.Directions.Right;
                 if (lastPos.y == newPos.y - 1 && lastPos.x == newPos.x)//has ido a la derecha
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Right, true);
+                    colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     currentTile.ChangeColor(pressedColor);
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Left, true);
-                   
-
+                    legalMove = true;
                 }
                 else if (lastPos.y == newPos.y + 1 && lastPos.x == newPos.x)//has ido a la izquierda
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Left, true);
+                    colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     currentTile.ChangeColor(pressedColor);
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Right, true);
+                    legalMove = true;
 
                 }
                 else if(lastPos.x == newPos.x + 1 && lastPos.y == newPos.y)//has ido arriba
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Up, true);
+                    colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     currentTile.ChangeColor(pressedColor);
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Down, true);
+                    legalMove = true;
                 }
                 else if (lastPos.x == newPos.x - 1 && lastPos.y == newPos.y)//has ido abajo
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Down, true);
+                    colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     currentTile.ChangeColor(pressedColor);
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Up, true);
+                    legalMove = true;
                 }
 
 
@@ -276,29 +279,27 @@ namespace FlowFree
                 if (deActivate)
                 {
                     deactivate(fromDir);
+                    lastConnectedTile = currentTile;
                 }
-                else 
+                else if (legalMove)
                 {
                     if(!_flows[_flowsIndex].Contains(currentTile))
-                        _flows[_flowsIndex].Insert(_flows[_flowsIndex].Count - 1, currentTile);
-                    else if (!currentTile.getIsMain())
+                        _flows[_flowsIndex].Add(currentTile);
+                    else 
                     {
-
-                        if (lastConnectedTile.getIsMain())
-                        {
-                            int ind = _flows[_flowsIndex].IndexOf(lastConnectedTile);
-                            _flows[_flowsIndex][ind].deactiveIn();
-                            _flows[_flowsIndex][_flows[_flowsIndex].Count - 2].notDeactiveIn();
-                        }
+                        lastConnectedTile.deactiveIn();
+                        if (!currentTile.getIsMain())
+                            currentTile.notDeactiveIn();
                         else
-                        {
-                            _flows[_flowsIndex][_flows[_flowsIndex].Count - 2].deactiveIn();
-                            _flows[_flowsIndex][_flows[_flowsIndex].Count - 3].notDeactiveIn();
-                            _flows[_flowsIndex].RemoveAt(_flows[_flowsIndex].Count - 2 );
-                        }
+                            currentTile.deactiveAll();
+                        _flows[_flowsIndex].Remove(lastConnectedTile);
+                        
                     }
+                    lastConnectedTile = currentTile;
                 }
-                lastConnectedTile = currentTile;
+                    
+
+
 
             }
             Debug.Log(_flows[_flowsIndex].Count);
@@ -328,6 +329,22 @@ namespace FlowFree
                 
             }
 #endif
+        }
+
+        int getColorIndex(Color c)
+        {
+            int index = -1; 
+            int i = 0;
+            while (index == -1 && i < colors.Count)
+            {
+                if (c == colors[i])
+                {
+                    index = i;
+                    break;
+                }
+                ++i;
+            }
+            return index;
         }
     }
 
