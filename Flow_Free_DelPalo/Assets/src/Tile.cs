@@ -41,6 +41,9 @@ namespace FlowFree
         [Tooltip("Caminos del tile, deben ser hijos")]
         public SpriteRenderer[] childrensPaths;
 
+        //Los indices de los path de entrada o salida
+        int inIndex = -1, outIndex = -1;
+
 
         void Start()
         {
@@ -145,37 +148,81 @@ namespace FlowFree
                     childrensPaths[0].enabled = true;
                     childrensPaths[0].color = tileColor;
                     sR = childrensPaths[0];
+                    if (inIndex == -1)
+                        inIndex = 0;
+                    else 
+                        outIndex = 0;
                     break;
                 
                 case Logic.Directions.Down:
                     childrensPaths[1].enabled = true;
                     childrensPaths[1].color = tileColor;
                     sR = childrensPaths[1];
+                    if (inIndex == -1)
+                        inIndex = 1;
+                    else
+                        outIndex = 1;
                     break;
                 
                 case Logic.Directions.Left:
                     childrensPaths[2].enabled = true;
                     childrensPaths[2].color = tileColor;
                     sR = childrensPaths[2];
+                    if (inIndex == -1)
+                        inIndex = 2;
+                    else 
+                        outIndex = 2;
                     break;
                 
                 case Logic.Directions.Up:
                     childrensPaths[3].enabled = true;
                     childrensPaths[3].color = tileColor;
                     sR = childrensPaths[3];
+                    if (inIndex == -1)
+                        inIndex = 3;
+                    else 
+                        outIndex = 3;
                     break;
                 
             }
 
-            return checkDifferentColor(sR); /*|| checkManyPaths()*/;
+            return /*checkDifferentColor(sR); || */checkManyPaths();
         }
 
         // Desactiva todos los caminos que tiene
         public void deactiveAll()
         {
-           foreach(SpriteRenderer sp in childrensPaths)
-                    sp.enabled = false;
+            foreach (SpriteRenderer sp in childrensPaths)
+            {
+                sp.enabled = false;
+                if(!isMain)
+                    tileColor = Color.black;
+            }
+            inIndex = outIndex = -1;
+        }
+
+        // Desactiva todos los caminos que tiene menos el in
+        public void notDeactiveIn()
+        {
+            for(int i = 0; i < childrensPaths.Length; ++i)
+            {
+                if(i != inIndex)
+                    childrensPaths[i].enabled = false;
+            }
+           
+            outIndex = -1;
+        }
+
+        public void deactiveIn()
+        {
             
+            if (inIndex != -1)
+                childrensPaths[inIndex].enabled = false;
+            inIndex = -1;
+            if (outIndex != -1)
+                childrensPaths[outIndex].enabled = false;
+            outIndex = -1;
+
         }
 
         /// <summary>
