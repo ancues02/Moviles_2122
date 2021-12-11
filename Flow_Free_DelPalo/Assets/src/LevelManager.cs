@@ -6,12 +6,21 @@ namespace FlowFree
 {
     public class LevelManager : MonoBehaviour
     {
-        int levelIndex;
+        public BoardManager board;
 
         void Start()
         {
-            GameManager gameManager = GameManager.getInstance();
-            //levelIndex = gameManager.getLevel();
+        }
+
+
+        void Update()
+        {
+            // Para probar cambios de escenas
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                GameManager gm = GameManager.getInstance();
+                gm.ChangeScene("MenuTest");
+            }
         }
     }
 }

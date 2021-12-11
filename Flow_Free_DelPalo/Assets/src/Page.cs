@@ -15,7 +15,7 @@
     // cada pagina tiene 30 tiles.
     struct LevelPage
     {
-        Page pageAttributes;
-        LevelTile[] tiles;
+        public Page pageAttributes;
+        public LevelTile[] tiles;
     }
 }

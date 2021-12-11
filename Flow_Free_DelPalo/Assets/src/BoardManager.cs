@@ -7,6 +7,7 @@ namespace FlowFree
     public class BoardManager : MonoBehaviour
     {
         public GameObject TilePrefab;
+        public bool testing;
 
         private Tile[,] _tiles;
         private int _width, _height;
@@ -24,29 +25,12 @@ namespace FlowFree
         Tile lastKnownTile;
         Tile currentTile;
 
-        // Obtenerlos del GameManager
         private List<Color> colors;
 
-        /**
-         * #FF0000, #008D00, #0C29FE, #EAE000,
-            #FB8900, #00FFFF, #FF0AC9, #A52A2A, #800080, #FFFFFF, #9F9FBD, #00FF00, #A18A51, #09199F,
-            #008080 y #FE7CEC
-         */
+        
 
         void Start()
-        {
-            GameManager gameManager = GameManager.getInstance();
-
-            // Cogemos los colores del tema actual
-            colors = new List<Color>();
-            foreach(Color c in gameManager.theme.colors){
-                colors.Add(c);
-            };
-
-            //esto no deberia llamarse aqui
-            setMap(new Logic.Map());
-
-            
+        { 
         }
 
 
@@ -84,6 +68,47 @@ namespace FlowFree
             transform.Translate(new Vector2(vectorOffset.x + 0.5f, vectorOffset.y - 0.5f));
         }
 
+
+        public void setMapTest(Logic.Map m)
+        {
+            map = m;
+            _tiles = new Tile[m.Width, m.Height];
+            _width = m.Width;
+            _height = m.Height;
+            _flows = new List<Tile>[m.FlowNumber];
+            _tmpFlows = new List<Tile>[m.FlowNumber];
+
+            for (int i = 0; i < m.Width; ++i)
+            {
+                for (int j = 0; j < m.Height; ++j)
+                {
+                    // Esta bien colocado por el pivot del sprite
+                    _tiles[i, j] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity, transform).GetComponent<Tile>();
+                    _tiles[i, j].name = $"Tile {i} {j}";
+                    _tiles[i, j].setVisible(false);
+                    _tiles[i, j].setBoardPos(new Vector2Int(i, j));
+                    _tiles[i, j].ChangeColor(Color.black);
+                    if (j == 0)
+                        _tiles[i, j].activeLeftLimit();
+
+                    if (i == 0)
+                        _tiles[i, j].activeTop();
+                }
+            }
+            setMainTiles();
+            vectorOffset = new Vector2(-m.Width / 2f, (-m.Height / 2f) + m.Height);
+            transform.Translate(new Vector2(vectorOffset.x + 0.5f, vectorOffset.y - 0.5f));
+        }
+
+        public void setFlowColors(Color[] cs)
+        {
+            // Cogemos los colores del tema actual
+            colors = new List<Color>();
+            foreach (Color c in cs)
+            {
+                colors.Add(c);
+            };
+        }
         // Dice que Tiles son main, es decir, los circulos grandes,
         // les pone su color y tambien en los añadimos a los flows del boardManager
         private void setMainTiles()

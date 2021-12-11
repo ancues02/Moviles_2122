@@ -59,12 +59,12 @@ namespace FlowFree.Logic
         public bool Parse(string str)
         {
             
-            str = "5,0,1,5;" +//, (puentes) , (vacio) 5:4:6:23, (paredes) 2|7:3|8,
+            /*str = "5,0,1,5;" +//, (puentes) , (vacio) 5:4:6:23, (paredes) 2|7:3|8,
                 "18,17,12;" +
                 "21,16,11,6;" +
                 "3,4,9;" +
                 "0,1,2,7,8,13,14,19,24,23,22;" +
-                "20,15,10,5";
+                "20,15,10,5";*/
 
             string[] lvl = str.Split(';');
             levelAttributes(lvl[0]);

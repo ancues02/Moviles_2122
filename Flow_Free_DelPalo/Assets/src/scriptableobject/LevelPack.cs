@@ -29,14 +29,25 @@ namespace FlowFree
         public Logic.Map[] Maps { get => levels; }
 
         // Niveles de un lote
-        private Logic.Map[] levels;
+        Logic.Map[] levels;
+        
+        public bool Valid { get; private set; }
 
-        public bool Parse()
+        // Parsea todos los niveles de un lote
+        public void Parse()
         {
-            bool done = false;
+            Valid = true;
+            string [] mapsText = maps.text.Split(new char[]{'\r','\n'}, System.StringSplitOptions.RemoveEmptyEntries);
+            levels = new Logic.Map[mapsText.Length];
 
-
-            return done;
+            int i = 0;
+            while(i < mapsText.Length && Valid) {
+                levels[i] = new Logic.Map();
+                Valid = levels[i].Parse(mapsText[i]);
+                i++;
+            }
+            Debug.Log(Valid);
         }
+
     }
 }

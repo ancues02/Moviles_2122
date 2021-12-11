@@ -10,18 +10,29 @@ namespace FlowFree
 {
     public class LevelSelectorManager : MonoBehaviour
     {
-        LevelPack pack;
-        LevelPage[] pages;  // el nº de paginas depende del nº de niveles del lote
+        public int testLevel;
 
-        void Start()
-        {
-            GameManager gameManager = GameManager.getInstance();
-            pack = gameManager.getSelectedPack();
-        }
+        const int LEVELS_PER_PAGE = 30;
+        LevelPage[] pages;  // el nº de paginas depende del nº de niveles del lote
+        
+        LevelPack pack;
 
         private void Update()
         {
             //gestionar la seleccion del nivel y cambiar entre paginas
+
+            // Para probar cambios de escenas
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                GameManager gm = GameManager.getInstance();
+                gm.setSelectedLevel(testLevel);
+                gm.ChangeScene("GameBoardTest");
+            }
+        }
+
+        public void setPack(LevelPack p)
+        {
+            pack = p;
         }
 
     }
