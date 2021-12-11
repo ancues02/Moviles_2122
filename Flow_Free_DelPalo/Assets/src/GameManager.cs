@@ -11,50 +11,37 @@ namespace FlowFree
         // Categorias que contienen los lotes que estan en el juego
         public Category[] categories;
 
-        // Referencia al levelManager para 
-        public LevelManager lvlManger;
+        // Tema de colores que se usara en el juego
+        public ColorTheme theme;
+
         public MenuManager menuManager;
+        public LevelSelectorManager lvlSelectorManager;
+        public LevelManager lvlManger;
+        
 
-        private static GameManager _instance;
-
-
+        static GameManager _instance;
         Category selectedCategory;
         LevelPack selectedLevelPack;
 
-
-
         private void Awake()
         {
-            
-        }
-
-        private GameManager()
-        {
-            // initialize your game manager here. Do not reference to GameObjects here (i.e. GameObject.Find etc.)
-            // because the game manager will be created before the objects
-        }
-
-
-        public static GameManager getInstance()
-        {
-            if (!_instance)
-            {
-                _instance = new GameManager();
-            }
-
-            return _instance;
-            
-        }
-
-        private void Start()
-        {
-            if(_instance)
+            if (_instance)
             {
                 _instance.lvlManger = lvlManger;
+                _instance.lvlSelectorManager = lvlSelectorManager;
                 _instance.menuManager = menuManager;
                 Destroy(gameObject);
             }
-           
+            else
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject); 
+            }
+        }
+
+        public static GameManager getInstance()
+        {
+            return _instance;   
         }
 
         public void ChangeScene(string sceneName)

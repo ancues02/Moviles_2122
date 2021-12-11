@@ -8,15 +8,7 @@ using UnityEngine;
 //lo mismo con la categoria para llegar hasta aqui.
 namespace FlowFree
 {
-    // El nº de niveles en el lote es siempre multiplo de 30,
-    // cada pagina tiene 30 tiles.
-    struct LevelPage
-    {
-        string name;
-        LevelTile[] tiles;
-    }
-
-    public class PackManager : MonoBehaviour
+    public class LevelSelectorManager : MonoBehaviour
     {
         LevelPack pack;
         LevelPage[] pages;  // el nº de paginas depende del nº de niveles del lote

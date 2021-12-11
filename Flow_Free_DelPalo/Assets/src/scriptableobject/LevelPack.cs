@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace FlowFree
 {
+
+
     /**
      * Scriptable Object para gestionar los lotes como datos.
      * Contiene el nombre del lote y el fichero de texto
@@ -21,17 +23,20 @@ namespace FlowFree
         public TextAsset maps;
 
         // TODO: Juntar estos dos en una estructura
-        [Tooltip("Nombre de cada pagina de niveles")]
-        public string[] pagesNames;
-
-        [Tooltip("Bloqueo de cada pagina de niveles")]
-        public string[] blockedPages;
+        [Tooltip("Paginas de niveles")]
+        public Page[] pages;
 
         public Logic.Map[] Maps { get => levels; }
 
         // Niveles de un lote
         private Logic.Map[] levels;
 
-        
+        public bool Parse()
+        {
+            bool done = false;
+
+
+            return done;
+        }
     }
 }
