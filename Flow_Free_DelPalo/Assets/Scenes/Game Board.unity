@@ -2522,6 +2522,10 @@ PrefabInstance:
       value: GameManager
       objectReference: {fileID: 0}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
+      propertyPath: theme
+      value: 
+      objectReference: {fileID: 11400000, guid: e99b35cd6ec95fc4b944902f9dbe4e71, type: 2}
+    - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: lvlManger
       value: 
       objectReference: {fileID: 2011856597}
@@ -2545,6 +2549,14 @@ PrefabInstance:
       propertyPath: levels.Array.data[0]
       value: 
       objectReference: {fileID: 11400000, guid: 152315fb51ad7cf4681d4fb50f7c6cb3, type: 2}
+    - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
+      propertyPath: categories.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
+      propertyPath: categories.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 4522b6d2c02ccbe4fa60c2903974c253, type: 2}
     - target: {fileID: 3776296069195461219, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: m_RootOrder
       value: 1
