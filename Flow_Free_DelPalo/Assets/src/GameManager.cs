@@ -25,43 +25,44 @@ namespace FlowFree
         LevelPack selectedLevelPack;
         int selectedLevel;
 
-        // 
+        // Para testear
+        public bool Testing;
+        public int CategoryIndex;
+        public int PackIndex;
+        public int Level;
+
         private void Awake()
         {        
+            if (Testing)
+                Test(CategoryIndex, PackIndex, Level);
             if(!_instance)
             {
                 //selectedLevelPack = new LevelPack();
                 _instance = this;
                 DontDestroyOnLoad(gameObject); 
             }
-        }
-
-        private void Start()
-        {
-            if (_instance != this)
+            else
             {
-                // Dejamos en la instancia el MenuManager actual
+                // Actualizamos las instancias de los managers
                 _instance.menuManager = menuManager;
-
-                // Dejamos en la instancia el LvlSelectorManager actual
-                if (lvlSelectorManager)
-                { 
-                    lvlSelectorManager.setPack(selectedLevelPack);
-                }
                 _instance.lvlSelectorManager = lvlSelectorManager;
-
-                // Dejamos en la instancia el LvlManager y le damos el nivel actual al tablero
-                if (lvlManager)
-                {
-                    if (_instance.selectedLevelPack.Valid)
-                    {
-                        lvlManager.board.setFlowColors(theme.colors);
-                        lvlManager.board.setMapTest(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
-                    }
-                }
                 _instance.lvlManager = lvlManager;
-                
-                Destroy(gameObject);
+
+                // Se destruye al final del frame asi que puede ir aqui
+                Destroy(gameObject);  
+            }
+
+            // Iniciamos los managers si toca
+            if (_instance.lvlSelectorManager)
+                lvlSelectorManager.setPack(selectedLevelPack);
+
+            if (_instance.lvlManager)
+            {
+                if (_instance.selectedLevelPack.Valid)
+                {
+                    lvlManager.board.setFlowColors(_instance.theme.colors);
+                    lvlManager.board.setMapTest(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
+                }
             }
         }
 
@@ -73,12 +74,6 @@ namespace FlowFree
         public void ChangeScene(string sceneName)
         {
             SceneManager.LoadScene(sceneName);
-            /*Scene sceneToChange = SceneManager.GetSceneByName(sceneName);
-
-            Scene scenes = SceneManager.GetSceneByName("GameBoard");
-            
-            if (sceneToChange.IsValid())
-                SceneManager.SetActiveScene(sceneToChange);*/
         }
 
         /**
@@ -120,6 +115,16 @@ namespace FlowFree
         public void prevLevel()
         {
             selectedLevel--;
+        }
+
+        /**
+         * Metodo para probar cualquier nivel desde la escena del board
+         * configurando directamente la categoria el lote y el nivel
+         */
+        private void Test(int categoryIndex, int packIndex, int level)
+        {
+            setLevelPack(categoryIndex, packIndex);
+            setSelectedLevel(level);
         }
     }
 }

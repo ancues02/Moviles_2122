@@ -28,12 +28,6 @@ namespace FlowFree
 
         private List<Color> colors;
 
-        
-
-        void Start()
-        { 
-        }
-
 
         //el mapa tiene que llegar ya parseado
         public void setMap(Logic.Map m)

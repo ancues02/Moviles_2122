@@ -1268,6 +1268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TilePrefab: {fileID: 8712364534256855023, guid: 55d97be62e4bde343b69825d87f59694, type: 3}
+  testing: 0
 --- !u!4 &1125272008
 Transform:
   m_ObjectHideFlags: 0
@@ -2496,7 +2497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325eef8941f27a640911efad7eac156d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  board: {fileID: 0}
+  board: {fileID: 1125272007}
 --- !u!4 &2011856598
 Transform:
   m_ObjectHideFlags: 0
@@ -2523,9 +2524,17 @@ PrefabInstance:
       value: GameManager
       objectReference: {fileID: 0}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
+      propertyPath: Level
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: theme
       value: 
       objectReference: {fileID: 11400000, guid: e99b35cd6ec95fc4b944902f9dbe4e71, type: 2}
+    - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
+      propertyPath: Testing
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: lvlManger
       value: 

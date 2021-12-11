@@ -9,10 +9,6 @@ namespace FlowFree
         public int categoryTest;
         public int packTest;
 
-        void Start()
-        {
-        }
-
         private void Update()
         {
             // Gestiona la seleccion de categoria y pack dentro de la categoria

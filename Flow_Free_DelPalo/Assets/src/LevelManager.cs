@@ -8,11 +8,6 @@ namespace FlowFree
     {
         public BoardManager board;
 
-        void Start()
-        {
-        }
-
-
         void Update()
         {
             // Para probar cambios de escenas
