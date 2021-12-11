@@ -35,14 +35,13 @@ namespace FlowFree
 
         void Start()
         {
+            GameManager gameManager = GameManager.getInstance();
 
+            // Cogemos los colores del tema actual
             colors = new List<Color>();
-            colors.Add(Color.red);
-            colors.Add(Color.blue);
-            colors.Add(Color.green);
-            colors.Add(Color.yellow);
-            colors.Add(Color.cyan);
-            colors.Add(Color.white);
+            foreach(Color c in gameManager.theme.colors){
+                colors.Add(c);
+            };
 
             //esto no deberia llamarse aqui
             setMap(new Logic.Map());
