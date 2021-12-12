@@ -26,6 +26,9 @@ namespace FlowFree
         private Vector2 _availableSize;
         private Vector2 _baseRatio;
 
+        [Tooltip("El panel del canvas de de ganar")]
+        public GameObject winPanel;
+
         private Tile[,] _tiles;
         private int _width, _height;
         private Logic.Map map;
@@ -48,11 +51,14 @@ namespace FlowFree
 
         bool win = false;
 
+        bool end = false;
+
         private List<Color> colors;
 
         private void Start()
         {
-            if (!flowText || !movesText || !pipesText || !hintText || !TilePrefab || !lvlManager)
+            if (!flowText || !movesText || !pipesText || !hintText
+                || !TilePrefab || !lvlManager || !winPanel)
                 Debug.LogError("Falta alguna referencia en BoardManager!");
             else
             {
@@ -200,6 +206,11 @@ namespace FlowFree
             {
                 _tmpFlows[i].Clear();
             }
+            if (numFlows == totalFlows)
+            {
+                win = true;
+                winPanel.SetActive(true);
+            }
         }
 
         void DragInput(Vector2 pos)
@@ -263,8 +274,7 @@ namespace FlowFree
                     numFlows++;               
             }
             flowText.text = "flows: "+ numFlows + "/" + totalFlows;
-            if (numFlows == totalFlows)
-                win = true;
+            
         }
 
         /// <summary>
@@ -480,34 +490,35 @@ namespace FlowFree
         private void Update()
         {
 #if UNITY_EDITOR
-            
-            if (Input.GetMouseButtonDown(0))
-                PressInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            if (Input.GetMouseButtonUp(0))
-                ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            if (Input.GetMouseButton(0))
-                DragInput();
+            if (!win)
+            {
+                if (Input.GetMouseButtonDown(0))
+                    PressInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+                if (Input.GetMouseButtonUp(0))
+                    ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+                if (Input.GetMouseButton(0))
+                    DragInput();
+            }
 #else
             foreach(Input inp in Input.touches)
             {
                 
             }
 #endif
-            if (win)
+            if (end)
             {
-
-
                 Vector3 tmp = transform.localPosition;
-                tmp.x += 0.01f;
+                tmp.x += 0.02f;
                 transform.localPosition = tmp;
 
-                 tmp = transform.localScale;
+                tmp = transform.localScale;
                 tmp.x -= 0.01f;
                 transform.localScale = tmp;
 
                 if (tmp.x <= 0)
                     lvlManager.nextLevel();
             }
+            
         }
 
         int getColorIndex(Color c)
@@ -525,6 +536,14 @@ namespace FlowFree
             }
             return index;
         }
+
+        public void changeLevel()
+        {
+            end = true;
+            winPanel.SetActive(false);
+        }
+
+        
     }
 
 }

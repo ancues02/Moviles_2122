@@ -52,6 +52,9 @@ namespace FlowFree
             }
 
             // Iniciamos los managers si toca
+            if (_instance.menuManager)
+                _instance.menuManager.setCategories(categories);
+
             if (_instance.lvlSelectorManager)
                 lvlSelectorManager.setPack(selectedLevelPack);
 
