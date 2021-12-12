@@ -61,7 +61,7 @@ namespace FlowFree
                 if (_instance.selectedLevelPack.Valid)
                 {
                     lvlManager.board.setFlowColors(_instance.theme.colors);
-                    lvlManager.board.setMapTest(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
+                    lvlManager.board.setMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
                 }
             }
         }
