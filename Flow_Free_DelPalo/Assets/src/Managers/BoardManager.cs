@@ -1,12 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FlowFree
 {
     public class BoardManager : MonoBehaviour
     {
         public GameObject TilePrefab;
+        public LevelManager lvlManager;
+
+        [Tooltip ("El texto del canvas de flows")]
+        public Text flowText;
+
+        [Tooltip("El texto del canvas de moves")]
+        public Text movesText;
+
+        [Tooltip("El texto del canvas de pipe")]
+        public Text pipesText;
+
+        [Tooltip("El texto del canvas de pistas")]
+        public Text hintText;
+
+        public Vector2Int _baseSize = new Vector2Int(5, 5);
+        public Vector2 _baseRatio;
 
         private Tile[,] _tiles;
         private int _width, _height;
@@ -20,12 +37,33 @@ namespace FlowFree
         private List<List<Tile>> _tmpFlows;//flows que se han cortado mientras estas pulsando
 
         Vector2 vectorOffset;
-        Color pressedColor = Color.black;
+        Color pressedColor = Color.black, lastPressedColor = Color.black;
         Tile currentTile;
         Tile lastConnectedTile;
         bool colorConflict = false;
 
+        int totalFlows, best, totalNumPipes;
+        int numFlows, moves, numPipes;
+
+        bool win = false;
+
+
+
         private List<Color> colors;
+
+        private void Start()
+        {
+            if (!flowText || !movesText || !pipesText || !hintText || !TilePrefab || !lvlManager)
+                Debug.LogError("Falta alguna referencia en BoardManager!");
+            else
+            {
+                moves = 0;
+                //flowText.text = "flows: 0/" + ;
+                movesText.text = "moves:" + moves + " best: -";
+                pipesText.text = "pipe: 0%";
+                hintText.text = "3 x ";
+            }
+        }
 
         public void setMap(Logic.Map m)
         {
@@ -33,8 +71,11 @@ namespace FlowFree
             _tiles = new Tile[m.Width, m.Height];
             _width = m.Width;
             _height = m.Height;
+            _baseRatio = new Vector2(_baseSize.x / (float)_width, _baseSize.y / (float)_height);
             _flows = new List<Tile>[m.FlowNumber];
             _tmpFlows = new List<List<Tile>>();
+            numPipes = 0;
+            numFlows = moves= 0;
 
             for (int i = 0; i < m.Width; ++i)
             {
@@ -53,9 +94,13 @@ namespace FlowFree
                         _tiles[i, j].activeTop();
                 }
             }
+            totalFlows = map.FlowNumber;
+            totalNumPipes = m.Width* m.Height;
             setMainTiles();
-            vectorOffset = new Vector2(-m.Width / 2f, (-m.Height / 2f) + m.Height);
-            transform.Translate(new Vector2(vectorOffset.x + 0.5f, vectorOffset.y - 0.5f));
+            vectorOffset = new Vector2((-m.Width / 2f) * _baseRatio.x, ((-m.Height / 2f) * _baseRatio.y) + m.Height * _baseRatio.y);
+            transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
+            transform.Translate(new Vector2(vectorOffset.x  + (0.5f * _baseRatio.x), vectorOffset.y  - (0.5f * _baseRatio.y)));
+            flowText.text = "flows: 0/" + totalFlows;
         }
 
         public void setFlowColors(Color[] cs)
@@ -89,8 +134,7 @@ namespace FlowFree
 
         void PressInput(Vector2 pos)
         {
-            Vector2Int boardPos = new Vector2Int(Mathf.FloorToInt((pos - vectorOffset).x), 
-                Mathf.FloorToInt(-(pos - vectorOffset).y));
+            Vector2Int boardPos = getBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _height &&
                 boardPos.y >= 0 && boardPos.y < _width)
             {
@@ -118,6 +162,12 @@ namespace FlowFree
         void ReleaseInput(Vector2 pos)
         {
             lastConnectedTile = null;
+            if (pressedColor != lastPressedColor)
+            {
+                moves++;
+                checkMoves();
+            }
+            lastPressedColor = pressedColor;
             pressedColor = Color.black;
             // quitar informacion de tuberias cortadas
             for(int i = 0; i < _tmpFlows.Count; ++i)
@@ -128,8 +178,7 @@ namespace FlowFree
 
         void DragInput(Vector2 pos)
         {
-            Vector2Int boardPos = new Vector2Int(Mathf.FloorToInt((pos - vectorOffset).x),
-                Mathf.FloorToInt(-(pos - vectorOffset).y));
+            Vector2Int boardPos = getBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _height &&
                 boardPos.y >= 0 && boardPos.y < _width)
             {
@@ -139,6 +188,13 @@ namespace FlowFree
 
                 currentTile = _tiles[boardPos.y, boardPos.x];
             } 
+        }
+
+        private Vector2Int getBoardTile(Vector2 pos)
+        {
+            int x = Mathf.FloorToInt((pos - vectorOffset).x / _baseRatio.x);
+            int y = Mathf.FloorToInt(-(pos - vectorOffset).y / _baseRatio.y);
+            return new Vector2Int(x, y);
         }
 
         // Si se pulsa en un Tile main, se desactiva todo el flow que tenia
@@ -151,6 +207,47 @@ namespace FlowFree
                 _flows[_flowsIndex][0].deactiveAll();
                 _flows[_flowsIndex].RemoveAt(0);
             }
+            checkPipes();
+            checkFlows();
+        }
+
+        /// <summary>
+        /// Modifica el texto de pipes del canvas
+        /// </summary>
+        private void checkPipes()
+        {
+            numPipes = 0;
+            for (int i = 0; i < _flows.Length; ++i)
+            {
+                numPipes += _flows[i].Count;
+            }
+            int percent = Mathf.RoundToInt((numPipes / (float)totalNumPipes) * 100);
+            pipesText.text = "pipe: " + percent + "%";
+        }
+
+        /// <summary>
+        /// Modifica el texto de flows del canvas
+        /// </summary>
+        private void checkFlows()
+        {
+            numFlows = 0;
+            for (int i = 0; i < _flows.Length; ++i)
+            {
+                if(_flows[i].Count > 2 && _flows[i][_flows[i].Count -1].getIsMain())
+                    numFlows++;               
+            }
+            flowText.text = "flows: "+ numFlows + "/" + totalFlows;
+            if (numFlows == totalFlows)
+                win = true;
+        }
+
+        /// <summary>
+        /// Modifica el texto de moves del canvas
+        /// </summary>
+        private void checkMoves()
+        {
+
+            movesText.text = "moves:"+moves+" best: -";
         }
 
         /// <summary>
@@ -169,6 +266,7 @@ namespace FlowFree
 
             bool halfUp = _flows[ind].Count / 2 < index;
             int i = 0;
+            //te cortan por la primera mitad y estaba finalizada la tuberia
             if (!halfUp && _flows[ind][_flows[ind].Count - 1].getIsMain())
             {
                 for (int j = 0; j <= index && index < _flows[ind].Count; j++)
@@ -177,7 +275,12 @@ namespace FlowFree
                     _flows[ind].RemoveAt(i);
                 }
                 _flows[ind][0].deactiveIn();
-            }
+                _flows[ind].Reverse();
+                foreach(Tile t in _flows[ind])
+                {
+                    t.swap();
+                }
+            }//te cortan por la segunda mitad y estaba finalizada la tuberia
             else if (_flows[ind][_flows[ind].Count - 1].getIsMain())
             {
                 i = index;
@@ -185,9 +288,11 @@ namespace FlowFree
                 {
                     _flows[ind][i].deactiveAll();
                     _flows[ind].RemoveAt(i);
+                    
                 }
                 _flows[ind][_flows[ind].Count - 1].deactiveOut();
-            }
+                
+            }//te cortan por la segunda mitad y estaba finalizada la tuberia
             else
             {
                 i = index;
@@ -195,6 +300,7 @@ namespace FlowFree
                 {
                     _flows[ind][i].deactiveAll();
                     _flows[ind].RemoveAt(i);
+                    
                 }
                 _flows[ind][_flows[ind].Count - 1].deactiveOut();
             }
@@ -235,7 +341,8 @@ namespace FlowFree
             {
                 deactivateByColor(dir);
             }
-            
+            checkFlows();
+
         }
 
 
@@ -314,7 +421,9 @@ namespace FlowFree
                     if (!_flows[_flowsIndex].Contains(currentTile))
                     {
                         _flows[_flowsIndex].Add(currentTile);
-                        //Debug.Log(currentTile.getBoardPos() + "   " + _flows[_flowsIndex].Count);
+                        numPipes++;
+                        if(currentTile.getIsMain())
+                            checkFlows();
                     }
                     else
                     {
@@ -328,9 +437,10 @@ namespace FlowFree
                     }
                     lastConnectedTile = currentTile;
                 }
-                    
+                //Debug.Log(_flows[_flowsIndex].Count);
+                checkPipes();
             }
-            //Debug.Log(_flows[_flowsIndex].Count);
+            
         }
 
         private void DragInput()
@@ -357,6 +467,21 @@ namespace FlowFree
                 
             }
 #endif
+            if (win)
+            {
+
+
+                Vector3 tmp = transform.localPosition;
+                tmp.x += 0.01f;
+                transform.localPosition = tmp;
+
+                 tmp = transform.localScale;
+                tmp.x -= 0.01f;
+                transform.localScale = tmp;
+
+                if (tmp.x <= 0)
+                    lvlManager.nextLevel();
+            }
         }
 
         int getColorIndex(Color c)
