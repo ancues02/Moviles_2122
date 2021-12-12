@@ -105,7 +105,7 @@ namespace FlowFree
         }
         public void nextLevel()
         {
-            selectedLevel++;
+            selectedLevel = Mathf.Clamp(selectedLevel + 1, 0, selectedLevelPack.Maps.Length -1);
         }
 
         public bool DoesPrevLevelExist()
@@ -114,7 +114,8 @@ namespace FlowFree
         }
         public void prevLevel()
         {
-            selectedLevel--;
+           
+            selectedLevel = Mathf.Clamp(selectedLevel-1,0, selectedLevelPack.Maps.Length-1);
         }
 
         /**

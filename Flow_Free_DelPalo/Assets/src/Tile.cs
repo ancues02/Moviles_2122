@@ -139,54 +139,94 @@ namespace FlowFree
 
         // Activa un camino en funcion la direccion que le pasan
         // Devuelve true si ha tenido que desactivar algun camino
-        private bool active(Logic.Directions dir)
+        private bool active(Logic.Directions dir, Color c)
         {
             SpriteRenderer sR = null;
+            bool fail = false;
             switch (dir)
             {
                 case Logic.Directions.Right:
                     childrensPaths[0].enabled = true;
-                    childrensPaths[0].color = tileColor;
                     sR = childrensPaths[0];
-                    if (inIndex == -1)
+                    if (c != tileColor)
+                    {
                         inIndex = 0;
-                    else 
-                        outIndex = 0;
+                        if (tileColor != Color.black)
+                            fail = true;
+                    }
+                    else if(!isMain)
+                    {
+                        fail = true;
+                    }
+                    childrensPaths[0].color = tileColor = c;
+                   
+
+                    if (outIndex != -1)
+                        fail = true;
+                    outIndex = 0;
                     break;
                 
                 case Logic.Directions.Down:
                     childrensPaths[1].enabled = true;
-                    childrensPaths[1].color = tileColor;
                     sR = childrensPaths[1];
-                    if (inIndex == -1)
+                    if (c != tileColor)
+                    {
                         inIndex = 1;
-                    else
-                        outIndex = 1;
+                        if (tileColor != Color.black)
+                            fail = true;
+                    }
+                    else if (!isMain)
+                    {
+                        fail = true;
+                    }
+                    childrensPaths[1].color = tileColor = c;
+
+                    if (outIndex != -1)
+                        fail = true;
+                    outIndex = 1;
                     break;
                 
                 case Logic.Directions.Left:
                     childrensPaths[2].enabled = true;
-                    childrensPaths[2].color = tileColor;
                     sR = childrensPaths[2];
-                    if (inIndex == -1)
+                    if (c != tileColor)
+                    {
                         inIndex = 2;
-                    else 
-                        outIndex = 2;
+                        if (tileColor != Color.black)
+                            fail = true;
+                    }
+                    else if (!isMain)
+                    {
+                        fail = true;
+                    }
+                    childrensPaths[2].color = tileColor = c;
+                    if (outIndex != -1)
+                        fail = true;
+                    outIndex = 2;
                     break;
                 
                 case Logic.Directions.Up:
                     childrensPaths[3].enabled = true;
-                    childrensPaths[3].color = tileColor;
                     sR = childrensPaths[3];
-                    if (inIndex == -1)
+                    if (c != tileColor)
+                    {
                         inIndex = 3;
-                    else 
-                        outIndex = 3;
+                        if (tileColor != Color.black)
+                            fail = true;
+                    }
+                    else if (!isMain)
+                    {
+                        fail = true;
+                    }
+                    childrensPaths[3].color = tileColor = c;
+                    if (outIndex != -1)
+                        fail = true;
+                    outIndex = 3;
                     break;
                 
             }
 
-            return /*checkDifferentColor(sR); || */checkManyPaths();
+            return /*checkDifferentColor(sR); || checkManyPaths()*/ fail;
         }
 
         // Desactiva todos los caminos que tiene
@@ -195,9 +235,10 @@ namespace FlowFree
             foreach (SpriteRenderer sp in childrensPaths)
             {
                 sp.enabled = false;
-                if(!isMain)
-                    tileColor = Color.black;
+                sp.color = Color.black;
             }
+            if(!isMain)
+                tileColor = Color.black;
             inIndex = outIndex = -1;
         }
 
@@ -206,8 +247,11 @@ namespace FlowFree
         {
             for(int i = 0; i < childrensPaths.Length; ++i)
             {
-                if(i != inIndex)
+                if (i != inIndex)
+                {
                     childrensPaths[i].enabled = false;
+                    childrensPaths[i].color = Color.black;
+                }
             }
            
             outIndex = -1;
@@ -215,20 +259,29 @@ namespace FlowFree
 
         public void deactiveIn()
         {
-            
+
             if (inIndex != -1)
+            {
                 childrensPaths[inIndex].enabled = false;
+                childrensPaths[inIndex].color = Color.black;
+            }
             inIndex = -1;
-            if (outIndex != -1)
+            /*if (outIndex != -1)
+            {
                 childrensPaths[outIndex].enabled = false;
-            outIndex = -1;
+                childrensPaths[outIndex].color = Color.black;
+            }
+            outIndex = -1;*/
 
         }
 
         public void deactiveOut()
-        {            
+        {
             if (outIndex != -1)
+            {
                 childrensPaths[outIndex].enabled = false;
+                childrensPaths[outIndex].color = Color.black;
+            }
             outIndex = -1;
 
         }
@@ -295,7 +348,7 @@ namespace FlowFree
         /// <param name="active_">  Si es true lo activa, si es false lo desactiva </param>
         /// <returns> Devuelve true si ha activado un camino y tiene que desactivar otro 
         /// ya sea por cambio de color, tres direcciones ...</returns>        
-        public bool modify(Logic.Directions dir, bool active_)
+        public bool modify(Logic.Directions dir, bool active_, Color c)
         {
 
             if (!active_)
@@ -304,7 +357,7 @@ namespace FlowFree
                 return false;
             }
             else
-                return active(dir);
+                return active(dir, c);
         }
 
 
