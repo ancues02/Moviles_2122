@@ -114,15 +114,15 @@ namespace FlowFree
                 for (int j = 0; j < m.Height; ++j)
                 {
                     // Esta bien colocado por el pivot del sprite
-                    _tiles[i, j] = Instantiate(TilePrefab, new Vector2(j, -i), Quaternion.identity, transform).GetComponent<Tile>();
+                    _tiles[i, j] = Instantiate(TilePrefab, new Vector2(i, -j), Quaternion.identity, transform).GetComponent<Tile>();
                     _tiles[i, j].name = $"Tile {i} {j}";
                     _tiles[i, j].setVisible(false);
                     _tiles[i, j].setBoardPos(new Vector2Int(i, j));
                     _tiles[i, j].ChangeColor(Color.black);
-                    if (j == 0)
+                    if (i == 0)
                         _tiles[i, j].activeLeftLimit();
 
-                    if (i == 0)
+                    if (j == 0)
                         _tiles[i, j].activeTop();
                 }
             }
@@ -167,11 +167,11 @@ namespace FlowFree
         void PressInput(Vector2 pos)
         {
             Vector2Int boardPos = getBoardTile(pos);
-            if (boardPos.x >= 0 && boardPos.x < _height &&
-                boardPos.y >= 0 && boardPos.y < _width)
+            if (boardPos.x >= 0 && boardPos.x < _width &&
+                boardPos.y >= 0 && boardPos.y < _height)
             {
                 
-                Tile activatedTile = _tiles[boardPos.y, boardPos.x];
+                Tile activatedTile = _tiles[boardPos.x, boardPos.y];
                 if (activatedTile.getColor() != Color.black)
                 {
                     pressedColor = activatedTile.getColor();
@@ -216,14 +216,14 @@ namespace FlowFree
         void DragInput(Vector2 pos)
         {
             Vector2Int boardPos = getBoardTile(pos);
-            if (boardPos.x >= 0 && boardPos.x < _height &&
-                boardPos.y >= 0 && boardPos.y < _width)
+            if (boardPos.x >= 0 && boardPos.x < _width &&
+                boardPos.y >= 0 && boardPos.y < _height)
             {
                 //if (!_tiles[boardPos.y, boardPos.x].getIsMain() ||
                 //    (_tiles[boardPos.y, boardPos.x].getIsMain() &&
                 //    _tiles[boardPos.y, boardPos.x].getColor() == pressedColor)) 
 
-                currentTile = _tiles[boardPos.y, boardPos.x];
+                currentTile = _tiles[boardPos.x, boardPos.y];
             } 
         }
 
@@ -414,14 +414,14 @@ namespace FlowFree
                
                 Logic.Directions fromDir = Logic.Directions.Right;
                 Logic.Directions toDir = Logic.Directions.Right;
-                if ((lastPos.y == newPos.y - 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido a la derecha
+                if ((lastPos.x == newPos.x - 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido a la derecha
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Right, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;                    
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Left, true, pressedColor);
                     legalMove = true;
                 }
-                else if ((lastPos.y == newPos.y + 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido a la izquierda
+                else if ((lastPos.x == newPos.x + 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido a la izquierda
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Left, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
@@ -429,14 +429,14 @@ namespace FlowFree
                     legalMove = true;
 
                 }
-                else if((lastPos.x == newPos.x + 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido arriba
+                else if((lastPos.y == newPos.y + 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido arriba
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Up, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Down, true, pressedColor);
                     legalMove = true;
                 }
-                else if ((lastPos.x == newPos.x - 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido abajo
+                else if ((lastPos.y == newPos.y - 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido abajo
                 {
                     lastConnectedTile.modify(toDir = Logic.Directions.Down, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
