@@ -158,6 +158,7 @@ namespace FlowFree
                     {
                         fail = true;
                     }
+
                     childrensPaths[0].color = tileColor = c;
                    
 
@@ -266,13 +267,18 @@ namespace FlowFree
                 childrensPaths[inIndex].color = Color.black;
             }
             inIndex = -1;
-            /*if (outIndex != -1)
-            {
-                childrensPaths[outIndex].enabled = false;
-                childrensPaths[outIndex].color = Color.black;
-            }
-            outIndex = -1;*/
 
+        }
+
+        public void swap()
+        {
+            if (!isMain)
+            {
+                int tmp = inIndex;
+                inIndex = outIndex;
+                outIndex = tmp;
+            }            
+            
         }
 
         public void deactiveOut()
@@ -350,7 +356,6 @@ namespace FlowFree
         /// ya sea por cambio de color, tres direcciones ...</returns>        
         public bool modify(Logic.Directions dir, bool active_, Color c)
         {
-
             if (!active_)
             {
                 deactive(dir);
