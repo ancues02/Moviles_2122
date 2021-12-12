@@ -7,17 +7,17 @@ namespace FlowFree
     public class MenuManager : MonoBehaviour
     {
         // Prefab del display de categorias
-        public GameObject CategoryDisplayPref;
+        public GameObject categoryDisplayPref;
 
         // Objeto del canvas que contendra los displays de las categorias
-        public GameObject Display;
+        public Transform display;
         public void setCategories(Category[] categories)
         {
             GameObject categoryObj;
             CategoryDisplay categoryDplay;
             for (int i = 0; i < categories.Length; i++)
             {
-                categoryObj = Instantiate(CategoryDisplayPref, Display.transform);
+                categoryObj = Instantiate(categoryDisplayPref, display);
                 categoryDplay = categoryObj.GetComponent<CategoryDisplay>();
                 categoryDplay.setAttributes(categories[i], i);
             }

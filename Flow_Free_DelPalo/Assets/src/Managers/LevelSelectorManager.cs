@@ -10,29 +10,22 @@ namespace FlowFree
 {
     public class LevelSelectorManager : MonoBehaviour
     {
-        public int testLevel;
+        public GameObject levelPagePref;
 
-        const int LEVELS_PER_PAGE = 30;
+        // Objeto del canvas que contendra los displays de las categorias
+        public Transform display;
+
         LevelPage[] pages;  // el nº de paginas depende del nº de niveles del lote
-        
-        LevelPack pack;
-
-        private void Update()
+        public void setPack(LevelPack pack)
         {
-            //gestionar la seleccion del nivel y cambiar entre paginas
-
-            // Para probar cambios de escenas
-            if (Input.GetKeyDown(KeyCode.Space))
+            GameObject categoryObj;
+            PackDisplay categoryDplay;
+            for (int i = 0; i < pack.pages.Length; i++)
             {
-                GameManager gm = GameManager.getInstance();
-                gm.setSelectedLevel(testLevel);
-                gm.ChangeScene("GameBoardTest");
+                categoryObj = Instantiate(levelPagePref, display);
+                categoryDplay = categoryObj.GetComponent<PackDisplay>();
+                categoryDplay.setAttributes(pack, i);
             }
-        }
-
-        public void setPack(LevelPack p)
-        {
-            pack = p;
         }
 
     }
