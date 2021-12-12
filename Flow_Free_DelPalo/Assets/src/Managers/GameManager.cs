@@ -17,7 +17,6 @@ namespace FlowFree
         public MenuManager menuManager;
         public LevelSelectorManager lvlSelectorManager;
         public LevelManager lvlManager;
-        
 
         static GameManager _instance;
 
@@ -64,6 +63,7 @@ namespace FlowFree
                 if (_instance.selectedLevelPack.Valid)
                 {
                     _instance.lvlManager.board.setFlowColors(_instance.theme.colors);
+                    _instance.lvlManager.board.getCameraSize();
                     _instance.lvlManager.board.setMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
                 }
             }
@@ -95,7 +95,6 @@ namespace FlowFree
                 Debug.Log("Lote cargado correctamente");
             
         }
-
 
         public void setSelectedLevel(int levelIndex)
         {
