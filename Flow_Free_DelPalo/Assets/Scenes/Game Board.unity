@@ -1268,7 +1268,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TilePrefab: {fileID: 8712364534256855023, guid: 55d97be62e4bde343b69825d87f59694, type: 3}
-  testing: 0
+  _baseSize: {x: 5, y: 5}
+  _baseRatio: {x: 0, y: 0}
 --- !u!4 &1125272008
 Transform:
   m_ObjectHideFlags: 0
@@ -2525,7 +2526,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: Level
-      value: 0
+      value: 280
       objectReference: {fileID: 0}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: theme
