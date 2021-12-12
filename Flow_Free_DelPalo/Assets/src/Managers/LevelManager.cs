@@ -23,8 +23,6 @@ namespace FlowFree
             gm.prevLevel();
             gm.ChangeScene("Game Board");
         }
-        
-
         void Update()
         {
             // Para probar cambios de escenas
