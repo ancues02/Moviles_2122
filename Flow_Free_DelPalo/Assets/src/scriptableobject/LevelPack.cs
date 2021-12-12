@@ -46,7 +46,6 @@ namespace FlowFree
                 Valid = levels[i].Parse(mapsText[i]);
                 i++;
             }
-            Debug.Log(Valid);
         }
 
     }

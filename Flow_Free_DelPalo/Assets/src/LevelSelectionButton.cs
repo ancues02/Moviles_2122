@@ -8,7 +8,14 @@ namespace FlowFree
     public class LevelSelectionButton : MonoBehaviour
     {
         public Button button;
+
         public Text levelNumberText;
+
+        public void setColor(Color color)
+        {
+            button.image.color = color;
+        }
+        
         public void setLevelNumber(int numLevel)
         {
             levelNumberText.text = numLevel.ToString();

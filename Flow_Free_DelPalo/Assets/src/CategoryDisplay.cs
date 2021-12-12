@@ -31,14 +31,5 @@ namespace FlowFree
                 });
             }
         }
-        private void Update()
-        {
-            Debug.Log(categoryBackground.color);
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                MenuButton packButton = Instantiate(buttonPref, transform).GetComponent<MenuButton>();
-                packButton.setPackTextColor(Color.white);
-            }
-        }
     }
 }
