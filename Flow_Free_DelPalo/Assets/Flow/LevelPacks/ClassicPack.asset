@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ClassicPack
   m_EditorClassIdentifier: 
   packName: ClassicPack
-  maps: {fileID: 4900000, guid: 37c2996d66f05134396ab42db8a58a1e, type: 3}
+  maps: {fileID: 4900000, guid: c6bce27ac74b64540bdf3f19e3eadab2, type: 3}
   pages:
   - name: "5x5 - f\xE1cil"
     blocked: 0

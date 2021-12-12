@@ -22,8 +22,9 @@ namespace FlowFree
         [Tooltip("El texto del canvas de pistas")]
         public Text hintText;
 
-        public Vector2Int _baseSize = new Vector2Int(5, 5);
-        public Vector2 _baseRatio;
+        private Vector2 _cameraSize;
+        private Vector2 _availableSize;
+        private Vector2 _baseRatio;
 
         private Tile[,] _tiles;
         private int _width, _height;
@@ -47,8 +48,6 @@ namespace FlowFree
 
         bool win = false;
 
-
-
         private List<Color> colors;
 
         private void Start()
@@ -64,6 +63,18 @@ namespace FlowFree
                 hintText.text = "3 x ";
             }
         }
+        
+        public void getCameraSize()
+        {
+            if (Camera.main)
+            {
+                float y = Camera.main.orthographicSize * 2;
+                float x = y * Camera.main.aspect;
+                y *= 0.75f;  // Lo de la UI? No sé como vamos a hacerlo
+                _cameraSize = new Vector2(x, y);
+            }
+            else Debug.LogError("No hay cámara, ¿qué esperabas que pasara?");
+        }
 
         public void setMap(Logic.Map m)
         {
@@ -71,7 +82,22 @@ namespace FlowFree
             _tiles = new Tile[m.Width, m.Height];
             _width = m.Width;
             _height = m.Height;
-            _baseRatio = new Vector2(_baseSize.x / (float)_width, _baseSize.y / (float)_height);
+
+            float camAspect = _cameraSize.x / _cameraSize.y;
+            float mapAspect = _width / (float)_height;
+            
+            if (camAspect >= 1)
+                if(mapAspect >= camAspect)
+                    _availableSize = new Vector2(_cameraSize.x, _cameraSize.x / mapAspect);
+                else
+                    _availableSize = new Vector2(_cameraSize.y * mapAspect, _cameraSize.y);
+            else
+                if (mapAspect >= camAspect)
+                    _availableSize = new Vector2(_cameraSize.x, _cameraSize.x / mapAspect);
+                else
+                    _availableSize = new Vector2(_cameraSize.y * mapAspect, _cameraSize.y);
+
+            _baseRatio = new Vector2(_availableSize.x / (float)_width, _availableSize.y / (float)_height);
             _flows = new List<Tile>[m.FlowNumber];
             _tmpFlows = new List<List<Tile>>();
             numPipes = 0;
