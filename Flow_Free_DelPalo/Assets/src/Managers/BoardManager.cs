@@ -22,6 +22,9 @@ namespace FlowFree
         [Tooltip("El texto del canvas de pistas")]
         public Text hintText;
 
+        public Vector2Int _baseSize = new Vector2Int(5, 5);
+        public Vector2 _baseRatio;
+
         private Tile[,] _tiles;
         private int _width, _height;
         private Logic.Map map;
@@ -68,6 +71,7 @@ namespace FlowFree
             _tiles = new Tile[m.Width, m.Height];
             _width = m.Width;
             _height = m.Height;
+            _baseRatio = new Vector2(_baseSize.x / (float)_width, _baseSize.y / (float)_height);
             _flows = new List<Tile>[m.FlowNumber];
             _tmpFlows = new List<List<Tile>>();
             numPipes = 0;
@@ -93,9 +97,9 @@ namespace FlowFree
             totalFlows = map.FlowNumber;
             totalNumPipes = m.Width* m.Height;
             setMainTiles();
-            vectorOffset = new Vector2(-m.Width / 2f, (-m.Height / 2f) + m.Height);
-            transform.Translate(new Vector2(vectorOffset.x + 0.5f, vectorOffset.y - 0.5f));
-
+            vectorOffset = new Vector2((-m.Width / 2f) * _baseRatio.x, ((-m.Height / 2f) * _baseRatio.y) + m.Height * _baseRatio.y);
+            transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
+            transform.Translate(new Vector2(vectorOffset.x  + (0.5f * _baseRatio.x), vectorOffset.y  - (0.5f * _baseRatio.y)));
             flowText.text = "flows: 0/" + totalFlows;
         }
 
@@ -130,8 +134,7 @@ namespace FlowFree
 
         void PressInput(Vector2 pos)
         {
-            Vector2Int boardPos = new Vector2Int(Mathf.FloorToInt((pos - vectorOffset).x), 
-                Mathf.FloorToInt(-(pos - vectorOffset).y));
+            Vector2Int boardPos = getBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _height &&
                 boardPos.y >= 0 && boardPos.y < _width)
             {
@@ -175,8 +178,7 @@ namespace FlowFree
 
         void DragInput(Vector2 pos)
         {
-            Vector2Int boardPos = new Vector2Int(Mathf.FloorToInt((pos - vectorOffset).x),
-                Mathf.FloorToInt(-(pos - vectorOffset).y));
+            Vector2Int boardPos = getBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _height &&
                 boardPos.y >= 0 && boardPos.y < _width)
             {
@@ -186,6 +188,13 @@ namespace FlowFree
 
                 currentTile = _tiles[boardPos.y, boardPos.x];
             } 
+        }
+
+        private Vector2Int getBoardTile(Vector2 pos)
+        {
+            int x = Mathf.FloorToInt((pos - vectorOffset).x / _baseRatio.x);
+            int y = Mathf.FloorToInt(-(pos - vectorOffset).y / _baseRatio.y);
+            return new Vector2Int(x, y);
         }
 
         // Si se pulsa en un Tile main, se desactiva todo el flow que tenia
