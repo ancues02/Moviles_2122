@@ -6,9 +6,17 @@ namespace FlowFree
 {
     public class MenuManager : MonoBehaviour
     {
+        public GameObject CategoryTilePref;
+
+
         public int categoryTest;
         public int packTest;
 
+
+        public void setCategoriesTiles(Category[] categories)
+        {
+
+        }
         private void Update()
         {
             // Gestiona la seleccion de categoria y pack dentro de la categoria

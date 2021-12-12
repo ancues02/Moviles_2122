@@ -7,7 +7,6 @@ namespace FlowFree
     public class BoardManager : MonoBehaviour
     {
         public GameObject TilePrefab;
-        public bool testing;
 
         private Tile[,] _tiles;
         private int _width, _height;
