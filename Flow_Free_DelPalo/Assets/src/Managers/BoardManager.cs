@@ -49,6 +49,7 @@ namespace FlowFree
         Tile currentTile;
         Tile lastConnectedTile;
         bool colorConflict = false;
+        bool legalMove = false;
 
         int totalFlows, best, totalNumPipes;
         int numFlows, moves, numPipes;
@@ -220,11 +221,17 @@ namespace FlowFree
             if (_flows[_flowsIndex].Count == 1)
                 _flows[_flowsIndex].RemoveAt(0);
 
-            if (!currentTile.getIsMain())
+            //Desactivar o activar el circulo pequenio solo si se ha cambiado alguna tuberia
+            if (_flows[_flowsIndex].Count > 1)
             {
-                currentTile.SmallCircleSetActive(true);
+                foreach (List<Tile> tiles in _flows)
+                {
+                    if (tiles.Count > 0 && tiles[tiles.Count - 1] != currentTile)
+                        tiles[tiles.Count - 1].SmallCircleSetActive(false);
+                }
+                if (!_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
+                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(true);
             }
-
             // quitar informacion de tuberias cortadas
             while (_tmpFlows.Count != 0)
                 _tmpFlows.RemoveAt(0);
@@ -412,8 +419,6 @@ namespace FlowFree
                 }
                 _flows[ind][_flows[ind].Count - 1].DeactiveOut();
             }
-            _flows[ind][_flows[ind].Count - 1].SmallCircleSetActive(true);
-
 
             _flows[_flowsIndex].Add(currentTile);
             currentTile.modify(dir, true, pressedColor);
@@ -459,7 +464,6 @@ namespace FlowFree
                                 break;
                             }
                         }
-                        _flows[ind][_flows[ind].Count - 1].SmallCircleSetActive(true);
                         break;
                     }
 
@@ -547,7 +551,7 @@ namespace FlowFree
                 Vector2Int lastPos = lastConnectedTile.getBoardPos(),
                     newPos = currentTile.getBoardPos();
 
-                bool legalMove = false;
+                legalMove = false;
 
                 Logic.Directions fromDir = Logic.Directions.Right;
                 Logic.Directions toDir = Logic.Directions.Right;
