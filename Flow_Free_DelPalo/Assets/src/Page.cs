@@ -7,10 +7,10 @@ namespace FlowFree
      * paginas de niveles desde los lotes
      */
     [System.Serializable]
-    public struct Page
+    public class Page
     {
+        public const int LEVELS_PER_PAGE = 30;
         public string name;
         public Color color;
-        public bool blocked;
     }
 }

@@ -22,15 +22,11 @@ namespace FlowFree
         [Tooltip("Fichero con los niveles")]
         public TextAsset maps;
 
-        // TODO: Juntar estos dos en una estructura
         [Tooltip("Paginas de niveles")]
         public Page[] pages;
 
-        public Logic.Map[] Maps { get => levels; }
+        public Logic.Map[] Maps { get; private set; }
 
-        // Niveles de un lote
-        Logic.Map[] levels;
-        
         public bool Valid { get; private set; }
 
         // Parsea todos los niveles de un lote
@@ -38,12 +34,12 @@ namespace FlowFree
         {
             Valid = true;
             string [] mapsText = maps.text.Split(new char[]{'\r','\n'}, System.StringSplitOptions.RemoveEmptyEntries);
-            levels = new Logic.Map[mapsText.Length];
+            Maps = new Logic.Map[mapsText.Length];
 
             int i = 0;
             while(i < mapsText.Length && Valid) {
-                levels[i] = new Logic.Map();
-                Valid = levels[i].Parse(mapsText[i]);
+                Maps[i] = new Logic.Map();
+                Valid = Maps[i].Parse(mapsText[i]);
                 i++;
             }
         }
