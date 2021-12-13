@@ -41,8 +41,9 @@ namespace FlowFree
         public void setPack(LevelPack pack)
         {
             packText.text = pack.packName;
+            if (pack.pages.Length <= 0) return; // si no hay ninguna pagina no hacemos nada
+           
             markerImages = new Image[pack.pages.Length];
-
             // Ajustamos el display segun el nº de paginas
             float newX = display.sizeDelta.x + pack.pages.Length * ((RectTransform)levelPagePref.transform).sizeDelta.x;
             display.sizeDelta = new Vector2(newX, display.sizeDelta.y);
@@ -55,7 +56,7 @@ namespace FlowFree
                 packDplay.setAttributes(pack, i);
                 markerImages[i] = Instantiate(pageMarkerPref, markerDisplay).GetComponent<Image>();
             }
-            markerImages[0].color = Color.white;
+            
         }
 
         ///<summary>

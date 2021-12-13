@@ -750,6 +750,7 @@ GameObject:
   - component: {fileID: 1802241059}
   - component: {fileID: 1802241060}
   - component: {fileID: 1802241058}
+  - component: {fileID: 1802241061}
   m_Layer: 5
   m_Name: LevelsText
   m_TagString: Untagged
@@ -806,10 +807,10 @@ MonoBehaviour:
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: <color=red>l</color><color=green>e</color><color=blue>v</color><color=yellow>e</color><color=orange>l</color><color=cyan>s</color>
+  m_Text: levels
 --- !u!222 &1802241059
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -838,6 +839,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1802241061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802241056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daa8cb8ecf4ba9b4cab9f8c3bad08f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Text: {fileID: 1802241058}
 --- !u!1001 &3776296068164177860
 PrefabInstance:
   m_ObjectHideFlags: 0
