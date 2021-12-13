@@ -7,7 +7,6 @@ namespace FlowFree
 {
     public class PackDisplay : MonoBehaviour
     {
-        const int LEVELS_PER_PAGE = 30;
 
         public GameObject buttonPref;
 
@@ -17,11 +16,11 @@ namespace FlowFree
         {
             pageName.text = pack.pages[pageIndex].name;
             LevelSelectionButton lvlButton;
-            for (int j = 0; j < LEVELS_PER_PAGE; j++)
+            for (int j = 0; j < Page.LEVELS_PER_PAGE; j++)
             {
-                int levelIndex = j + pageIndex * LEVELS_PER_PAGE;
+                int levelIndex = j + pageIndex * Page.LEVELS_PER_PAGE;
                 lvlButton = Instantiate(buttonPref, buttonGroup).GetComponent<LevelSelectionButton>();
-                lvlButton.setLevelNumber(pack.Maps[j + pageIndex * LEVELS_PER_PAGE].LevelNumber);
+                lvlButton.setLevelNumber(pack.Maps[j + pageIndex * Page.LEVELS_PER_PAGE].LevelNumber);
                 lvlButton.setColor(pack.pages[pageIndex].color);
                 lvlButton.setOnClick(() => {
                     GameManager.getInstance().setSelectedLevel(levelIndex);
