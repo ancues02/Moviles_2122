@@ -81,6 +81,12 @@ namespace FlowFree
             return tileColor;
         }
 
+        public void SmallCircleSetActive(bool active)
+        {
+            childrens[4].GetComponent<SpriteRenderer>().color = tileColor;
+            childrens[4].SetActive(active);
+        }
+
         // Activa o desactiva el renderSprite 
         public void setVisible(bool visible)
         {
@@ -221,6 +227,7 @@ namespace FlowFree
             }
             if(!isMain)
                 tileColor = Color.black;
+            childrens[4].SetActive(false);
             inIndex = outIndex = -1;
         }
 

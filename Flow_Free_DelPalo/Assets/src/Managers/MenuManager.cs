@@ -14,17 +14,22 @@ namespace FlowFree
         ///<summary>
         /// Objeto del canvas que contendra los displays de las categorias
         ///</summary>
-        public Transform display;
+        public RectTransform display;
         public void setCategories(Category[] categories)
         {
-            GameObject categoryObj;
+
+            // Ajustamos el display segun el nº de categorias
+            float newY = display.sizeDelta.y;
+
+            // Creamos los displays de las categorias
             CategoryDisplay categoryDplay;
             for (int i = 0; i < categories.Length; i++)
             {
-                categoryObj = Instantiate(categoryDisplayPref, display);
-                categoryDplay = categoryObj.GetComponent<CategoryDisplay>();
+                categoryDplay = Instantiate(categoryDisplayPref, display).GetComponent<CategoryDisplay>();
                 categoryDplay.setAttributes(categories[i], i);
+                newY += categoryDplay.getActualHeight();
             }
+            display.sizeDelta = new Vector2(display.sizeDelta.x, newY);
         }
     }
 }
