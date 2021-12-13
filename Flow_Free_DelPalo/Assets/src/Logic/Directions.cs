@@ -7,6 +7,7 @@ namespace FlowFree.Logic
         Up, 
         Left,
         Down,
-        Right
+        Right,
+        None
     }
 }

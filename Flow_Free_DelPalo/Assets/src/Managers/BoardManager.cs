@@ -54,6 +54,8 @@ namespace FlowFree
 
         private List<Color> colors;
 
+
+
         private void Start()
         {
             if (!flowText || !movesText || !pipesText || !hintText
@@ -157,7 +159,7 @@ namespace FlowFree
                     else
                     {
                         if(_flows[_flowsIndex][_flows[_flowsIndex].Count-1] != activatedTile)
-                        deactivateItSelf();
+                            deactivateItSelf(Logic.Directions.None);
                     }
                 }
             }
@@ -177,6 +179,7 @@ namespace FlowFree
             for(int i = 0; i < _tmpFlows.Count; ++i)
             {
                 _tmpFlows[i].Clear();
+                _tmpFlows.RemoveAt(0);
             }
             if (numFlows == totalFlows)
             {
@@ -259,6 +262,35 @@ namespace FlowFree
         }
 
         /// <summary>
+        /// Cuando se corta una tuberia con otro color
+        /// Se guarda el estado de la tuberia antes de ser cortada
+        /// </summary>
+        /// <param name="ind"></param>
+        private void cutFlow(int ind)
+        {
+            List<Tile> tmpList = new List<Tile>();
+
+            for(int i = 0; i < _flows[ind].Count; ++i) 
+            {
+                Tile t = _flows[ind][i];
+                Tile tmp = (Tile)t.Clone();
+                //donde se ha cortado volver a poner bien los caminos 
+                //de donde has venido y a donde has ido en ese tile
+                if(t == currentTile)
+                {
+                    tmp.deactiveAll();
+                    int outInd = -1;
+                    if (i + 1 < _flows[ind].Count)
+                        outInd = (_flows[ind][i + 1].inIndex +2) %4;
+                    tmp.activeInOut((tmpList[tmpList.Count - 1].outIndex + 2) % 4, outInd, tmpList[tmpList.Count - 1].getColor());
+                }
+                tmpList.Add(tmp);
+            }
+            _tmpFlows.Add(tmpList);
+            
+        }
+
+        /// <summary>
         /// Desactiva si una tuberia a cortado a otra
         /// </summary>
         private void deactivateByColor(Logic.Directions dir)
@@ -268,11 +300,11 @@ namespace FlowFree
             {
                 ind++;
             }
-            //_tmpFlows.Add(_flows[ind]);
+            cutFlow(ind);
 
             int index = _flows[ind].IndexOf(currentTile);
 
-            bool halfUp = _flows[ind].Count / 2 < index;
+            bool halfUp = _flows[ind].Count / 2 <= index;
             int i = 0;
             //te cortan por la primera mitad y estaba finalizada la tuberia
             if (!halfUp && _flows[ind][_flows[ind].Count - 1].getIsMain())
@@ -285,6 +317,11 @@ namespace FlowFree
                 _flows[ind][0].deactiveIn();
                 _flows[ind].Reverse();
                 foreach(Tile t in _flows[ind])
+                {
+                    t.swap();
+                }
+                _tmpFlows[_tmpFlows.Count - 1].Reverse();
+                foreach (Tile t in _tmpFlows[_tmpFlows.Count - 1])
                 {
                     t.swap();
                 }
@@ -313,27 +350,98 @@ namespace FlowFree
                 _flows[ind][_flows[ind].Count - 1].deactiveOut();
             }
 
-            //_tmpFlows[j].Add(_flows[_flowsIndex][index]);
+            
             _flows[_flowsIndex].Add(currentTile);
             currentTile.modify(dir, true, pressedColor);
             colorConflict = false;
         }
 
+
+        private bool sameColorAdy(Tile tile)
+        {
+            Vector2Int pos = tile.getBoardPos();
+            Color c = tile.getColor();
+            if (pos.x > 0 && _tiles[pos.x-1,pos.y].getColor() == c)//mismo color izquierda
+            {
+                return true;
+            }
+            if (pos.y > 0 && _tiles[pos.x, pos.y -1].getColor() == c)// mismo color arriba
+            {
+                return true;
+            }
+            if (pos.x < _width-1 && _tiles[pos.x + 1, pos.y].getColor() == c)//mismo color derecha
+            {
+                return true;
+            }
+            if (pos.y > _height -1 && _tiles[pos.x, pos.y +1].getColor() == c)//mimsmo color abajo
+            {
+                return true;
+            }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Reactiva un camino que se habia cortado durante ese mismo movimiento
+        /// </summary>
+        /// <param name="toCheck"></param>
+        private void reFlow(List<Tile> toCheck)
+        {
+            for (int i = _tmpFlows.Count - 1; i >= 0 ; --i)
+            {
+
+                List<Tile> list = _tmpFlows[i];
+                foreach(Tile tile in toCheck)
+                {
+                    if (list.Contains(tile) && sameColorAdy(tile) /*&& tile.getColor() != pressedColor*/)
+                    {
+                        int ind = getColorIndex(list[0].getColor());
+                        int j = _flows[ind].Count - 1;
+                        Tile t = list[j];
+                        Tile boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
+
+                        boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
+                        j++;
+                        for (; j < list.Count; ++j)
+                        {
+                            t = list[j];
+                            boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
+
+                            boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
+                            _flows[ind].Add(boardTile);
+                        }
+
+                        _tmpFlows.Remove(list);
+
+                        break;
+                    }
+
+                }
+                if (toCheck.Count == 1 )
+                    break;
+                
+            }
+        }
+
         /// <summary>
         /// Desactiva si una tuberia se ha cortado a si misma
         /// </summary>
-        private void deactivateItSelf()
+        /// <param name="dir"> La direccion en la que se ha movido</param>
+        private void deactivateItSelf(Logic.Directions dir)
         {
-            // buscamos donde guardar la nueva tuberia cortada
-
-            //desactivamos todas las tiles de la tuberia y las aniadimos a la lista de tuberias cortadas
             int index = _flows[_flowsIndex].IndexOf(currentTile);
-
+            List<Tile> toCheck = new List<Tile>();
             for (int i = index + 1; i < _flows[_flowsIndex].Count;)
             {
                 _flows[_flowsIndex][i].deactiveAll();
+                toCheck.Add(_flows[_flowsIndex][i]);
                 _flows[_flowsIndex].RemoveAt(i);
             }
+            if (dir != Logic.Directions.None) {
+                toCheck.Reverse();
+                reFlow(toCheck);
+            }
+
 
             _flows[_flowsIndex][index].notDeactiveIn();
         }
@@ -343,7 +451,7 @@ namespace FlowFree
         {
 
             if (lastConnectedTile.getColor() == currentTile.getColor() && !colorConflict){
-                deactivateItSelf();
+                deactivateItSelf(dir);
             }
             else//un color a cortado a otro
             {

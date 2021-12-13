@@ -4,8 +4,17 @@ using UnityEngine;
 
 namespace FlowFree
 {
-    public class Tile : MonoBehaviour
+    public class Tile : MonoBehaviour, System.ICloneable
     {
+        public Tile(Tile t)
+        {
+            isMain = t.isMain;
+            boardPos = t.boardPos;
+            tileColor = t.tileColor;
+            inIndex = t.inIndex;
+            outIndex = t.outIndex;
+        }
+
         public enum ConnectionType
         {
             Normal,
@@ -42,7 +51,7 @@ namespace FlowFree
         public SpriteRenderer[] childrensPaths;
 
         //Los indices de los path de entrada o salida
-        int inIndex = -1, outIndex = -1;
+        public int inIndex = -1, outIndex = -1;
 
 
         void Start()
@@ -141,13 +150,12 @@ namespace FlowFree
         // Devuelve true si ha tenido que desactivar algun camino
         private bool active(Logic.Directions dir, Color c)
         {
-            SpriteRenderer sR = null;
+            
             bool fail = false;
             switch (dir)
             {
                 case Logic.Directions.Right:
                     childrensPaths[0].enabled = true;
-                    sR = childrensPaths[0];
                     if (c != tileColor)
                     {
                         inIndex = 0;
@@ -159,17 +167,17 @@ namespace FlowFree
                         fail = true;
                     }
 
-                    childrensPaths[0].color = tileColor = c;
-                   
-
                     if (outIndex != -1)
                         fail = true;
-                    outIndex = 0;
+
+                    if (tileColor != Color.black)
+                        outIndex = 0;
+                   
+                    childrensPaths[0].color = tileColor = c;
                     break;
                 
                 case Logic.Directions.Down:
                     childrensPaths[1].enabled = true;
-                    sR = childrensPaths[1];
                     if (c != tileColor)
                     {
                         inIndex = 1;
@@ -180,16 +188,16 @@ namespace FlowFree
                     {
                         fail = true;
                     }
-                    childrensPaths[1].color = tileColor = c;
-
                     if (outIndex != -1)
                         fail = true;
-                    outIndex = 1;
+                    if (tileColor != Color.black)
+                        outIndex = 1;
+
+                    childrensPaths[1].color = tileColor = c;
                     break;
                 
                 case Logic.Directions.Left:
                     childrensPaths[2].enabled = true;
-                    sR = childrensPaths[2];
                     if (c != tileColor)
                     {
                         inIndex = 2;
@@ -200,15 +208,16 @@ namespace FlowFree
                     {
                         fail = true;
                     }
-                    childrensPaths[2].color = tileColor = c;
                     if (outIndex != -1)
                         fail = true;
-                    outIndex = 2;
+                    if (tileColor != Color.black)
+                        outIndex = 2;
+
+                    childrensPaths[2].color = tileColor = c;
                     break;
                 
                 case Logic.Directions.Up:
                     childrensPaths[3].enabled = true;
-                    sR = childrensPaths[3];
                     if (c != tileColor)
                     {
                         inIndex = 3;
@@ -219,15 +228,17 @@ namespace FlowFree
                     {
                         fail = true;
                     }
-                    childrensPaths[3].color = tileColor = c;
                     if (outIndex != -1)
                         fail = true;
+                    if(tileColor != Color.black)
                     outIndex = 3;
+                    
+                    childrensPaths[3].color = tileColor = c;
                     break;
                 
             }
 
-            return /*checkDifferentColor(sR); || checkManyPaths()*/ fail;
+            return  fail;
         }
 
         // Desactiva todos los caminos que tiene
@@ -267,6 +278,28 @@ namespace FlowFree
                 childrensPaths[inIndex].color = Color.black;
             }
             inIndex = -1;
+
+        }
+
+        public void activeInOut(int inIndex_, int outIndex_, Color c)
+        {
+            tileColor = c;
+            if (inIndex_ != -1)
+            {
+                inIndex = inIndex_;
+
+                childrensPaths[inIndex].enabled = true;
+                childrensPaths[inIndex].color = tileColor;
+            }
+
+            if (outIndex_ != -1)
+            {
+                outIndex = outIndex_;
+
+                childrensPaths[outIndex].enabled = true;
+                childrensPaths[outIndex].color = tileColor;
+            }
+            
 
         }
 
@@ -365,6 +398,27 @@ namespace FlowFree
                 return active(dir, c);
         }
 
+        public void resetTile(int inIndex_, int outIndex_, Color c)
+        {
+            deactiveAll();
+            tileColor = c;
+            inIndex = inIndex_;
+            if (inIndex != -1)
+            {
+                childrensPaths[inIndex].enabled = true;
+                childrensPaths[inIndex].color = c;
+            }
+            outIndex = outIndex_;
+            if(outIndex != -1)
+            {
+                childrensPaths[outIndex].color = c;
+                childrensPaths[outIndex].enabled = true;
+            }
+        }
 
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }
