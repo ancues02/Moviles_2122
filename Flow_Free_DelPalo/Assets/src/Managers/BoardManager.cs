@@ -195,7 +195,7 @@ namespace FlowFree
                             deactivateItSelf(Logic.Directions.None);
                     }
 
-                    pointer.transform.position = pos;
+                    pointer.transform.position = new Vector3(pos.x, pos.y, -2);
                     pointer.enabled = true;
                     pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
                 }
@@ -242,7 +242,7 @@ namespace FlowFree
                 pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
             }
             else pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.25f);
-            pointer.transform.position = pos;
+            pointer.transform.position = new Vector3(pos.x, pos.y, -2);
         }
 
         private Vector2Int getBoardTile(Vector2 pos)
@@ -614,6 +614,7 @@ namespace FlowFree
             //if (currentTile.getIsMain())
             //    pressedColor = currentTile.getColor();
         }
+
         private void Update()
         {
 #if UNITY_EDITOR
@@ -645,8 +646,6 @@ namespace FlowFree
                 if (tmp.x <= 0)
                     lvlManager.nextLevel();
             }
-            Debug.Log(_flows[_flowsIndex].Count);
-
         }
 
         int getColorIndex(Color c)
@@ -671,7 +670,10 @@ namespace FlowFree
             winPanel.SetActive(false);
         }
 
-
+        public void doHint()
+        {
+            Debug.Log("PISTA");
+        }
     }
 
 }
