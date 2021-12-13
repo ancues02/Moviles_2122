@@ -39,6 +39,7 @@ namespace FlowFree
         //cada fila guarda un flow diferente. Siempre tienen como minimo el incio y fin de un flow
         private List<Tile>[] _flows;
         private int _flowsIndex;//el indice de la tuberia que se esta modificando
+        private int _circleFlowsIndex = -1;//el indice de la tuberia que tiene el circulo pequenio
 
         private List<List<Tile>> _tmpFlows;//flows que se han cortado mientras estas pulsando
 
@@ -50,6 +51,7 @@ namespace FlowFree
         Tile lastConnectedTile;
         bool colorConflict = false;
         bool legalMove = false;
+        bool changes = false; 
 
         int totalFlows, best, totalNumPipes;
         int numFlows, moves, numPipes;
@@ -211,26 +213,46 @@ namespace FlowFree
         void ReleaseInput(Vector2 pos)
         {
             lastConnectedTile = null;
-            if (pressedColor != lastPressedColor)
+            /*if (pressedColor != lastPressedColor)
             {
                 moves++;
                 checkMoves();
-            }
+            }*/
             lastPressedColor = pressedColor;
             cutColor = pressedColor = Color.black;
             if (_flows[_flowsIndex].Count == 1)
+            {
+                if(pressedColor != lastPressedColor)
+                {
+                    moves++;
+                    checkMoves();
+                }
+                
                 _flows[_flowsIndex].RemoveAt(0);
+            }
 
             //Desactivar o activar el circulo pequenio solo si se ha cambiado alguna tuberia
-            if (_flows[_flowsIndex].Count > 1)
+            if (changes)
             {
-                foreach (List<Tile> tiles in _flows)
+                /*if (_flows[_flowsIndex].Count > 1)
                 {
-                    if (tiles.Count > 0 && tiles[tiles.Count - 1] != currentTile)
-                        tiles[tiles.Count - 1].SmallCircleSetActive(false);
-                }
-                if (!_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
+                    foreach (List<Tile> tiles in _flows)
+                    {
+                        if (tiles.Count > 0 && tiles[tiles.Count - 1] != currentTile)
+                            tiles[tiles.Count - 1].SmallCircleSetActive(false);
+                    }
+                    if (!_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
+                        _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(true);
+                }*/
+                _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(false);
+                if (_circleFlowsIndex == -1)
+                {
                     _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(true);
+                }
+                else
+                    _flows[_circleFlowsIndex][_flows[_circleFlowsIndex].Count - 1].SmallCircleSetActive(true);
+                _circleFlowsIndex = _flowsIndex;
+                changes = false;
             }
             // quitar informacion de tuberias cortadas
             while (_tmpFlows.Count != 0)
@@ -243,6 +265,7 @@ namespace FlowFree
             }
 
             pointer.enabled = false;
+            
         }
 
         void DragInput(Vector2 pos)
@@ -272,7 +295,9 @@ namespace FlowFree
         // Si se pulsa en un Tile main, se desactiva todo el flow que tenia
         private void deactivateMain()
         {
-            //Debug.Log(_flows[_flowsIndex].Count);
+            if (_flows[_flowsIndex].Count > 0)
+                changes = true;
+            
             //desactivamos todas las tiles de la tuberia           
             while (_flows[_flowsIndex].Count > 0)
             {
@@ -281,6 +306,7 @@ namespace FlowFree
             }
             checkPipes();
             checkFlows();
+            
         }
 
         /// <summary>
@@ -517,7 +543,7 @@ namespace FlowFree
                 deactivateByColor(dir);
             }
             checkFlows();
-
+            changes = true;
         }
 
 
@@ -545,6 +571,7 @@ namespace FlowFree
                         break;
                     i++;
                 }
+                changes = true;
                 _flowsIndex = i;
                 bool deActivate = false;
                 // Compare positions
