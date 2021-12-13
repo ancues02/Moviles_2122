@@ -36,7 +36,6 @@ namespace FlowFree
         private Logic.Map map;
 
         //los caminos que hay en el tablero durante el juego
-        //cada fila guarda un flow diferente. Siempre tienen como minimo el incio y fin de un flow
         private List<Tile>[] _flows;
         private int _flowsIndex;//el indice de la tuberia que se esta modificando
 
@@ -60,7 +59,7 @@ namespace FlowFree
 
         private List<Color> colors;
 
-
+        private List<int> _hintIndexs;
 
         private void Start()
         {
@@ -115,6 +114,10 @@ namespace FlowFree
             _tmpFlows = new List<List<Tile>>();
             numPipes = 0;
             numFlows = moves = 0;
+
+            _hintIndexs = new List<int>();
+            for (int i = 0; i < m.FlowNumber; ++i)
+                _hintIndexs.Add(i);
 
             for (int i = 0; i < m.Width; ++i)
             {
@@ -178,33 +181,40 @@ namespace FlowFree
             if (boardPos.x >= 0 && boardPos.x < _width &&
                 boardPos.y >= 0 && boardPos.y < _height)
             {
-
-                Tile activatedTile = _tiles[boardPos.x, boardPos.y];
-                if (activatedTile.getColor() != Color.black)
+                PressTile(boardPos);
+                if (_tiles[boardPos.x, boardPos.y].getColor() != Color.black)
                 {
-                    pressedColor = activatedTile.getColor();
-                    lastConnectedTile = currentTile = activatedTile;
-                    _flowsIndex = getColorIndex(currentTile.getColor());
-                    if (currentTile.getIsMain())
-                    {
-                        deactivateMain();
-                        //_flows[_flowsIndex].Add(currentTile);
-                    }
-                    else
-                    {
-                        //desactivar el circulo pequenio
-                        int lastInd = _flows[_flowsIndex].Count - 1;
-                        _flows[_flowsIndex][lastInd].SmallCircleSetActive(false);
-                        
-                        //si no eres el final, desactivar el resto
-                        if (_flows[_flowsIndex][lastInd] != activatedTile)
-                            deactivateItSelf(Logic.Directions.None);
-                    }
-
                     pointer.transform.position = new Vector3(pos.x, pos.y, -2);
                     pointer.enabled = true;
                     pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
                 }
+            }
+        }
+
+        // Presiona una tile específica
+        void PressTile(Vector2Int boardPos)
+        {
+            Tile activatedTile = _tiles[boardPos.x, boardPos.y];
+            if (activatedTile.getColor() != Color.black)
+            {
+                pressedColor = activatedTile.getColor();
+                lastConnectedTile = currentTile = activatedTile;
+                _flowsIndex = getColorIndex(currentTile.getColor());
+                if (currentTile.getIsMain())
+                {
+                    deactivateMain();
+                    //_flows[_flowsIndex].Add(currentTile);
+                }
+                else
+                {
+                    //desactivar el circulo pequenio
+                    int lastInd = _flows[_flowsIndex].Count - 1;
+                    _flows[_flowsIndex][lastInd].SmallCircleSetActive(false);
+
+                    //si no eres el final, desactivar el resto
+                    if (_flows[_flowsIndex][lastInd] != activatedTile)
+                        deactivateItSelf(Logic.Directions.None);
+                }     
             }
         }
 
@@ -254,12 +264,17 @@ namespace FlowFree
                 //if (!_tiles[boardPos.y, boardPos.x].getIsMain() ||
                 //    (_tiles[boardPos.y, boardPos.x].getIsMain() &&
                 //    _tiles[boardPos.y, boardPos.x].getColor() == pressedColor)) 
-
-                currentTile = _tiles[boardPos.x, boardPos.y];
+                DragTile(boardPos);
                 pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
             }
             else pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.25f);
             pointer.transform.position = new Vector3(pos.x, pos.y, -2);
+        }
+
+        // Hace drag sobre una tile específica
+        void DragTile(Vector2Int boardPos)
+        {
+            currentTile = _tiles[boardPos.x, boardPos.y];
         }
 
         private Vector2Int getBoardTile(Vector2 pos)
@@ -688,7 +703,32 @@ namespace FlowFree
 
         public void doHint()
         {
-            Debug.Log("PISTA");
+            if (GameManager.getInstance().useHint())
+            {
+                int index = _hintIndexs[Random.Range(0, _hintIndexs.Count)]; // Color/flow aleatorio
+                _hintIndexs.Remove(index);
+
+                if (_flows[index].Count > 0)
+                {
+                    Vector2Int iniPos = _flows[index][0].getBoardPos();
+                    Vector2Int finPos = _flows[index][_flows[index].Count - 1].getBoardPos();
+                    PressTile(iniPos);
+                    PressTile(finPos);
+                }
+
+                PressTile(map.Flows[index].flowPoints[0]);
+
+                for (int i = 1; i < map.Flows[index].flowPoints.Count; ++i)
+                {
+                    DragTile(map.Flows[index].flowPoints[i]);
+                    ProcessTileChange();
+                }
+
+                ReleaseInput(new Vector2(0, 0));
+
+                _flows[index][0].childrens[5].SetActive(true);
+                _flows[index][_flows[index].Count - 1].childrens[5].SetActive(true);
+            }
         }
     }
 

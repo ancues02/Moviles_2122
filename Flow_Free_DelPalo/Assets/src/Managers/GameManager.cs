@@ -30,6 +30,8 @@ namespace FlowFree
         public int PackIndex;
         public int Level;
 
+        private int numHints = 3;
+
         private void Awake()
         {        
             if (Testing)
@@ -105,6 +107,7 @@ namespace FlowFree
         {
             return selectedLevel + 1 < selectedLevelPack.Maps.Length;
         }
+
         public void nextLevel()
         {
             selectedLevel = Mathf.Clamp(selectedLevel + 1, 0, selectedLevelPack.Maps.Length -1);
@@ -114,6 +117,7 @@ namespace FlowFree
         {
             return selectedLevel - 1 >= 0;
         }
+
         public void prevLevel()
         {
            
@@ -128,6 +132,20 @@ namespace FlowFree
         {
             setLevelPack(categoryIndex, packIndex);
             setSelectedLevel(level);
+        }
+
+        public bool useHint()
+        {
+            bool ret = false;
+
+            if(numHints > 0)
+            {
+                ret = true;
+                numHints--;
+                // Reescribe número de hints en archivo o algo
+            }
+
+            return ret;
         }
     }
 }

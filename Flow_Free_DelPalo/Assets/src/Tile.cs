@@ -228,6 +228,7 @@ namespace FlowFree
             if(!isMain)
                 tileColor = Color.black;
             childrens[4].SetActive(false);
+            //childrens[5].SetActive(false);
             inIndex = outIndex = -1;
         }
 
