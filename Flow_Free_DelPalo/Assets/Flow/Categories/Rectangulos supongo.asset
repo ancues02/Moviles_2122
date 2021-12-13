@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62e5cb92d3b892140af77d79b00e7775, type: 3}
+  m_Name: Rectangulos supongo
+  m_EditorClassIdentifier: 
+  categoryName: rectangulos supongo
+  categoryColor: {r: 0, g: 1, b: 0.3887062, a: 1}
+  packs:
+  - {fileID: 11400000, guid: 819233297e77a2f4f9dbbae596df06bb, type: 2}
