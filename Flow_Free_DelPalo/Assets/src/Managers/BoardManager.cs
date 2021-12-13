@@ -189,7 +189,12 @@ namespace FlowFree
                     }
                     else
                     {
-                        if (_flows[_flowsIndex][_flows[_flowsIndex].Count - 1] != activatedTile)
+                        //desactivar el circulo pequenio
+                        int lastInd = _flows[_flowsIndex].Count - 1;
+                        _flows[_flowsIndex][lastInd].SmallCircleSetActive(false);
+                        
+                        //si no eres el final, desactivar el resto
+                        if (_flows[_flowsIndex][lastInd] != activatedTile)
                             deactivateItSelf(Logic.Directions.None);
                     }
                 }
@@ -208,6 +213,11 @@ namespace FlowFree
             cutColor = pressedColor = Color.black;
             if (_flows[_flowsIndex].Count == 1)
                 _flows[_flowsIndex].RemoveAt(0);
+
+            if (!currentTile.getIsMain())
+            {
+                currentTile.SmallCircleSetActive(true);
+            }
 
             // quitar informacion de tuberias cortadas
             while (_tmpFlows.Count != 0)
@@ -309,6 +319,7 @@ namespace FlowFree
             }
             List<Tile> tmpList = new List<Tile>();
 
+            //copiar el estado de ese flow a la lista de flows cortados para poder restaurar su estado
             for (int i = 0; i < _flows[ind].Count; ++i)
             {
                 Tile t = _flows[ind][i];
@@ -322,6 +333,7 @@ namespace FlowFree
                     if (i + 1 < _flows[ind].Count)
                         outInd = (_flows[ind][i + 1].inIndex + 2) % 4;
                     tmp.ActiveInOut((tmpList[tmpList.Count - 1].outIndex + 2) % 4, outInd, tmpList[tmpList.Count - 1].getColor());
+                    
                 }
                 tmpList.Add(tmp);
             }
@@ -390,6 +402,7 @@ namespace FlowFree
                 }
                 _flows[ind][_flows[ind].Count - 1].DeactiveOut();
             }
+            _flows[ind][_flows[ind].Count - 1].SmallCircleSetActive(true);
 
 
             _flows[_flowsIndex].Add(currentTile);
@@ -403,7 +416,7 @@ namespace FlowFree
         /// Reactiva un camino que se habia cortado durante ese mismo movimiento
         /// </summary>
         /// <param name="toCheck"></param>
-        private void reFlow(List<Tile> toCheck)
+        private void ReactivateFlow(List<Tile> toCheck)
         {
             for (int i = _tmpFlows.Count - 1; i >= 0; --i)
             {
@@ -436,15 +449,14 @@ namespace FlowFree
                                 break;
                             }
                         }
-
-
-
+                        _flows[ind][_flows[ind].Count - 1].SmallCircleSetActive(true);
                         break;
                     }
 
                 }
 
             }
+
         }
 
         /// <summary>
@@ -466,7 +478,7 @@ namespace FlowFree
             if (dir != Logic.Directions.None)
             {
                 toCheck.Reverse();
-                reFlow(toCheck);
+                ReactivateFlow(toCheck);
             }
 
             if (!_flows[_flowsIndex][index].getIsMain())
