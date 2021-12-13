@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a53d842ff84f84e8c2b771089ad179, type: 3}
+  m_Name: TestPack_2
+  m_EditorClassIdentifier: 
+  packName: Test Pack 2
+  maps: {fileID: 4900000, guid: 24450abb1ac727a48b7a4d57982d2242, type: 3}
+  pages:
+  - name: facil
+    color: {r: 0, g: 0.018627167, b: 1, a: 1}
+    blocked: 0
+  - name: medio
+    color: {r: 0.27058828, g: 0.39439687, b: 1, a: 1}
+    blocked: 0
+  - name: dificil
+    color: {r: 0.46274507, g: 0.637902, b: 0.99215686, a: 1}
+    blocked: 0

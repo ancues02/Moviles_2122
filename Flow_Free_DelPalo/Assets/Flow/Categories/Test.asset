@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62e5cb92d3b892140af77d79b00e7775, type: 3}
-  m_Name: Intro
+  m_Name: Test
   m_EditorClassIdentifier: 
-  categoryName: Intro
-  categoryColor: {r: 0, g: 0.6415094, b: 0.2367769, a: 1}
+  categoryName: Test
+  categoryColor: {r: 0.9433962, g: 0.4227483, b: 0.90576285, a: 1}
   packs:
-  - {fileID: 11400000, guid: 152315fb51ad7cf4681d4fb50f7c6cb3, type: 2}
+  - {fileID: 11400000, guid: 3e12d256efd1a7445a117d3136c47008, type: 2}
+  - {fileID: 11400000, guid: adc7b05e66ae534469a89cb9acf919b3, type: 2}
+  - {fileID: 11400000, guid: 457bf3a84d9feab4eab7fce79b6c01a0, type: 2}
