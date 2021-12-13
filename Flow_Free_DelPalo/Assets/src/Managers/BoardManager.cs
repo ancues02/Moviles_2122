@@ -253,6 +253,30 @@ namespace FlowFree
             }
 
             pointer.enabled = false;
+
+            if (checkIfHintedFlow(_flowsIndex))
+                putStars(_flowsIndex, true);
+        }
+
+        // Mira si es uno en el que se ha hecho una pista
+        bool checkIfHintedFlow(int flowsindex)
+        {
+            bool wasHinted = !_hintIndexs.Contains(flowsindex);
+            bool isCorrect = _flows[flowsindex].Count == map.Flows[flowsindex].flowPoints.Count;
+            int i = 0;
+            while (isCorrect && i < _flows[flowsindex].Count)
+            {
+                isCorrect = map.Flows[flowsindex].flowPoints.Contains(_flows[flowsindex][i].getBoardPos());
+                ++i;
+            }
+            return wasHinted && isCorrect;
+        }
+
+        // Pone o no estrellas en los extremos main
+        void putStars(int flowsindex, bool toggle)
+        {
+            if(_flows[flowsindex][0].getIsMain()) _flows[flowsindex][0].childrens[5].SetActive(toggle);
+            if(_flows[flowsindex][_flows[flowsindex].Count - 1].getIsMain()) _flows[flowsindex][_flows[flowsindex].Count - 1].childrens[5].SetActive(toggle);
         }
 
         void DragInput(Vector2 pos)
@@ -371,8 +395,6 @@ namespace FlowFree
             }
 
             _tmpFlows.Add(tmpList);
-
-
         }
 
         /// <summary>
@@ -532,7 +554,6 @@ namespace FlowFree
                 deactivateByColor(dir);
             }
             checkFlows();
-
         }
 
 
@@ -725,9 +746,6 @@ namespace FlowFree
                 }
 
                 ReleaseInput(new Vector2(0, 0));
-
-                _flows[index][0].childrens[5].SetActive(true);
-                _flows[index][_flows[index].Count - 1].childrens[5].SetActive(true);
             }
         }
     }
