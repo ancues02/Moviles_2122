@@ -112,45 +112,14 @@ namespace FlowFree
         }
 
 
-        // Comprueba si tiene que desactivar algun camino por cambio de color en tile
-        // en caso afirmativo, lo desactiva
-        // Recibe por parametro el camino que ha sido activado en ese momento
-        private bool checkDifferentColor(SpriteRenderer SpriteR)
-        {
-            bool change = false;
-            foreach(SpriteRenderer sR in childrensPaths)
-            {
-                if(sR != SpriteR)
-                {
-                    if(sR.color != Color.black && sR.color != SpriteR.color)
-                    {
-                        sR.enabled = false;
-                        change = true;
-                    }
-                } 
-            }
-            return change;
-        }
-
-        // Comprueba si tiene que desactivar algun camino por tener varios caminos activos
-        // en caso afirmativo, lo desactiva
-        // Recibe por parametro el camino que ha sido activado en ese momento
-        private bool checkManyPaths()
-        {
-            int pathCont = 0;
-            foreach (SpriteRenderer sR in childrensPaths)
-            {
-                if (sR.enabled)
-                    pathCont++;
-            }
-            return pathCont>2 /*|| isMain && pathCont > 1*/;
-        }
-
-        // Activa un camino en funcion la direccion que le pasan
-        // Devuelve true si ha tenido que desactivar algun camino
+        /// <summary>
+        /// Activa un camino en funcion la direccion que le pasan
+        /// </summary>
+        /// <param name="dir"> la direccion a la que se quiere activar el camino</param>
+        /// <param name="c"> el color con el que se mueve</param>
+        /// <returns>Devuelve true si ha tenido que desactivar algun camino</returns>
         private bool active(Logic.Directions dir, Color c)
         {
-            
             bool fail = false;
             switch (dir)
             {
@@ -237,12 +206,13 @@ namespace FlowFree
                     break;
                 
             }
-
             return  fail;
         }
 
-        // Desactiva todos los caminos que tiene
-        public void deactiveAll()
+        /// <summary>
+        /// Desactiva todos los caminos que tiene
+        /// </summary>        
+        public void DeactiveAll()
         {
             foreach (SpriteRenderer sp in childrensPaths)
             {
@@ -254,8 +224,11 @@ namespace FlowFree
             inIndex = outIndex = -1;
         }
 
-        // Desactiva todos los caminos que tiene menos el in
-        public void notDeactiveIn()
+
+        /// <summary>
+        /// Desactiva todos los caminos que tiene menos el de entrada
+        /// </summary>
+        public void NotDeactiveIn()
         {
             for(int i = 0; i < childrensPaths.Length; ++i)
             {
@@ -269,52 +242,58 @@ namespace FlowFree
             outIndex = -1;
         }
 
-        public void deactiveIn()
+        /// <summary>
+        /// Desactiva el camino de entrada
+        /// </summary>
+        public void DeactiveIn()
         {
-
             if (inIndex != -1)
             {
                 childrensPaths[inIndex].enabled = false;
                 childrensPaths[inIndex].color = Color.black;
+                inIndex = -1;
             }
-            inIndex = -1;
-
         }
 
-        public void activeInOut(int inIndex_, int outIndex_, Color c)
+        /// <summary>
+        /// Activa los caminos de entrada y salida y pone el color al tile
+        /// </summary>
+        /// <param name="inIndex_"> el indice de entrada</param>
+        /// <param name="outIndex_"> el indice de salida</param>
+        /// <param name="c"> el color que se quiere poner</param>
+        public void ActiveInOut(int inIndex_, int outIndex_, Color c)
         {
             tileColor = c;
-            if (inIndex_ != -1)
+            if (inIndex_ != -1 && inIndex_ < childrensPaths.Length)
             {
                 inIndex = inIndex_;
-
                 childrensPaths[inIndex].enabled = true;
                 childrensPaths[inIndex].color = tileColor;
             }
 
-            if (outIndex_ != -1)
+            if (outIndex_ != -1 && outIndex_ < childrensPaths.Length)
             {
                 outIndex = outIndex_;
-
                 childrensPaths[outIndex].enabled = true;
                 childrensPaths[outIndex].color = tileColor;
-            }
-            
-
-        }
-
-        public void swap()
-        {
-            if (!isMain)
-            {
-                int tmp = inIndex;
-                inIndex = outIndex;
-                outIndex = tmp;
             }            
-            
+
         }
 
-        public void deactiveOut()
+        /// <summary>
+        /// Intercambia sus valores de entrada y salida de camino
+        /// </summary>
+        public void Swap()
+        {            
+            int tmp = inIndex;
+            inIndex = outIndex;
+            outIndex = tmp;                    
+        }
+
+        /// <summary>
+        /// Desactiva el camino de salida
+        /// </summary>
+        public void DeactiveOut()
         {
             if (outIndex != -1)
             {
@@ -325,35 +304,35 @@ namespace FlowFree
 
         }
 
-        /// <summary>
-        /// Desactiva todos los caminos menos el que recibe
-        /// </summary>
-        public void notDeactivateAll(Logic.Directions dir)
-        {
-            SpriteRenderer SpriteR = null;
-            switch (dir)
-            {
-                case Logic.Directions.Right:
-                    SpriteR = childrensPaths[0];
-                    break;
+        ///// <summary>
+        ///// Desactiva todos los caminos menos el que recibe
+        ///// </summary>
+        //public void notDeactivateAll(Logic.Directions dir)
+        //{
+        //    SpriteRenderer SpriteR = null;
+        //    switch (dir)
+        //    {
+        //        case Logic.Directions.Right:
+        //            SpriteR = childrensPaths[0];
+        //            break;
 
-                case Logic.Directions.Down:
-                    SpriteR = childrensPaths[1];
-                    break;
+        //        case Logic.Directions.Down:
+        //            SpriteR = childrensPaths[1];
+        //            break;
 
-                case Logic.Directions.Left:
-                    SpriteR = childrensPaths[2];
-                    break;
+        //        case Logic.Directions.Left:
+        //            SpriteR = childrensPaths[2];
+        //            break;
 
-                case Logic.Directions.Up:
-                    SpriteR = childrensPaths[3];
-                    break;
+        //        case Logic.Directions.Up:
+        //            SpriteR = childrensPaths[3];
+        //            break;
 
-            }
-            foreach (SpriteRenderer sp in childrensPaths)
-                if(sp != SpriteR)
-                    sp.enabled = false;
-        }
+        //    }
+        //    foreach (SpriteRenderer sp in childrensPaths)
+        //        if(sp != SpriteR)
+        //            sp.enabled = false;
+        //}
 
         // Desactiva en esa direccion
         private void deactive(Logic.Directions dir)
@@ -400,7 +379,7 @@ namespace FlowFree
 
         public void resetTile(int inIndex_, int outIndex_, Color c)
         {
-            deactiveAll();
+            DeactiveAll();
             tileColor = c;
             inIndex = inIndex_;
             if (inIndex != -1)
