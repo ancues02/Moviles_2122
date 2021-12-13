@@ -919,3 +919,5 @@ MonoBehaviour:
   - {fileID: 170498296}
   - {fileID: 881654463}
   - {fileID: 150108498}
+  inIndex: -1
+  outIndex: -1
