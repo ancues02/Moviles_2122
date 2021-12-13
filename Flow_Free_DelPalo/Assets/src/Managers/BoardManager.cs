@@ -10,6 +10,8 @@ namespace FlowFree
         public GameObject TilePrefab;
         public LevelManager lvlManager;
 
+        public SpriteRenderer pointer;
+
         [Tooltip("El texto del canvas de flows")]
         public Text flowText;
 
@@ -192,6 +194,10 @@ namespace FlowFree
                         if (_flows[_flowsIndex][_flows[_flowsIndex].Count - 1] != activatedTile)
                             deactivateItSelf(Logic.Directions.None);
                     }
+
+                    pointer.transform.position = pos;
+                    pointer.enabled = true;
+                    pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
                 }
             }
         }
@@ -218,6 +224,8 @@ namespace FlowFree
                 win = true;
                 winPanel.SetActive(true);
             }
+
+            pointer.enabled = false;
         }
 
         void DragInput(Vector2 pos)
@@ -231,8 +239,10 @@ namespace FlowFree
                 //    _tiles[boardPos.y, boardPos.x].getColor() == pressedColor)) 
 
                 currentTile = _tiles[boardPos.x, boardPos.y];
-
+                pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
             }
+            else pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.25f);
+            pointer.transform.position = pos;
         }
 
         private Vector2Int getBoardTile(Vector2 pos)
