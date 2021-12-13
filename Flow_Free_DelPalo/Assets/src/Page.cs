@@ -1,21 +1,16 @@
-﻿namespace FlowFree
+﻿using UnityEngine;
+
+namespace FlowFree
 {
     /**
      * Estructura auxiliar configurar las 
-     * paginas de niveles  desde los lotes
+     * paginas de niveles desde los lotes
      */
     [System.Serializable]
     public struct Page
     {
         public string name;
+        public Color color;
         public bool blocked;
-    }
-
-    // El nº de niveles en el lote es siempre multiplo de 30,
-    // cada pagina tiene 30 tiles.
-    struct LevelPage
-    {
-        public Page pageAttributes;
-        public LevelTile[] tiles;
     }
 }

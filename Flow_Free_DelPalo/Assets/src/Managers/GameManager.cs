@@ -17,7 +17,6 @@ namespace FlowFree
         public MenuManager menuManager;
         public LevelSelectorManager lvlSelectorManager;
         public LevelManager lvlManager;
-        
 
         static GameManager _instance;
 
@@ -53,15 +52,19 @@ namespace FlowFree
             }
 
             // Iniciamos los managers si toca
+            if (_instance.menuManager)
+                _instance.menuManager.setCategories(_instance.categories);
+
             if (_instance.lvlSelectorManager)
-                lvlSelectorManager.setPack(selectedLevelPack);
+                _instance.lvlSelectorManager.setPack(_instance.selectedLevelPack);
 
             if (_instance.lvlManager)
             {
                 if (_instance.selectedLevelPack.Valid)
                 {
-                    lvlManager.board.setFlowColors(_instance.theme.colors);
-                    lvlManager.board.setMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
+                    _instance.lvlManager.board.setFlowColors(_instance.theme.colors);
+                    _instance.lvlManager.board.getCameraSize();
+                    _instance.lvlManager.board.setMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
                 }
             }
         }
@@ -92,7 +95,6 @@ namespace FlowFree
                 Debug.Log("Lote cargado correctamente");
             
         }
-
 
         public void setSelectedLevel(int levelIndex)
         {

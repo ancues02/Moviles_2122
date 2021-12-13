@@ -48,8 +48,8 @@ namespace FlowFree.Logic
         Vector2Int parsePoint(int pos)
         {
             Vector2Int p = new Vector2Int();
-            p.x = pos / Width;
-            p.y = pos % Height;
+            p.x = pos % Width;
+            p.y = pos / Width;
             return p;
         }
 
@@ -85,17 +85,16 @@ namespace FlowFree.Logic
                 flow.start = pos;
 
                 //calcular el recorrido de la tuberia
-                for (int j = 1; j < flowPoints.Length-1; ++j) {//recorre cada flow
+                for (int j = 1; j < flowPoints.Length - 1; ++j) {//recorre cada flow
                     tmp = int.Parse(flowPoints[j]);
                     flow.flowPoints.Add(parsePoint(tmp));
                 }
                 //fin de la tuberia
-                tmp = int.Parse(flowPoints[flowPoints.Length-1]);
+                tmp = int.Parse(flowPoints[flowPoints.Length - 1]);
                 pos = parsePoint(tmp);
                 flow.flowPoints.Add(pos);
                 flow.end = pos;
-                flows.Add(flow);//añadir el nuevo flow con todas sus posiciones en el mapa
-                
+                flows.Add(flow);    //añadir el nuevo flow con todas sus posiciones en el mapa              
             }
             return true;
         }

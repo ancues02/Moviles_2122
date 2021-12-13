@@ -6,38 +6,24 @@ namespace FlowFree
 {
     public class MenuManager : MonoBehaviour
     {
-        // Prefab del display de categorias
-        public GameObject CategoryDisplayPref;
+        ///<summary>
+        /// Prefab del display de categorias
+        ///</summary>        
+        public GameObject categoryDisplayPref;
 
-        // Objeto del canvas que contendra los displays de las categorias
-        public GameObject Display;
-
-        public int categoryTest;
-        public int packTest;
-
-        CategoryDisplay[] categoryDisplays;
+        ///<summary>
+        /// Objeto del canvas que contendra los displays de las categorias
+        ///</summary>
+        public Transform display;
         public void setCategories(Category[] categories)
         {
             GameObject categoryObj;
             CategoryDisplay categoryDplay;
-            foreach(Category cat in categories)
+            for (int i = 0; i < categories.Length; i++)
             {
-                categoryObj = Instantiate(CategoryDisplayPref, Vector2.zero, Quaternion.identity, Display.transform);
+                categoryObj = Instantiate(categoryDisplayPref, display);
                 categoryDplay = categoryObj.GetComponent<CategoryDisplay>();
-                categoryDplay.setAttributes(cat);
-            }
-        }
-        private void Update()
-        {
-            // Gestiona la seleccion de categoria y pack dentro de la categoria
-            // ademas del scroll vertical
-
-            // Para probar cambios de escenas
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                GameManager gm = GameManager.getInstance();
-                gm.setLevelPack(categoryTest, packTest);
-                gm.ChangeScene("LevelSelectionTest");
+                categoryDplay.setAttributes(categories[i], i);
             }
         }
     }

@@ -12,16 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a53d842ff84f84e8c2b771089ad179, type: 3}
   m_Name: ClassicPack
   m_EditorClassIdentifier: 
-  packName: ClassicPack
-  maps: {fileID: 4900000, guid: 37c2996d66f05134396ab42db8a58a1e, type: 3}
+  packName: Classic Pack
+  maps: {fileID: 4900000, guid: c6bce27ac74b64540bdf3f19e3eadab2, type: 3}
   pages:
   - name: "5x5 - f\xE1cil"
+    color: {r: 1, g: 0, b: 0, a: 1}
     blocked: 0
   - name: 6x6
+    color: {r: 1, g: 0.8263446, b: 0, a: 1}
     blocked: 0
   - name: 7x7 - medio
+    color: {r: 0, g: 0.86242104, b: 1, a: 1}
     blocked: 0
   - name: 8x8
+    color: {r: 0.27545047, g: 0.6509434, b: 0, a: 1}
     blocked: 0
   - name: "9x9 - dif\xEDcil"
+    color: {r: 0.4563582, g: 0, b: 0.764151, a: 1}
     blocked: 0

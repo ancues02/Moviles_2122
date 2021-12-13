@@ -1,38 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-//pasar al gamermanagar el nivel que se va a jugar
-//y el gamanager se lo pasa a boardmanager
-//
-//lo mismo con la categoria para llegar hasta aqui.
+
 namespace FlowFree
 {
     public class LevelSelectorManager : MonoBehaviour
     {
-        public int testLevel;
+        ///<summary>
+        /// Prefab del display de la pagina de niveles
+        ///</summary>
+        public GameObject levelPagePref;
 
-        const int LEVELS_PER_PAGE = 30;
-        LevelPage[] pages;  // el nº de paginas depende del nº de niveles del lote
-        
-        LevelPack pack;
+        ///<summary>
+        /// Objeto del canvas que contendra los displays de las paginas
+        ///</summary>
+        public Transform display;
 
-        private void Update()
+        public Text packText;
+
+        ///<summary>
+        /// Establece las paginas segun el lote correspondiente
+        ///</summary>
+        public void setPack(LevelPack pack)
         {
-            //gestionar la seleccion del nivel y cambiar entre paginas
-
-            // Para probar cambios de escenas
-            if (Input.GetKeyDown(KeyCode.Space))
+            packText.text = pack.packName;
+            PackDisplay packDplay;
+            for (int i = 0; i < pack.pages.Length; i++)
             {
-                GameManager gm = GameManager.getInstance();
-                gm.setSelectedLevel(testLevel);
-                gm.ChangeScene("GameBoardTest");
+                packDplay = Instantiate(levelPagePref, display).GetComponent<PackDisplay>();
+                packDplay.setAttributes(pack, i);
             }
-        }
-
-        public void setPack(LevelPack p)
-        {
-            pack = p;
         }
 
     }
