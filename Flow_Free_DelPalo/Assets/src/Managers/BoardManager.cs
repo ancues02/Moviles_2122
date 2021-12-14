@@ -143,7 +143,7 @@ namespace FlowFree
             {
                 Vector2Int A = new Vector2Int(pair.x % m.Width, pair.x / m.Width);
                 Vector2Int B = new Vector2Int(pair.y % m.Width, pair.y / m.Width);
-                if (A.x == B.x - 1 && B.y == B.y) //A|B
+                if (A.x == B.x - 1 && A.y == B.y) //A|B
                 {
                     _tiles[A.x, A.y].setActiveWall(Logic.Directions.Right);
                     _tiles[B.x, B.y].setActiveWall(Logic.Directions.Left);
@@ -165,20 +165,17 @@ namespace FlowFree
                 }
             }
 
-            if (m.isBordered())
+            foreach(Tile t in _tiles)
             {
-                foreach(Tile t in _tiles)
-                {
-                    Vector2Int tPos = t.getBoardPos();
-                    if(!t.getIsVoid() && (tPos.x - 1 < 0 || (tPos.x - 1 >= 0 && _tiles[tPos.x - 1, tPos.y].getIsVoid())))
-                        t.setActiveWall(Logic.Directions.Left);
-                    if (!t.getIsVoid() && (tPos.x + 1 >= m.Width || (tPos.x + 1 < m.Width && _tiles[tPos.x + 1, tPos.y].getIsVoid())))
-                        t.setActiveWall(Logic.Directions.Right);
-                    if (!t.getIsVoid() && (tPos.y - 1 < 0 || (tPos.y - 1 >= 0 && _tiles[tPos.x, tPos.y - 1].getIsVoid())))
-                        t.setActiveWall(Logic.Directions.Up);
-                    if (!t.getIsVoid() && (tPos.y + 1 >= m.Height || (tPos.y + 1 < m.Height && _tiles[tPos.x, tPos.y + 1].getIsVoid())))
-                        t.setActiveWall(Logic.Directions.Down);
-                }
+                Vector2Int tPos = t.getBoardPos();
+                if(!t.getIsVoid() && ((tPos.x - 1 < 0 && m.isBordered()) || (tPos.x - 1 >= 0 && _tiles[tPos.x - 1, tPos.y].getIsVoid())))
+                    t.setActiveWall(Logic.Directions.Left);
+                if (!t.getIsVoid() && ((tPos.x + 1 >= m.Width && m.isBordered()) || (tPos.x + 1 < m.Width && _tiles[tPos.x + 1, tPos.y].getIsVoid())))
+                    t.setActiveWall(Logic.Directions.Right);
+                if (!t.getIsVoid() && ((tPos.y - 1 < 0 && m.isBordered()) || (tPos.y - 1 >= 0 && _tiles[tPos.x, tPos.y - 1].getIsVoid())))
+                    t.setActiveWall(Logic.Directions.Up);
+                if (!t.getIsVoid() && ((tPos.y + 1 >= m.Height && m.isBordered()) || (tPos.y + 1 < m.Height && _tiles[tPos.x, tPos.y + 1].getIsVoid())))
+                    t.setActiveWall(Logic.Directions.Down);
             }
 
             totalFlows = map.FlowNumber;
@@ -670,7 +667,6 @@ namespace FlowFree
                 (!currentTile.getIsMain() ||
                 currentTile.getIsMain() && currentTile.getColor() == pressedColor)
                 && lastConnectedTile.getColor() != Color.black
-                && !currentTile.getIsVoid()
                 && !isThereWall(lastConnectedTile, currentTile);
         }
 
@@ -681,13 +677,13 @@ namespace FlowFree
             Vector2Int A = AT.getBoardPos();
             Vector2Int B = BT.getBoardPos();
             if (A.x == B.x - 1 && B.y == B.y) //A|B
-                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Right) && _tiles[B.x, B.y].getActiveWall(Logic.Directions.Left);
+                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Right) || _tiles[B.x, B.y].getActiveWall(Logic.Directions.Left);
             else if (A.x == B.x + 1 && A.y == B.y)  //B|A
-                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Left) && _tiles[B.x, B.y].getActiveWall(Logic.Directions.Right);
+                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Left) || _tiles[B.x, B.y].getActiveWall(Logic.Directions.Right);
             else if (A.y == B.y + 1 && A.x == B.x)  //B/A
-                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Up) && _tiles[B.x, B.y].getActiveWall(Logic.Directions.Down);
+                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Up) || _tiles[B.x, B.y].getActiveWall(Logic.Directions.Down);
             else if (A.y == B.y - 1 && A.x == B.x)  //A/B
-                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Down) && _tiles[B.x, B.y].getActiveWall(Logic.Directions.Up);
+                ret = _tiles[A.x, A.y].getActiveWall(Logic.Directions.Down) || _tiles[B.x, B.y].getActiveWall(Logic.Directions.Up);
 
             return ret;
         }
