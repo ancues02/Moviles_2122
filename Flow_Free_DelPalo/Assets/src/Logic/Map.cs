@@ -126,7 +126,7 @@ namespace FlowFree.Logic
             else
             {
                 width = int.Parse(attr[0]);
-                height = int.Parse(attr[1]);
+                height = int.Parse(attr[1].Split('+')[0]);
             }
         }
 

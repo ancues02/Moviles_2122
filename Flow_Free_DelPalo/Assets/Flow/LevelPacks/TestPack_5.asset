@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 88a53d842ff84f84e8c2b771089ad179, type: 3}
-  m_Name: TestPack_4
+  m_Name: TestPack_5
   m_EditorClassIdentifier: 
-  packName: Levels Test
-  maps: {fileID: 4900000, guid: cd1d917a8f4e3a145b084a0e634b6c8f, type: 3}
+  packName: Hourglass
+  maps: {fileID: 4900000, guid: 6a539e46f3b6e9947b33d29f56ddfcbb, type: 3}
   pages:
-  - name: El levelpack_test
-    color: {r: 0.48661423, g: 0, b: 1, a: 1}
+  - name: "El hourglass en cuesti\xF3n"
+    color: {r: 0.6063456, g: 0.5518868, b: 1, a: 1}

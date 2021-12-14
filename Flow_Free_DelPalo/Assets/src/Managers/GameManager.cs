@@ -30,7 +30,7 @@ namespace FlowFree
         public int PackIndex;
         public int Level;
 
-        private int numHints = 3;
+        private int numHints = 1000;
 
         private void Awake()
         {        

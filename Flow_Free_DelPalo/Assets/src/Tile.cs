@@ -112,16 +112,6 @@ namespace FlowFree
         }
 
         // Activa la linea de arriba del tile
-        public void activeTop()
-        {
-            childrens[3].SetActive(true);
-        }
-
-        // Activa la linea de la izquierda del tile
-        public void activeLeftLimit()
-        {
-            childrens[2].SetActive(true);
-        }
 
         public void setActiveWall(Logic.Directions dir)
         {
@@ -142,91 +132,26 @@ namespace FlowFree
         private bool active(Logic.Directions dir, Color c)
         {
             bool fail = false;
-            switch (dir)
+            childrensPaths[(int)dir].enabled = true;
+            if (c != tileColor)
             {
-                case Logic.Directions.Right:
-                    childrensPaths[0].enabled = true;
-                    if (c != tileColor)
-                    {
-                        inIndex = 0;
-                        if (tileColor != Color.black)
-                            fail = true;
-                    }
-                    else if (!isMain)
-                    {
-                        fail = true;
-                    }
-
-                    if (outIndex != -1)
-                        fail = true;
-
-                    if (tileColor != Color.black)
-                        outIndex = 0;
-
-                    childrensPaths[0].color = tileColor = c;
-                    break;
-                
-                case Logic.Directions.Down:
-                    childrensPaths[1].enabled = true;
-                    if (c != tileColor)
-                    {
-                        inIndex = 1;
-                        if (tileColor != Color.black)
-                            fail = true;
-                    }
-                    else if (!isMain)
-                    {
-                        fail = true;
-                    }
-                    if (outIndex != -1)
-                        fail = true;
-                    if (tileColor != Color.black)
-                        outIndex = 1;
-
-                    childrensPaths[1].color = tileColor = c;
-                    break;
-                
-                case Logic.Directions.Left:
-                    childrensPaths[2].enabled = true;
-                    if (c != tileColor)
-                    {
-                        inIndex = 2;
-                        if (tileColor != Color.black)
-                            fail = true;
-                    }
-                    else if (!isMain)
-                    {
-                        fail = true;
-                    }
-                    if (outIndex != -1)
-                        fail = true;
-                    if (tileColor != Color.black)
-                        outIndex = 2;
-
-                    childrensPaths[2].color = tileColor = c;
-                    break;
-                
-                case Logic.Directions.Up:
-                    childrensPaths[3].enabled = true;
-                    if (c != tileColor)
-                    {
-                        inIndex = 3;
-                        if (tileColor != Color.black)
-                            fail = true;
-                    }
-                    else if (!isMain)
-                    {
-                        fail = true;
-                    }
-                    if (outIndex != -1)
-                        fail = true;
-                    if (tileColor != Color.black)
-                        outIndex = 3;
-
-                    childrensPaths[3].color = tileColor = c;
-                    break;
-                
+                inIndex = (int)dir;
+                if (tileColor != Color.black)
+                    fail = true;
             }
+            else if (!isMain)
+            {
+                fail = true;
+            }
+
+            if (outIndex != -1)
+                fail = true;
+
+            if (tileColor != Color.black)
+                outIndex = (int)dir;
+
+            childrensPaths[(int)dir].color = tileColor = c;
+            
             return  fail;
         }
 
@@ -243,7 +168,6 @@ namespace FlowFree
             if(!isMain)
                 tileColor = Color.black;
             childrens[4].SetActive(false);
-            //childrens[5].SetActive(false);
             inIndex = outIndex = -1;
         }
 
@@ -360,25 +284,7 @@ namespace FlowFree
         // Desactiva en esa direccion
         private void deactive(Logic.Directions dir)
         {
-            switch (dir)
-            {
-                case Logic.Directions.Right:
-                    childrensPaths[0].enabled = false;
-                    break;
-
-                case Logic.Directions.Down:
-                    childrensPaths[1].enabled = false;
-                    break;
-
-                case Logic.Directions.Left:
-                    childrensPaths[2].enabled = false;
-                    break;
-
-                case Logic.Directions.Up:
-                    childrensPaths[3].enabled = false;
-                    break;
-
-            }
+            childrensPaths[(int)dir].enabled = false;
         }
 
 

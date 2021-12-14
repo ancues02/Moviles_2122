@@ -106,9 +106,9 @@ namespace FlowFree
                     _availableSize = new Vector2(_cameraSize.y * mapAspect, _cameraSize.y);
             else
                 if (mapAspect >= camAspect)
-                _availableSize = new Vector2(_cameraSize.x, _cameraSize.x / mapAspect);
-            else
-                _availableSize = new Vector2(_cameraSize.y * mapAspect, _cameraSize.y);
+                    _availableSize = new Vector2(_cameraSize.x, _cameraSize.x / mapAspect);
+                else
+                    _availableSize = new Vector2(_cameraSize.y * mapAspect, _cameraSize.y);
 
             _baseRatio = new Vector2(_availableSize.x / (float)_width, _availableSize.y / (float)_height);
             _flows = new List<Tile>[m.FlowNumber];
@@ -130,11 +130,6 @@ namespace FlowFree
                     _tiles[i, j].setVisible(false);
                     _tiles[i, j].setBoardPos(new Vector2Int(i, j));
                     _tiles[i, j].ChangeColor(Color.black);
-                    if (i == 0)
-                        _tiles[i, j].activeLeftLimit();
-
-                    if (j == 0)
-                        _tiles[i, j].activeTop();
                 }
             }
 
@@ -825,7 +820,7 @@ namespace FlowFree
 
         public void doHint()
         {
-            if (GameManager.getInstance().useHint())
+            if (_hintIndexs.Count > 0 && GameManager.getInstance().useHint())
             {
                 int index = _hintIndexs[Random.Range(0, _hintIndexs.Count)]; // Color/flow aleatorio
                 _hintIndexs.Remove(index);
