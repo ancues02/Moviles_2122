@@ -214,5 +214,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   button: {fileID: 1714432204416043178}
-  levelImage: {fileID: 8306506530426865226}
   levelNumberText: {fileID: 237229322134861463}
