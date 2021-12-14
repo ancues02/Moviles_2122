@@ -11,15 +11,15 @@ namespace FlowFree.Logic
          *  
          *  Devuelve false si hay algun error
          */
-        int width = -1, height = -1,//5 = mismo ancho y alto, 5:6 = 5 de ancho y 6 de alto
-            reserved = 0,//siempre es 0
-            levelNumber = -1,// el numero del nivel
-            flowNumber = -1; // numero de flujos
+        int width = -1, height = -1,    //5 = mismo ancho y alto, 5:6 = 5 de ancho y 6 de alto
+            reserved = 0,   //siempre es 0
+            levelNumber = -1,   // el numero del nivel
+            flowNumber = -1;    // numero de flujos
         //opcionales
-        List<int> bridges;//separadas por dos puntos son sus ubicaciones
-        List<int> voids;//separadas por dos puntos son sus ubicaciones
-        List<Vector2Int> walls;//separadas por dos puntos son sus ubicaciones, cada muro viene dado por dos casillas 2|9 
-
+        List<int> bridges;  //separadas por dos puntos son sus ubicaciones
+        List<int> voids;    //separadas por dos puntos son sus ubicaciones
+        List<Vector2Int> walls; //separadas por dos puntos son sus ubicaciones, cada muro viene dado por dos casillas 2|9 
+        bool bordered;
 
         List<Flow> flows;//las tuberias
 
@@ -32,8 +32,6 @@ namespace FlowFree.Logic
         public List<int> Bridges { get => bridges;  }
         public List<int> Voids { get => voids; }
         public List<Vector2Int> Walls { get => walls;  }
-
-
 
         //Tuberia, contiene una lista de puntos que es la solucion a esa tuberia
         //tiene dos puntos, el inicio y el fin
@@ -126,7 +124,9 @@ namespace FlowFree.Logic
             else
             {
                 width = int.Parse(attr[0]);
-                height = int.Parse(attr[1].Split('+')[0]);
+                string[] second = attr[1].Split('+');
+                height = int.Parse(second[0]);
+                bordered = second.Length > 1;
             }
         }
 
@@ -150,6 +150,11 @@ namespace FlowFree.Logic
             }
         }
 
+        // Devuelve si está rodeado de bordes
+        public bool isBordered() 
+        {
+            return bordered;
+        }
 
         //devuelve si es inicio o fin de una tuberia
         public bool IsFlow(int i, int j)

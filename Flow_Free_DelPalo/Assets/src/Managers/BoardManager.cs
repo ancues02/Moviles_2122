@@ -83,7 +83,8 @@ namespace FlowFree
             {
                 float y = Camera.main.orthographicSize * 2;
                 float x = y * Camera.main.aspect;
-                y *= 0.75f;  // Lo de la UI? No sé como vamos a hacerlo
+                x *= 0.99f; // Ligero margen
+                y *= 0.75f; // Lo de la UI? No sé como vamos a hacerlo
                 _cameraSize = new Vector2(x, y);
             }
             else Debug.LogError("No hay cámara, ¿qué esperabas que pasara?");
@@ -161,6 +162,22 @@ namespace FlowFree
                 {
                     _tiles[A.x, A.y].setActiveWall(Logic.Directions.Down);
                     _tiles[B.x, B.y].setActiveWall(Logic.Directions.Up);
+                }
+            }
+
+            if (m.isBordered())
+            {
+                foreach(Tile t in _tiles)
+                {
+                    Vector2Int tPos = t.getBoardPos();
+                    if(!t.getIsVoid() && (tPos.x - 1 < 0 || (tPos.x - 1 >= 0 && _tiles[tPos.x - 1, tPos.y].getIsVoid())))
+                        t.setActiveWall(Logic.Directions.Left);
+                    if (!t.getIsVoid() && (tPos.x + 1 >= m.Width || (tPos.x + 1 < m.Width && _tiles[tPos.x + 1, tPos.y].getIsVoid())))
+                        t.setActiveWall(Logic.Directions.Right);
+                    if (!t.getIsVoid() && (tPos.y - 1 < 0 || (tPos.y - 1 >= 0 && _tiles[tPos.x, tPos.y - 1].getIsVoid())))
+                        t.setActiveWall(Logic.Directions.Up);
+                    if (!t.getIsVoid() && (tPos.y + 1 >= m.Height || (tPos.y + 1 < m.Height && _tiles[tPos.x, tPos.y + 1].getIsVoid())))
+                        t.setActiveWall(Logic.Directions.Down);
                 }
             }
 
@@ -852,6 +869,8 @@ namespace FlowFree
                 }
 
                 ReleaseInput(new Vector2(0, 0));
+                
+                _usingHint = false;
             }
         }
     }
