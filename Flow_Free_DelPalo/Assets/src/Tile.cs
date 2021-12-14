@@ -39,6 +39,9 @@ namespace FlowFree
         [Tooltip("Paredes de tile, deben ser hijos")]
         public GameObject[] childrensWalls;
 
+        [Tooltip("Aniamciones de tile (en corrutinas :D)")]
+        public TileAnimations animations;
+
         //Los indices de los path de entrada o salida
         public int inIndex = -1, outIndex = -1;
 

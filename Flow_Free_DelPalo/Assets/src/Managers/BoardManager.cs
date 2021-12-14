@@ -35,7 +35,6 @@ namespace FlowFree
         private int _width, _height;
         private Logic.Map map;
 
-
         //los caminos que hay en el tablero durante el juego
         private List<Tile>[] _flows;
         private int _flowsIndex;//el indice de la tuberia que se esta modificando
@@ -61,6 +60,7 @@ namespace FlowFree
         private List<Color> colors;
 
         private List<int> _hintIndexs;
+        private bool _usingHint = false;
 
         private void Start()
         {
@@ -237,6 +237,7 @@ namespace FlowFree
                 if (currentTile.getIsMain())
                 {
                     DeactivateMain();
+                    if(!_usingHint) playWiggleOnExtreme(currentTile);
                 }
                 else
                 {
@@ -248,11 +249,19 @@ namespace FlowFree
                     {
                         DeactivateItSelf(Logic.Directions.None);
                         changes = true;
-                        
                     }
                 }
                 
             }
+        }
+
+        void playWiggleOnExtreme(Tile start)
+        {
+            int index = getColorIndex(start.getColor());
+            Vector2Int target = map.Flows[index].start;
+            if (start.getBoardPos() == target) 
+                target = map.Flows[index].end;
+            _tiles[target.x, target.y].animations.Wiggle();
         }
 
         void ReleaseInput(Vector2 pos)
@@ -286,19 +295,26 @@ namespace FlowFree
             while (_tmpFlows.Count != 0)
                 _tmpFlows.RemoveAt(0);
 
-            // comprobar si se ha ganado
-            if (numFlows == totalFlows)
-            {
-                win = true;
-                winPanel.SetActive(true);
-            }
-
-           
             pointer.enabled = false;
 
             // pistas
             if (CheckIfHintedFlow(_flowsIndex))
                 PutStars(_flowsIndex, true);
+
+            if (!_usingHint && _flows[_flowsIndex].Count > 0)
+                if(_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
+                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.Pulse();
+                else
+                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.SmallWiggle();
+
+            // comprobar si se ha ganado
+            if (numFlows == totalFlows)
+            {
+                win = true;
+                winPanel.SetActive(true);
+                foreach (Tile t in _tiles)
+                    if (t.getIsMain()) t.animations.Pulse();
+            }
         }
 
         // Mira si es uno en el que se ha hecho una pista
@@ -748,7 +764,6 @@ namespace FlowFree
                     }
                     lastConnectedTile = currentTile;
                 }
-                //Debug.Log(_flows[_flowsIndex].Count);
                 checkPipes();
             }
 
@@ -758,9 +773,6 @@ namespace FlowFree
         {
             DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             ProcessTileChange();
-
-            //if (currentTile.getIsMain())
-            //    pressedColor = currentTile.getColor();
         }
 
         private void Update()
@@ -824,6 +836,7 @@ namespace FlowFree
             {
                 int index = _hintIndexs[Random.Range(0, _hintIndexs.Count)]; // Color/flow aleatorio
                 _hintIndexs.Remove(index);
+                _usingHint = true;
 
                 if (_flows[index].Count > 0)
                 {
@@ -842,5 +855,4 @@ namespace FlowFree
             }
         }
     }
-
 }
