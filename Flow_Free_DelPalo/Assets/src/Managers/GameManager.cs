@@ -64,9 +64,9 @@ namespace FlowFree
             {
                 if (_instance.selectedLevelPack.Valid)
                 {
-                    _instance.lvlManager.board.setFlowColors(_instance.theme.colors);
-                    _instance.lvlManager.board.getCameraSize();
-                    _instance.lvlManager.board.setMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
+                    _instance.lvlManager.board.SetFlowColors(_instance.theme.colors);
+                    _instance.lvlManager.board.GetCameraSize();
+                    _instance.lvlManager.board.SetMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
                 }
             }
         }

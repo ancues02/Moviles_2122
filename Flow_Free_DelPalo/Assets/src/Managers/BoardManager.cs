@@ -44,8 +44,7 @@ namespace FlowFree
 
         Vector2 vectorOffset;
         Color pressedColor = Color.black,
-            lastPressedColor = Color.black,
-            cutColor = Color.black;
+            lastMoveColor = Color.black;
         Tile currentTile;
         Tile lastConnectedTile;
         bool colorConflict = false;
@@ -78,7 +77,7 @@ namespace FlowFree
             }
         }
 
-        public void getCameraSize()
+        public void GetCameraSize()
         {
             if (Camera.main)
             {
@@ -90,7 +89,7 @@ namespace FlowFree
             else Debug.LogError("No hay cámara, ¿qué esperabas que pasara?");
         }
 
-        public void setMap(Logic.Map m)
+        public void SetMap(Logic.Map m)
         {
             map = m;
             _tiles = new Tile[m.Width, m.Height];
@@ -147,7 +146,7 @@ namespace FlowFree
             flowText.text = "flows: 0/" + totalFlows;
         }
 
-        public void setFlowColors(Color[] cs)
+        public void SetFlowColors(Color[] cs)
         {
             // Cogemos los colores del tema actual
             colors = new List<Color>();
@@ -204,18 +203,21 @@ namespace FlowFree
                 _flowsIndex = getColorIndex(currentTile.getColor());
                 if (currentTile.getIsMain())
                 {
-                    deactivateMain();
+                    DeactivateMain();
                     //_flows[_flowsIndex].Add(currentTile);
                 }
                 else
                 {
                     //desactivar el circulo pequenio
                     int lastInd = _flows[_flowsIndex].Count - 1;
-                    _flows[_flowsIndex][lastInd].SmallCircleSetActive(false);
+                    //_flows[_flowsIndex][lastInd].SmallCircleSetActive(false);
 
                     //si no eres el final, desactivar el resto
                     if (_flows[_flowsIndex][lastInd] != activatedTile)
-                        deactivateItSelf(Logic.Directions.None);
+                    {
+                        DeactivateItSelf(Logic.Directions.None);
+                        changes = true;
+                    }
                 }     
             }
         }
@@ -223,65 +225,51 @@ namespace FlowFree
         void ReleaseInput(Vector2 pos)
         {
             lastConnectedTile = null;
-            /*if (pressedColor != lastPressedColor)
+            //Aumentar numero de movimientos si ha habido algun cambio
+            //y es un color diferente al anterior con el que se ha aumentado el numero de movimientos
+            if ((/*_flows[_flowsIndex].Count > 1 ||*/ changes) && lastMoveColor != pressedColor)
             {
+                lastMoveColor = pressedColor;
                 moves++;
-                checkMoves();
-            }*/
-            lastPressedColor = pressedColor;
-            cutColor = pressedColor = Color.black;
-            if (_flows[_flowsIndex].Count == 1)
-            {
-                if(pressedColor != lastPressedColor)
-                {
-                    moves++;
-                    checkMoves();
-                }
-                
-                _flows[_flowsIndex].RemoveAt(0);
+                checkMoves();                
             }
 
             //Desactivar o activar el circulo pequenio solo si se ha cambiado alguna tuberia
             if (changes)
             {
-                /*if (_flows[_flowsIndex].Count > 1)
-                {
-                    foreach (List<Tile> tiles in _flows)
-                    {
-                        if (tiles.Count > 0 && tiles[tiles.Count - 1] != currentTile)
-                            tiles[tiles.Count - 1].SmallCircleSetActive(false);
-                    }
-                    if (!_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
-                        _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(true);
-                }*/
-                _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(false);
-                if (_circleFlowsIndex == -1)
+                //desactivar el que esta activo (el anterior que se ha activado)
+                if (_circleFlowsIndex != -1 && _flows[_circleFlowsIndex].Count > 1)
+                    _flows[_circleFlowsIndex][_flows[_circleFlowsIndex].Count - 1].SmallCircleSetActive(false);
+               //activar el nuevo, el de la tuberia que se ha modificado
+                if (_flows[_flowsIndex].Count > 1)
                 {
                     _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(true);
+                    _circleFlowsIndex = _flowsIndex;
                 }
-                else
-                    _flows[_circleFlowsIndex][_flows[_circleFlowsIndex].Count - 1].SmallCircleSetActive(true);
-                _circleFlowsIndex = _flowsIndex;
                 changes = false;
             }
+
             // quitar informacion de tuberias cortadas
             while (_tmpFlows.Count != 0)
                 _tmpFlows.RemoveAt(0);
 
+            // comprobar si se ha ganado
             if (numFlows == totalFlows)
             {
                 win = true;
                 winPanel.SetActive(true);
             }
 
+           
             pointer.enabled = false;
 
-            if (checkIfHintedFlow(_flowsIndex))
+            // pistas
+            if (CheckIfHintedFlow(_flowsIndex))
                 putStars(_flowsIndex, true);
         }
 
         // Mira si es uno en el que se ha hecho una pista
-        bool checkIfHintedFlow(int flowsindex)
+        bool CheckIfHintedFlow(int flowsindex)
         {
             bool wasHinted = !_hintIndexs.Contains(flowsindex);
             bool isCorrect = _flows[flowsindex].Count == map.Flows[flowsindex].flowPoints.Count;
@@ -307,11 +295,20 @@ namespace FlowFree
             if (boardPos.x >= 0 && boardPos.x < _width &&
                 boardPos.y >= 0 && boardPos.y < _height)
             {
-                //if (!_tiles[boardPos.y, boardPos.x].getIsMain() ||
-                //    (_tiles[boardPos.y, boardPos.x].getIsMain() &&
-                //    _tiles[boardPos.y, boardPos.x].getColor() == pressedColor)) 
                 DragTile(boardPos);
-                pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
+                if (currentTile.getIsMain())
+                {
+                    if(currentTile.getColor() == pressedColor )
+                    {
+                        if(_flows[_flowsIndex].Count > 2)
+                            pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.75f);                        
+                    }
+                    else
+                        pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.25f);
+
+                }
+                else
+                    pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.5f);
             }
             else pointer.color = new Color(pressedColor.r, pressedColor.g, pressedColor.b, 0.25f);
             pointer.transform.position = new Vector3(pos.x, pos.y, -2);
@@ -331,7 +328,7 @@ namespace FlowFree
         }
 
         // Si se pulsa en un Tile main, se desactiva todo el flow que tenia
-        private void deactivateMain()
+        private void DeactivateMain()
         {
             if (_flows[_flowsIndex].Count > 0)
                 changes = true;
@@ -539,10 +536,9 @@ namespace FlowFree
         /// Desactiva si una tuberia se ha cortado a si misma
         /// </summary>
         /// <param name="dir"> La direccion en la que se ha movido</param>
-        private void deactivateItSelf(Logic.Directions dir)
+        private void DeactivateItSelf(Logic.Directions dir)
         {
             int index = _flows[_flowsIndex].IndexOf(currentTile);
-            cutColor = lastConnectedTile.getColor();
 
             List<Tile> toCheck = new List<Tile>();
             for (int i = index + 1; i < _flows[_flowsIndex].Count;)
@@ -572,7 +568,7 @@ namespace FlowFree
 
             if (lastConnectedTile.getColor() == currentTile.getColor() && !colorConflict)
             {
-                deactivateItSelf(dir);
+                DeactivateItSelf(dir);
             }
             else//un color a cortado a otro
             {
@@ -600,6 +596,8 @@ namespace FlowFree
                     _flows[_flowsIndex].Add(lastConnectedTile);
                 if (lastConnectedTile != _flows[_flowsIndex][0] && lastConnectedTile.getIsMain() && _flows[_flowsIndex].Contains(lastConnectedTile) && !_flows[_flowsIndex].Contains(currentTile))
                     return;
+                if(_circleFlowsIndex != -1 && _flows[_circleFlowsIndex].Count > 1)
+                    _flows[_circleFlowsIndex][_flows[_circleFlowsIndex].Count - 1].SmallCircleSetActive(false);
                 int i = 0;
                 while (i < _flows.Length)
                 {
