@@ -15,28 +15,14 @@ namespace FlowFree
             outIndex = t.outIndex;
         }
 
-        public enum ConnectionType
-        {
-            Normal,
-            Wall,
-            Void
-        }
-        struct Connection
-        {
-            ConnectionType[] sidesType;
-        }
-
         Vector2Int boardPos;
 
         Color tileColor;
 
+        bool isVoid = false;
+
         bool isMain = false;
 
-        public bool getIsMain() { return isMain; }
-        public void setIsMain(bool isFlow) {
-            isMain = isFlow;
-            renderSprite.color = tileColor;
-        }
         public List<Sprite> sprites;
 
         public Sprite hintedSprite;
@@ -49,6 +35,9 @@ namespace FlowFree
 
         [Tooltip("Caminos del tile, deben ser hijos")]
         public SpriteRenderer[] childrensPaths;
+
+        [Tooltip("Paredes de tile, deben ser hijos")]
+        public GameObject[] childrensWalls;
 
         //Los indices de los path de entrada o salida
         public int inIndex = -1, outIndex = -1;
@@ -66,6 +55,23 @@ namespace FlowFree
             renderSprite.sprite = sprites[0];
             //renderSprite.color = Color.black;
            
+        }
+
+        public bool getIsMain() { return isMain; }
+        public void setIsMain(bool isFlow)
+        {
+            isMain = isFlow;
+            renderSprite.color = tileColor;
+        }
+
+        public bool getIsVoid() { return isVoid; }
+
+        public void setIsVoid()
+        {
+            isVoid = true;
+            foreach(GameObject go in childrens)
+                go.SetActive(false);
+            renderSprite.color = Color.black;
         }
 
         // Cambia el color que tiene en ese momento el tile
@@ -117,6 +123,15 @@ namespace FlowFree
             childrens[2].SetActive(true);
         }
 
+        public void setActiveWall(Logic.Directions dir)
+        {
+            childrensWalls[(int)dir].SetActive(true);
+        }
+
+        public bool getActiveWall(Logic.Directions dir)
+        {
+            return childrensWalls[(int)dir].activeSelf;
+        }
 
         /// <summary>
         /// Activa un camino en funcion la direccion que le pasan
@@ -137,7 +152,7 @@ namespace FlowFree
                         if (tileColor != Color.black)
                             fail = true;
                     }
-                    else if(!isMain)
+                    else if (!isMain)
                     {
                         fail = true;
                     }
@@ -147,7 +162,7 @@ namespace FlowFree
 
                     if (tileColor != Color.black)
                         outIndex = 0;
-                   
+
                     childrensPaths[0].color = tileColor = c;
                     break;
                 
@@ -205,9 +220,9 @@ namespace FlowFree
                     }
                     if (outIndex != -1)
                         fail = true;
-                    if(tileColor != Color.black)
-                    outIndex = 3;
-                    
+                    if (tileColor != Color.black)
+                        outIndex = 3;
+
                     childrensPaths[3].color = tileColor = c;
                     break;
                 
