@@ -27,10 +27,8 @@ namespace FlowFree
         {
             // Para probar cambios de escenas
             if (Input.GetKeyDown(KeyCode.Space))
-            {
-                
+            {              
                 nextLevel();
-
             }
             if (Input.GetKeyDown(KeyCode.Q))
             {
@@ -38,10 +36,8 @@ namespace FlowFree
             }
             if (Input.GetKeyDown(KeyCode.W))
             {
-                GameManager gm = GameManager.getInstance();
-                
+                GameManager gm = GameManager.getInstance();               
                 gm.ChangeScene("Game Board");
-
             }
         }
     }

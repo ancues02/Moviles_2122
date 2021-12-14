@@ -99,8 +99,6 @@ namespace FlowFree.Logic
             return true;
         }
 
-
-
         void levelAttributes(string str)
         {
             string[] attr = str.Split(',');
@@ -108,11 +106,13 @@ namespace FlowFree.Logic
             reserved = int.Parse(attr[1]);
             levelNumber = int.Parse(attr[2]);
             flowNumber = int.Parse(attr[3]);
-            if(attr.Length > 5)//checkear opcionales
+            voids = new List<int>();
+            walls = new List<Vector2Int>();
+            if (attr.Length > 5)//checkear opcionales
             {
                 //int.Parse(attr[4]);//puentes que no queremos
                 getVoids(attr[5]);
-                if (attr.Length > 6)
+                if (attr.Length > 6) 
                     getWalls(attr[6]);
             }
         }
@@ -133,23 +133,21 @@ namespace FlowFree.Logic
         void getVoids(string str)
         {
             string[] attr = str.Split(':');
-            for(int i = 0; i < attr.Length; ++i)
+            for(int i = 0; i < attr.Length && attr[i] != ""; ++i)
             {
                 voids.Add(int.Parse(attr[i]));
             }
-
         }
 
         void getWalls(string str)
-        {
+        {        
             string[] attr = str.Split(':');
             string[] wall;
-            for (int i = 0; i < attr.Length; ++i)
+            for (int i = 0; i < attr.Length && attr[i] != ""; ++i)
             {
                 wall = attr[i].Split('|');
                 walls.Add(new Vector2Int(int.Parse(wall[0]), int.Parse(wall[1])));
             }
-
         }
 
 
