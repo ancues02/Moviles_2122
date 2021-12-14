@@ -45,8 +45,8 @@ namespace FlowFree
            
             markerImages = new Image[pack.pages.Length];
             // Ajustamos el display segun el nº de paginas
-            float newX = display.sizeDelta.x + pack.pages.Length * ((RectTransform)levelPagePref.transform).sizeDelta.x;
-            display.sizeDelta = new Vector2(newX, display.sizeDelta.y);
+            /*float newX = display.sizeDelta.x + pack.pages.Length * ((RectTransform)levelPagePref.transform).sizeDelta.x;
+            display.sizeDelta = new Vector2(newX, display.sizeDelta.y);*/
 
             // Creamos los displays de las paginas y los marcadores
             PackDisplay packDplay;
