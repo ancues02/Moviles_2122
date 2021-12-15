@@ -6,13 +6,15 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
-    public class AdsRewarded : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
-    {
-#if UNITY_IOS
-        [SerializeField] string AdUnityId = "Rewarded_IOS";
-#elif UNITY_ANDROID
-        [SerializeField] string AdUnityId = "Rewarded_Android";
+    public class AdsRewarded : MonoBehaviour
+#if UNITY_ANDROID
+        , IUnityAdsLoadListener, IUnityAdsShowListener
 #endif
+
+    {
+#if UNITY_ANDROID
+        [SerializeField] string AdUnityId = "Rewarded_Android";
+
         [SerializeField] Button showButton;
 
         int cont = 0;
@@ -70,6 +72,7 @@ namespace FlowFree
                 GameManager.getInstance().IncreaseHints(1);
             cont = 0;
         }
-        
+#endif
+
     }
 }

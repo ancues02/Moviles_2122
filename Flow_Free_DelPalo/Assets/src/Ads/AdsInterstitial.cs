@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEngine.Advertisements;
 namespace FlowFree
 {
-    public class AdsInterstitial : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
-    {
-#if UNITY_IOS
-        [SerializeField] string AdUnityId = "Interstitial_IOS";
-#elif UNITY_ANDROID
-        [SerializeField] string AdUnityId = "Interstitial_Android";
+    public class AdsInterstitial : MonoBehaviour
+#if UNITY_ANDROID
+        , IUnityAdsLoadListener, IUnityAdsShowListener
 #endif
+    {
+#if UNITY_ANDROID
+        [SerializeField] string AdUnityId = "Interstitial_Android";
         public LevelManager lvlManager;
         private void Start()
         {
@@ -61,6 +61,8 @@ namespace FlowFree
                 lvlManager.NextLevel();
             Debug.Log("Anuncio Insterstital acabado"); 
         }
+#endif
+
 
     }
 }

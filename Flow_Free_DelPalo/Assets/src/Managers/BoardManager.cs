@@ -892,7 +892,9 @@ namespace FlowFree
                 }
                 else
                 {
+#if UNITY_ANDROID
                     adsRewarded.ShowAd();
+#endif
                 }
             }
             
