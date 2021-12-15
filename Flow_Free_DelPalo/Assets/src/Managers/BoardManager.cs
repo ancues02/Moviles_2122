@@ -70,6 +70,8 @@ namespace FlowFree
         private bool _usingHint = false;    // Para que las hints no se animen
         private bool _animColor = false;    // Para que el release no haga wiggle si no tocaste nada
 
+        public OurAnimator _compleetTick;
+
         private void Start()
         {
             if (!flowText || !movesText || !pipesText || !hintText
@@ -193,6 +195,8 @@ namespace FlowFree
             transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
             transform.Translate(new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), vectorOffset.y - (0.5f * _baseRatio.y)));
             flowText.text = "flows: 0/" + totalFlows;
+
+            _compleetTick.transform.Translate(-new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), vectorOffset.y - (0.5f * _baseRatio.y)));
         }
 
         public void SetFlowColors(Color[] cs)
@@ -284,7 +288,7 @@ namespace FlowFree
             Vector2Int target = map.Flows[index].start;
             if (start.getBoardPos() == target) 
                 target = map.Flows[index].end;
-            _tiles[target.x, target.y].animations.Wiggle();
+            _tiles[target.x, target.y].animations.PlayWiggle(0);
         }
 
         void ReleaseInput(Vector2 pos)
@@ -326,9 +330,9 @@ namespace FlowFree
 
             if (!_usingHint && _animColor && _flows[_flowsIndex].Count > 0)
                 if(_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
-                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.Pulse();
+                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.PlayPulse(1);
                 else
-                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.SmallWiggle();
+                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.PlayWiggle(2);
 
             // comprobar si se ha ganado
             if (numFlows == totalFlows)
@@ -337,7 +341,10 @@ namespace FlowFree
                 winPanel.SetActive(true);
                 panelMovesText.text = "You completed the level\n"+" in " + moves +" moves";
                 foreach (Tile t in _tiles)
-                    if (t.getIsMain()) t.animations.Pulse();
+                    if (t.getIsMain()) t.animations.PlayPulse(1);
+
+                if (moves > _flows.Length) _compleetTick.PlayPulse(0);
+                else _compleetTick.PlayPulse(1);
             }
 
             _animColor = false;
@@ -818,7 +825,7 @@ namespace FlowFree
                     DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             }
 #else
-            if (Input.touches.Length > 0)
+            if (Input.touches.Length > 0 && !win)
             {
                 Touch input = Input.GetTouch(0);
                 switch (input.phase)
