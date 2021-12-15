@@ -17,6 +17,7 @@ namespace FlowFree
         public MenuManager menuManager;
         public LevelSelectorManager lvlSelectorManager;
         public LevelManager lvlManager;
+        public BoardManager boardManager;
 
         static GameManager _instance;
 
@@ -30,10 +31,13 @@ namespace FlowFree
         public int PackIndex;
         public int Level;
 
-        private int numHints = 1000;
+        public int numHints { get; private set; } = 3;
 
         private void Awake()
-        {        
+        {
+            #if UNITY_EDITOR
+                numHints=1;
+            #endif
             if (Testing)
                 Test(CategoryIndex, PackIndex, Level);
             if(!_instance)
@@ -48,6 +52,7 @@ namespace FlowFree
                 _instance.menuManager = menuManager;
                 _instance.lvlSelectorManager = lvlSelectorManager;
                 _instance.lvlManager = lvlManager;
+                _instance.boardManager = boardManager;
 
                 // Se destruye al final del frame asi que puede ir aqui
                 Destroy(gameObject);  
@@ -142,17 +147,15 @@ namespace FlowFree
             {
                 ret = true;
                 numHints--;
-                // Reescribe número de hints en archivo o algo
+                // TODO Reescribe número de hints en archivo o algo
             }
-
             return ret;
         }
 
-        public void IncreaseHints(int numHints)
+        public void IncreaseHints(int numHints_)
         {
-            Debug.Log(this.numHints);
-            this.numHints += numHints;
-            Debug.Log(this.numHints);
+            numHints += numHints_;
+            boardManager.CheckHints();
         }
     }
 }

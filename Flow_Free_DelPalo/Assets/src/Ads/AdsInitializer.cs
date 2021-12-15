@@ -12,7 +12,7 @@ namespace FlowFree
         [SerializeField] string gameId = "4506529";
 #endif
 
-        [SerializeField] bool testMode = true;
+        [SerializeField] bool testMode = false;
 
 
         void Start()
@@ -30,7 +30,5 @@ namespace FlowFree
         {
             Debug.Log($"Unity Ads initialization failed: {error.ToString()} - {message}");
         }
-
-
     }
 }

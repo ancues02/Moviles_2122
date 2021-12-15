@@ -14,13 +14,15 @@ namespace FlowFree
 
         private void Start()
         {
-            if (!board || !adsInterstitial)
-                Debug.LogError("Falta una referencia en LevelManager");
+            if (!board )
+                Debug.LogError("Falta referencia BoardManager en LevelManager");
+            if(!adsInterstitial)
+                Debug.LogWarning("Falta referencia de adsInterstitial en LevelManager");
         }
         public void LevelEnded()
         {
-            adsInterstitial.ShowAd();
-            Debug.Log("SHOW ANUNCIO");
+            if(adsInterstitial)
+                adsInterstitial.ShowAd();
         }
 
         public void NextLevel()

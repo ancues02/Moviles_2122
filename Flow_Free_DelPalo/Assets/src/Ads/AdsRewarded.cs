@@ -9,11 +9,13 @@ namespace FlowFree
     public class AdsRewarded : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
     {
 #if UNITY_IOS
-    [SerializeField] string AdUnityId = "Rewarded_IOS";
+        [SerializeField] string AdUnityId = "Rewarded_IOS";
 #elif UNITY_ANDROID
         [SerializeField] string AdUnityId = "Rewarded_Android";
 #endif
         [SerializeField] Button showButton;
+
+        int cont = 0;
 
         private void Awake()
         {
@@ -34,8 +36,9 @@ namespace FlowFree
 
         public void ShowAd()
         {
-            Debug.Log("Showing ad " + AdUnityId);
+            Debug.Log("Showing adRewarded " );
             Advertisement.Show(AdUnityId, this);
+            cont = 1;
         }
 
         public void OnUnityAdsAdLoaded(string placementId)
@@ -54,6 +57,7 @@ namespace FlowFree
 
         public void OnUnityAdsShowStart(string placementId)
         {
+
         }
 
         public void OnUnityAdsShowClick(string placementId)
@@ -62,8 +66,10 @@ namespace FlowFree
 
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
         {
-            if (GameManager.getInstance())
+            if (GameManager.getInstance() && cont == 1)
                 GameManager.getInstance().IncreaseHints(1);
+            cont = 0;
         }
+        
     }
 }

@@ -1256,8 +1256,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -148.6, y: 0}
-  m_SizeDelta: {x: -21.999977, y: 0}
+  m_AnchoredPosition: {x: -136.39499, y: 0}
+  m_SizeDelta: {x: 82.789986, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &463815183
 MonoBehaviour:
@@ -1726,7 +1726,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1125272007}
         m_TargetAssemblyTypeName: FlowFree.BoardManager, Assembly-CSharp
-        m_MethodName: doHint
+        m_MethodName: DoHint
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2940,6 +2940,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TilePrefab: {fileID: 8712364534256855023, guid: 55d97be62e4bde343b69825d87f59694, type: 3}
   lvlManager: {fileID: 2011856597}
+  adsRewarded: {fileID: 1657832526}
   pointer: {fileID: 74543543}
   flowText: {fileID: 1274124511}
   movesText: {fileID: 838881991}
@@ -4181,13 +4182,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1657832525}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6383e7fa156a6534599ea40c3affd357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gameId: 4506529
-  enablePerPlacementMode: 1
   testMode: 1
 --- !u!1 &1728421663
 GameObject:
@@ -5028,6 +5028,10 @@ PrefabInstance:
       propertyPath: menuManager
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
+      propertyPath: boardManager
+      value: 
+      objectReference: {fileID: 1125272007}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: level.Array.size
       value: 1
