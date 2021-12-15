@@ -15,13 +15,13 @@ MonoBehaviour:
   packName: 8x8 Manias
   maps: {fileID: 4900000, guid: cd320c1670930fa479b93903399dd90e, type: 3}
   pages:
-  - name: "5x5 - f\xE1cil"
+  - name: 1 - 30
     color: {r: 1, g: 0, b: 0, a: 1}
-  - name: 6x6
-    color: {r: 1, g: 0.8263446, b: 0, a: 1}
-  - name: 7x7 - medio
-    color: {r: 0, g: 0.86242104, b: 1, a: 1}
-  - name: 8x8
-    color: {r: 0.27545047, g: 0.6509434, b: 0, a: 1}
-  - name: "9x9 - dif\xEDcil"
-    color: {r: 0.4563582, g: 0, b: 0.764151, a: 1}
+  - name: 31 - 60
+    color: {r: 0, g: 0.754717, b: 0.13513349, a: 1}
+  - name: 61 -90
+    color: {r: 0, g: 0.16816235, b: 1, a: 1}
+  - name: 91 - 120
+    color: {r: 1, g: 0.9863347, b: 0, a: 1}
+  - name: 121 - 150
+    color: {r: 1, g: 0.5464047, b: 0, a: 1}

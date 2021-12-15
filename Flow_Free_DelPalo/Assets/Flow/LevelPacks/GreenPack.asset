@@ -16,12 +16,12 @@ MonoBehaviour:
   maps: {fileID: 4900000, guid: 6fd58819ad5fbc84dbf29611e5de8db5, type: 3}
   pages:
   - name: "5x5 - f\xE1cil"
-    color: {r: 1, g: 0, b: 0, a: 1}
+    color: {r: 0.011158126, g: 0.6886792, b: 0, a: 1}
   - name: 6x6
-    color: {r: 1, g: 0.8263446, b: 0, a: 1}
+    color: {r: 0.008547783, g: 0, b: 1, a: 1}
   - name: 7x7 - medio
-    color: {r: 0, g: 0.86242104, b: 1, a: 1}
+    color: {r: 0.9511088, g: 1, b: 0, a: 1}
   - name: 8x8
-    color: {r: 0.27545047, g: 0.6509434, b: 0, a: 1}
+    color: {r: 1, g: 0.5907618, b: 0, a: 1}
   - name: "9x9 - dif\xEDcil"
-    color: {r: 0.4563582, g: 0, b: 0.764151, a: 1}
+    color: {r: 1, g: 0.019191347, b: 0, a: 1}

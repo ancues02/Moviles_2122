@@ -15,13 +15,13 @@ MonoBehaviour:
   packName: Rectangle Pack
   maps: {fileID: 4900000, guid: c6bce27ac74b64540bdf3f19e3eadab2, type: 3}
   pages:
-  - name: "5x5 - f\xE1cil"
-    color: {r: 1, g: 0, b: 0, a: 1}
-  - name: 6x6
-    color: {r: 1, g: 0.8263446, b: 0, a: 1}
-  - name: 7x7 - medio
-    color: {r: 0, g: 0.86242104, b: 1, a: 1}
-  - name: 8x8
-    color: {r: 0.27545047, g: 0.6509434, b: 0, a: 1}
-  - name: "9x9 - dif\xEDcil"
-    color: {r: 0.4563582, g: 0, b: 0.764151, a: 1}
+  - name: 8x10
+    color: {r: 1, g: 0.49771386, b: 0, a: 1}
+  - name: 9x11
+    color: {r: 1, g: 0.054067917, b: 0, a: 1}
+  - name: 10x12
+    color: {r: 0, g: 0.8113208, b: 0.002006297, a: 1}
+  - name: 11x13
+    color: {r: 0, g: 0.112698555, b: 1, a: 1}
+  - name: 12x14
+    color: {r: 0.99410534, g: 1, b: 0, a: 1}
