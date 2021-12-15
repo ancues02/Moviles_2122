@@ -14,13 +14,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game Board.unity
     guid: c420c7cecbe6789418ac33f61456c626
-  - enabled: 1
-    path: Assets/Scenes/Test/MenuTest.unity
-    guid: 2ce37fddd38b19a4685cb94284702f49
-  - enabled: 1
-    path: Assets/Scenes/Test/LevelSelectionTest.unity
-    guid: 22fa8c93ac95b6b47847ee9b5e3abaea
-  - enabled: 1
-    path: Assets/Scenes/Test/GameBoardTest.unity
-    guid: 221a337dcdcea5a41b65fb74e4d11a6d
   m_configObjects: {}
