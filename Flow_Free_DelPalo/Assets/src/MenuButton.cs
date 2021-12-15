@@ -29,5 +29,10 @@ namespace FlowFree
         {
             button.onClick.AddListener(action);
         }
+
+        public void setBlocked(bool blocked)
+        {
+            button.interactable = blocked;
+        }
     }
 }

@@ -21,30 +21,5 @@ namespace FlowFree
 
         [Tooltip("Lotes de la categoria")]
         public LevelPack[] packs;
-
-        CategoryData_ data_;
-        public Category()
-        {
-            data_ = new CategoryData_();
-            data_.packs = new PackData_[packs.Length];
-            for(int i = 0; i < packs.Length; i++)
-            {
-                data_.packs[i] = packs[i].Data;
-            }
-        }
-    }
-
-    [System.Serializable]
-    public class CategoryData_
-    {
-        public PackData_[] packs;
-    }
-
-    [System.Serializable]
-    public class GameData_
-    {
-        public string hash;
-        public int hints;
-        public CategoryData_[] categoriesData;
     }
 }
