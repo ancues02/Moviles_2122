@@ -25,6 +25,11 @@ namespace FlowFree
         [Tooltip("Paginas de niveles")]
         public Page[] pages;
 
+        [Tooltip("Bloqueo del lote")]
+        public bool blocked;
+
+        [Tooltip("Nivel a partir del cual todos estan bloqueados")]
+        public int blockedLevelIndex;
         public Logic.Map[] Maps { get; private set; }
 
         public bool Valid { get; private set; }
