@@ -817,7 +817,10 @@ namespace FlowFree
                 transform.localScale = tmp;
 
                 if (tmp.x <= 0)
-                    lvlManager.nextLevel();
+                {
+                    lvlManager.LevelEnded();
+                    end = false;
+                }
             }
         }
 
@@ -837,7 +840,7 @@ namespace FlowFree
             return index;
         }
 
-        public void changeLevel()
+        public void ChangeLevel()
         {
             end = true;
             winPanel.SetActive(false);

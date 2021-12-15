@@ -147,5 +147,12 @@ namespace FlowFree
 
             return ret;
         }
+
+        public void IncreaseHints(int numHints)
+        {
+            Debug.Log(this.numHints);
+            this.numHints += numHints;
+            Debug.Log(this.numHints);
+        }
     }
 }

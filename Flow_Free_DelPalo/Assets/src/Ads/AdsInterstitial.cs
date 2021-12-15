@@ -7,12 +7,15 @@ namespace FlowFree
     public class AdsInterstitial : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
     {
 #if UNITY_IOS
-    [SerializeField] string AdUnityId = "Interstitial_IOS";
+        [SerializeField] string AdUnityId = "Interstitial_IOS";
 #elif UNITY_ANDROID
         [SerializeField] string AdUnityId = "Interstitial_Android";
 #endif
+        public LevelManager lvlManager;
         private void Start()
         {
+            if (!lvlManager)
+                Debug.LogError("Falta una referencia en AdsInterstitial");
             LoadAd();
         }
 
@@ -52,6 +55,8 @@ namespace FlowFree
 
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
         {
+            Debug.Log("CERRAR ANUNCIO");
+            lvlManager.NextLevel();
         }
     }
 }

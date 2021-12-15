@@ -62,6 +62,8 @@ namespace FlowFree
 
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
         {
+            if (GameManager.getInstance())
+                GameManager.getInstance().IncreaseHints(1);
         }
     }
 }

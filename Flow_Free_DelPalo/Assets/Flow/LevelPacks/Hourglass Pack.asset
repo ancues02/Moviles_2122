@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a53d842ff84f84e8c2b771089ad179, type: 3}
   m_Name: Hourglass Pack
   m_EditorClassIdentifier: 
-  packName: Rectangle Pack
+  packName: Hourglass Pack
   maps: {fileID: 4900000, guid: 6a539e46f3b6e9947b33d29f56ddfcbb, type: 3}
   pages:
   - name: "5x5 - f\xE1cil"

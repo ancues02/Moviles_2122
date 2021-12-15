@@ -7,17 +7,13 @@ namespace FlowFree
     public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
     {
 #if UNITY_IOS
-    [SerializeField] string gameId = "4506528";
+        [SerializeField] string gameId = "4506528";
 #elif UNITY_ANDROID
         [SerializeField] string gameId = "4506529";
 #endif
 
-        //[SerializeField] public string miVideoPlacement = "rewardedVideo";
-        // [SerializeField] public string myAdStatus = "";
-        [SerializeField] public bool enablePerPlacementMode = true;
         [SerializeField] bool testMode = true;
 
-        // ShowOptions options = new ShowOptions();
 
         void Start()
         {
@@ -35,16 +31,6 @@ namespace FlowFree
             Debug.Log($"Unity Ads initialization failed: {error.ToString()} - {message}");
         }
 
-        public void ShowRewardedVideo()
-        {
-
-        }
-        public void ShowInterstitialAd()
-        {
-            //Advertisement.a
-            //if (Advertisement.isInitialized)
-            //    Advertisement.Show(options);
-        }
 
     }
 }

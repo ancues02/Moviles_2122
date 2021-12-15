@@ -9,7 +9,7 @@ namespace FlowFree
     public class AdsBanner : MonoBehaviour
     {
 #if UNITY_IOS
-    [SerializeField] string AdUnityId = "Banner_IOS";
+        [SerializeField] string AdUnityId = "Banner_IOS";
 #elif UNITY_ANDROID
         [SerializeField] string AdUnityId = "Banner_Android";
 #endif
