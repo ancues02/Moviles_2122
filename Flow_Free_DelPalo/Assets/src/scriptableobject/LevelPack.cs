@@ -34,6 +34,21 @@ namespace FlowFree
 
         public bool Valid { get; private set; }
 
+        public PackData_ Data { get; private set; }
+
+        public LevelPack()
+        {
+            /*Parse();
+            Data = new PackData_();
+            Data.blocked = blocked;
+            Data.levels = new LevelData_[Maps.Length];
+            for(int i = 0; i < Maps.Length; i++)
+            {
+                Data.levels[i] = new LevelData_();
+                Data.levels[i].blocked = blockedLevelIndex >= i;
+                Data.levels[i].best = -1;
+            }*/
+        }
         // Parsea todos los niveles de un lote
         public void Parse()
         {
@@ -49,5 +64,19 @@ namespace FlowFree
             }
         }
 
+    }
+
+    [System.Serializable]
+    public class PackData_
+    {
+        public bool blocked;
+        public LevelData_[] levels;
+    }
+
+    [System.Serializable]
+    public class LevelData_
+    {
+        public bool blocked;
+        public int best;
     }
 }

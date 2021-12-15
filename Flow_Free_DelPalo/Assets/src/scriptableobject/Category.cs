@@ -21,5 +21,13 @@ namespace FlowFree
 
         [Tooltip("Lotes de la categoria")]
         public LevelPack[] packs;
+
+        
+    }
+
+    [System.Serializable]
+    public class CategoryData_
+    {
+        PackData_[] packs;
     }
 }
