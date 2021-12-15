@@ -9,8 +9,8 @@ namespace FlowFree
     public class GameManager : MonoBehaviour
     {
         // Categorias que contienen los lotes que estan en el juego
-        public Category[] categories;
-
+        public List<Category> categories;
+        //public  aux;
         // Tema de colores que se usara en el juego
         public ColorTheme theme;
 
@@ -23,6 +23,9 @@ namespace FlowFree
         //int selectedCategory;
         LevelPack selectedLevelPack;
         int selectedLevel;
+        
+        // Gestion del guardado 
+        GameDataManager _dataManager;
 
         // Para testear
         public bool Testing;
@@ -33,12 +36,17 @@ namespace FlowFree
         private int numHints = 1000;
 
         private void Awake()
-        {        
+        {
+            
             if (Testing)
                 Test(CategoryIndex, PackIndex, Level);
             if(!_instance)
             {
                 //selectedLevelPack = new LevelPack();
+                _dataManager = new GameDataManager();
+                /*_dataManager.initCategories();
+                _dataManager.load();*/
+                //_dataManager.Load();
                 _instance = this;
                 DontDestroyOnLoad(gameObject); 
             }
@@ -55,7 +63,7 @@ namespace FlowFree
 
             // Iniciamos los managers si toca
             if (_instance.menuManager)
-                _instance.menuManager.setCategories(_instance.categories);
+                _instance.menuManager.setCategories(_instance.categories.ToArray());
 
             if (_instance.lvlSelectorManager)
                 _instance.lvlSelectorManager.setPack(_instance.selectedLevelPack);
