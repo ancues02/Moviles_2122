@@ -367,7 +367,7 @@ namespace FlowFree
             }
         }
 
-        void DragInput(Vector2 pos)
+        void PorcessDragInput(Vector2 pos)
         {
             Vector2Int boardPos = getBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _width &&
@@ -577,8 +577,6 @@ namespace FlowFree
             currentTile.modify(dir, true, pressedColor);
             colorConflict = false;
         }
-
-
 
         /// <summary>
         /// Reactiva un camino que se habia cortado durante ese mismo movimiento
@@ -801,9 +799,9 @@ namespace FlowFree
 
         }
 
-        private void DragInput()
+        private void DragInput(Vector3 pos)
         {
-            DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            PorcessDragInput(pos);
             ProcessTileChange();
         }
 
@@ -817,12 +815,25 @@ namespace FlowFree
                 if (Input.GetMouseButtonUp(0))
                     ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 if (Input.GetMouseButton(0))
-                    DragInput();
+                    DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             }
 #else
-            foreach(Input inp in Input.touches)
+            if (Input.touches.Length > 0)
             {
-                
+                Touch input = Input.GetTouch(0);
+                switch (input.phase)
+                {
+                    case TouchPhase.Began:
+                        PressInput(Camera.main.ScreenToWorldPoint(input.position));
+                        break;
+                    case TouchPhase.Moved:
+                    case TouchPhase.Stationary:
+                        DragInput(Camera.main.ScreenToWorldPoint(input.position));
+                        break;
+                    case TouchPhase.Ended:
+                        ReleaseInput(Camera.main.ScreenToWorldPoint(input.position));
+                        break;
+                }
             }
 #endif
             if (end)
