@@ -869,5 +869,15 @@ namespace FlowFree
                 _usingHint = false;
             }
         }
+
+        public void goToPrevLevel()
+        {
+            GameManager.getInstance().prevLevel();
+        }
+
+        public void goToNextLevel()
+        {
+            GameManager.getInstance().nextLevel();
+        }
     }
 }
