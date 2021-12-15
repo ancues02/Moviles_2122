@@ -67,7 +67,8 @@ namespace FlowFree
         private List<Color> colors;
 
         private List<int> _hintIndexs;
-        private bool _usingHint = false;
+        private bool _usingHint = false;    // Para que las hints no se animen
+        private bool _animColor = false;    // Para que el release no haga wiggle si no tocaste nada
 
         private void Start()
         {
@@ -247,6 +248,7 @@ namespace FlowFree
             Tile activatedTile = _tiles[boardPos.x, boardPos.y];
             if (activatedTile.getColor() != Color.black)
             {
+                _animColor = true;
                 pressedColor = activatedTile.getColor();
                 lastConnectedTile = currentTile = activatedTile;
                 _flowsIndex = getColorIndex(currentTile.getColor());
@@ -258,7 +260,7 @@ namespace FlowFree
                 if (currentTile.getIsMain())
                 {
                     DeactivateMain();
-                    if(!_usingHint) playWiggleOnExtreme(currentTile);
+                    if(!_usingHint && _animColor) playWiggleOnExtreme(currentTile);
                 }
                 else
                 {
@@ -322,7 +324,7 @@ namespace FlowFree
             if (CheckIfHintedFlow(_flowsIndex))
                 PutStars(_flowsIndex, true);
 
-            if (!_usingHint && _flows[_flowsIndex].Count > 0)
+            if (!_usingHint && _animColor && _flows[_flowsIndex].Count > 0)
                 if(_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
                     _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.Pulse();
                 else
@@ -337,6 +339,8 @@ namespace FlowFree
                 foreach (Tile t in _tiles)
                     if (t.getIsMain()) t.animations.Pulse();
             }
+
+            _animColor = false;
         }
 
         // Mira si es uno en el que se ha hecho una pista
