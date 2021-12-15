@@ -4,18 +4,18 @@ using UnityEngine;
 using UnityEngine.Advertisements;
 namespace FlowFree
 {
-    public class AdsInterstitial : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
-    {
-#if UNITY_IOS
-        [SerializeField] string AdUnityId = "Interstitial_IOS";
-#elif UNITY_ANDROID
-        [SerializeField] string AdUnityId = "Interstitial_Android";
+    public class AdsInterstitial : MonoBehaviour
+#if UNITY_ANDROID
+        , IUnityAdsLoadListener, IUnityAdsShowListener
 #endif
+    {
+#if UNITY_ANDROID
+        [SerializeField] string AdUnityId = "Interstitial_Android";
         public LevelManager lvlManager;
         private void Start()
         {
             if (!lvlManager)
-                Debug.LogError("Falta una referencia en AdsInterstitial");
+                Debug.LogWarning("Falta referencia de LevelManager en AdsInterstitial");
             LoadAd();
         }
 
@@ -47,6 +47,8 @@ namespace FlowFree
 
         public void OnUnityAdsShowStart(string placementId)
         {
+            Debug.Log("Anuncio Insterstital empezado");
+
         }
 
         public void OnUnityAdsShowClick(string placementId)
@@ -55,8 +57,12 @@ namespace FlowFree
 
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
         {
-            Debug.Log("CERRAR ANUNCIO");
-            lvlManager.NextLevel();
+            if(lvlManager)
+                lvlManager.NextLevel();
+            Debug.Log("Anuncio Insterstital acabado"); 
         }
+#endif
+
+
     }
 }

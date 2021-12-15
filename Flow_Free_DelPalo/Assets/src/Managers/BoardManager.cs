@@ -10,6 +10,10 @@ namespace FlowFree
         public GameObject TilePrefab;
         public LevelManager lvlManager;
 
+
+        [Tooltip("El script AdsRewarded del objeto que lo contiene en la escena")]
+        public AdsRewarded adsRewarded;
+
         public SpriteRenderer pointer;
 
         [Tooltip("El texto del canvas de flows")]
@@ -23,6 +27,9 @@ namespace FlowFree
 
         [Tooltip("El texto del canvas de pistas")]
         public Text hintText;
+
+        [Tooltip("El texto del panel final de movimientos")]
+        public Text panelMovesText;
 
         private Vector2 _cameraSize;
         private Vector2 _availableSize;
@@ -60,12 +67,13 @@ namespace FlowFree
         private List<Color> colors;
 
         private List<int> _hintIndexs;
-        private bool _usingHint = false;
+        private bool _usingHint = false;    // Para que las hints no se animen
+        private bool _animColor = false;    // Para que el release no haga wiggle si no tocaste nada
 
         private void Start()
         {
             if (!flowText || !movesText || !pipesText || !hintText
-                || !TilePrefab || !lvlManager || !winPanel)
+                || !TilePrefab || !lvlManager || !winPanel || !adsRewarded)
                 Debug.LogError("Falta alguna referencia en BoardManager!");
             else
             {
@@ -73,7 +81,7 @@ namespace FlowFree
                 //flowText.text = "flows: 0/" + ;
                 movesText.text = "moves:" + moves + " best: -";
                 pipesText.text = "pipe: 0%";
-                hintText.text = "3 x ";
+                CheckHints();
             }
         }
 
@@ -240,6 +248,7 @@ namespace FlowFree
             Tile activatedTile = _tiles[boardPos.x, boardPos.y];
             if (activatedTile.getColor() != Color.black)
             {
+                _animColor = true;
                 pressedColor = activatedTile.getColor();
                 lastConnectedTile = currentTile = activatedTile;
                 _flowsIndex = getColorIndex(currentTile.getColor());
@@ -251,7 +260,7 @@ namespace FlowFree
                 if (currentTile.getIsMain())
                 {
                     DeactivateMain();
-                    if(!_usingHint) playWiggleOnExtreme(currentTile);
+                    if(!_usingHint && _animColor) playWiggleOnExtreme(currentTile);
                 }
                 else
                 {
@@ -287,7 +296,7 @@ namespace FlowFree
             {
                 lastMoveColor = pressedColor;
                 moves++;
-                checkMoves();                
+                CheckMoves();                
             }
 
             //Desactivar o activar el circulo pequenio solo si se ha cambiado alguna tuberia
@@ -315,7 +324,7 @@ namespace FlowFree
             if (CheckIfHintedFlow(_flowsIndex))
                 PutStars(_flowsIndex, true);
 
-            if (!_usingHint && _flows[_flowsIndex].Count > 0)
+            if (!_usingHint && _animColor && _flows[_flowsIndex].Count > 0)
                 if(_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
                     _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.Pulse();
                 else
@@ -326,9 +335,12 @@ namespace FlowFree
             {
                 win = true;
                 winPanel.SetActive(true);
+                panelMovesText.text = "You completed the level\n"+" in " + moves +" moves";
                 foreach (Tile t in _tiles)
                     if (t.getIsMain()) t.animations.Pulse();
             }
+
+            _animColor = false;
         }
 
         // Mira si es uno en el que se ha hecho una pista
@@ -355,7 +367,7 @@ namespace FlowFree
             }
         }
 
-        void DragInput(Vector2 pos)
+        void PorcessDragInput(Vector2 pos)
         {
             Vector2Int boardPos = getBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _width &&
@@ -406,15 +418,15 @@ namespace FlowFree
                 _flows[_flowsIndex][0].DeactiveAll();
                 _flows[_flowsIndex].RemoveAt(0);
             }
-            checkPipes();
-            checkFlows();
+            CheckPipes();
+            CheckFlows();
             
         }
 
         /// <summary>
         /// Modifica el texto de pipes del canvas
         /// </summary>
-        private void checkPipes()
+        private void CheckPipes()
         {
             numPipes = 0;
             for (int i = 0; i < _flows.Length; ++i)
@@ -428,7 +440,7 @@ namespace FlowFree
         /// <summary>
         /// Modifica el texto de flows del canvas
         /// </summary>
-        private void checkFlows()
+        private void CheckFlows()
         {
             numFlows = 0;
             for (int i = 0; i < _flows.Length; ++i)
@@ -443,10 +455,17 @@ namespace FlowFree
         /// <summary>
         /// Modifica el texto de moves del canvas
         /// </summary>
-        private void checkMoves()
+        private void CheckMoves()
         {
-
             movesText.text = "moves:" + moves + " best: -";
+        }
+
+        /// <summary>
+        /// Modifica el texto de pistas del canvas
+        /// </summary>
+        public void CheckHints()
+        {
+            hintText.text = GameManager.getInstance().numHints + " x ";
         }
 
         /// <summary>
@@ -559,8 +578,6 @@ namespace FlowFree
             colorConflict = false;
         }
 
-
-
         /// <summary>
         /// Reactiva un camino que se habia cortado durante ese mismo movimiento
         /// </summary>
@@ -655,22 +672,22 @@ namespace FlowFree
             {
                 deactivateByColor(dir);
             }
-            checkFlows();
+            CheckFlows();
             changes = true;
         }
 
 
         // Comprueba si hay que cambiar el color de una tuberia
-        private bool canActivate()
+        private bool CanActivate()
         {
             return lastConnectedTile != null && currentTile != lastConnectedTile &&
                 (!currentTile.getIsMain() ||
                 currentTile.getIsMain() && currentTile.getColor() == pressedColor)
                 && lastConnectedTile.getColor() != Color.black
-                && !isThereWall(lastConnectedTile, currentTile);
+                && !IsThereWall(lastConnectedTile, currentTile);
         }
 
-        bool isThereWall(Tile AT, Tile BT)
+        bool IsThereWall(Tile AT, Tile BT)
         {
             bool ret = false;
 
@@ -690,7 +707,7 @@ namespace FlowFree
 
         void ProcessTileChange()
         {
-            if (canActivate())
+            if (CanActivate())
             {
                 if (_flows[_flowsIndex].Count == 0)
                     _flows[_flowsIndex].Add(lastConnectedTile);
@@ -763,7 +780,7 @@ namespace FlowFree
                         _flows[_flowsIndex].Add(currentTile);
                         numPipes++;
                         if (currentTile.getIsMain())
-                            checkFlows();
+                            CheckFlows();
                     }
                     else
                     {
@@ -777,14 +794,14 @@ namespace FlowFree
                     }
                     lastConnectedTile = currentTile;
                 }
-                checkPipes();
+                CheckPipes();
             }
 
         }
 
-        private void DragInput()
+        private void DragInput(Vector3 pos)
         {
-            DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            PorcessDragInput(pos);
             ProcessTileChange();
         }
 
@@ -798,12 +815,25 @@ namespace FlowFree
                 if (Input.GetMouseButtonUp(0))
                     ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 if (Input.GetMouseButton(0))
-                    DragInput();
+                    DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             }
 #else
-            foreach(Input inp in Input.touches)
+            if (Input.touches.Length > 0)
             {
-                
+                Touch input = Input.GetTouch(0);
+                switch (input.phase)
+                {
+                    case TouchPhase.Began:
+                        PressInput(Camera.main.ScreenToWorldPoint(input.position));
+                        break;
+                    case TouchPhase.Moved:
+                    case TouchPhase.Stationary:
+                        DragInput(Camera.main.ScreenToWorldPoint(input.position));
+                        break;
+                    case TouchPhase.Ended:
+                        ReleaseInput(Camera.main.ScreenToWorldPoint(input.position));
+                        break;
+                }
             }
 #endif
             if (end)
@@ -846,31 +876,43 @@ namespace FlowFree
             winPanel.SetActive(false);
         }
 
-        public void doHint()
+
+        public void DoHint()
         {
-            if (_hintIndexs.Count > 0 && GameManager.getInstance().useHint())
+            if (_hintIndexs.Count > 0  )
             {
-                int index = _hintIndexs[Random.Range(0, _hintIndexs.Count)]; // Color/flow aleatorio
-                _hintIndexs.Remove(index);
-                _usingHint = true;
-
-                if (_flows[index].Count > 0)
+                if (GameManager.getInstance().useHint())
                 {
-                    PressTile(_flows[index][0].getBoardPos());
+                    int index = _hintIndexs[Random.Range(0, _hintIndexs.Count)]; // Color/flow aleatorio
+                    _hintIndexs.Remove(index);
+                    _usingHint = true;
+
+                    if (_flows[index].Count > 0)
+                    {
+                        PressTile(_flows[index][0].getBoardPos());
+                    }
+
+                    PressTile(map.Flows[index].flowPoints[0]);
+
+                    for (int i = 1; i < map.Flows[index].flowPoints.Count; ++i)
+                    {
+                        DragTile(map.Flows[index].flowPoints[i]);
+                        ProcessTileChange();
+                    }
+
+                    ReleaseInput(new Vector2(0, 0));
+
+                    _usingHint = false;
+                    CheckHints();
                 }
-
-                PressTile(map.Flows[index].flowPoints[0]);
-
-                for (int i = 1; i < map.Flows[index].flowPoints.Count; ++i)
+                else
                 {
-                    DragTile(map.Flows[index].flowPoints[i]);
-                    ProcessTileChange();
+#if UNITY_ANDROID
+                    adsRewarded.ShowAd();
+#endif
                 }
-
-                ReleaseInput(new Vector2(0, 0));
-                
-                _usingHint = false;
             }
+            
         }
 
         public void goToPrevLevel()
