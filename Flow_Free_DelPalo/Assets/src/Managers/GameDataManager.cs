@@ -14,7 +14,7 @@ namespace FlowFree
     public class GameDataManager
     {
         public const int MAX_HINTS = 99;
-        private string jsonFilePath = "saveFile.json";
+        private string jsonFilePath = "saveFileCAMBIAR.json";
         private const string pepper = "pimienta";
         GameData _gameData;
         public GameData GetGameData()

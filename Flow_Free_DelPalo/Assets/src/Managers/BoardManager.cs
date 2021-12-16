@@ -102,7 +102,7 @@ namespace FlowFree
                 float y = Camera.main.orthographicSize * 2;
                 float x = y * Camera.main.aspect;
                 x *= 0.99f; // Ligero margen
-                float ratio = (_canvasSize.rect.height - (_topSize.rect.height + _botSize.rect.height)) / _canvasSize.rect.height;
+                float ratio = /*(_canvasSize.rect.height - (_topSize.rect.height + _botSize.rect.height)) / _canvasSize.rect.height*/0.75f;
                 y *= ratio; // Lo de la UI? No sé como vamos a hacerlo
                 _cameraSize = new Vector2(x, y);
             }
@@ -214,9 +214,6 @@ namespace FlowFree
             //gameState = GamePhase.mid;
 
             flowText.text = "flows: 0/" + totalFlows;
-
-            _compleetParent.transform.Translate(-new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), 
-                vectorOffset.y - (0.5f * _baseRatio.y)));
         }
 
         public void SetFlowColors(Color[] cs)
@@ -859,6 +856,10 @@ namespace FlowFree
                         {
                             transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
                             transform.position = new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), vectorOffset.y - (0.5f * _baseRatio.y));
+
+                            _compleetParent.transform.Translate(-new Vector2(vectorOffset.x + (0.5f * _baseRatio.x),
+                                vectorOffset.y - (0.5f * _baseRatio.y)));
+
                             gameState = GamePhase.mid;
                         }
                     }
