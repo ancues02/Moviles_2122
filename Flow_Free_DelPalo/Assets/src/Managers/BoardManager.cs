@@ -542,16 +542,26 @@ namespace FlowFree
         }
 
         /// <summary>
-        /// Desactiva si una tuberia a cortado a otra
+        /// Desactiva si una tuberia a cortado a otra. Si es la primera vez cortada 
+        /// en ese drag, se aniade a la lista de tuberias cortadas y se guarda su estado
         /// </summary>
         private void DeactivateByColor(Logic.Directions dir)
         {
+            //encontrar el indice del flow cortado
             int ind = 0;
             while (!_flows[ind].Contains(currentTile) )
             {
                 ind++;
             }
+            //guardar el estado de la tuberia cortada(si es necesario)
             CutFlow(ind);
+
+            //encontrar el indice de las tuberias cortadas
+            int tmpInd = 0;
+            while (!_tmpFlows[tmpInd].Contains(currentTile))
+            {
+                tmpInd++;
+            }
 
             int index = _flows[ind].IndexOf(currentTile);
 
@@ -566,13 +576,14 @@ namespace FlowFree
                     _flows[ind].RemoveAt(i);
                 }
                 _flows[ind][0].DeactiveIn();
+                //volteamos el sentido de la tuberia
                 _flows[ind].Reverse();
                 foreach (Tile t in _flows[ind])
                 {
                     t.Swap();
                 }
-                _tmpFlows[_tmpFlows.Count - 1].Reverse();
-                foreach (Tile t in _tmpFlows[_tmpFlows.Count - 1])
+                _tmpFlows[tmpInd].Reverse();
+                foreach (Tile t in _tmpFlows[tmpInd])
                 {
                     t.Swap();
                 }
@@ -615,7 +626,6 @@ namespace FlowFree
             for (int i = _tmpFlows.Count - 1; i >= 0; --i)
             {
                 List<Tile> list = _tmpFlows[i];
-                Debug.Log(toCheck.Count);
                 bool reactivate = false;
                 foreach (Tile tile in toCheck)
                 {
@@ -638,7 +648,9 @@ namespace FlowFree
                                     boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
 
                                     boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
-                                    _flows[ind].Add(boardTile);
+                                    if(!_flows[ind].Contains(boardTile))
+                                        _flows[ind].Add(boardTile);
+                                   
                                 }
                                 else
                                 {
@@ -658,11 +670,9 @@ namespace FlowFree
                     }
                     if (reactivate)
                         break;
-
                 }
 
             }
-
         }
 
         /// <summary>
@@ -681,12 +691,15 @@ namespace FlowFree
                 toCheck.Add(_flows[_flowsIndex][i]);
                 _flows[_flowsIndex].RemoveAt(i);
             }
-            if (dir != Logic.Directions.None)
+            if (dir != Logic.Directions.None )
             {
                 toCheck.Reverse();
                 ReactivateFlow(toCheck);
             }
-
+            if(index == -1)
+            {
+                Debug.Log("Se ha roto");
+            }
             if (!_flows[_flowsIndex][index].getIsMain())
                 _flows[_flowsIndex][index].NotDeactiveIn();
             if (_flows[_flowsIndex].Count == 1)
