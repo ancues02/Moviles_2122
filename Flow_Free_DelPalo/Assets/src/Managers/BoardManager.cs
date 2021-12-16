@@ -818,7 +818,7 @@ namespace FlowFree
                     DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             }
 #else
-            if (Input.touches.Length > 0)
+            if (Input.touches.Length > 0 && !win)
             {
                 Touch input = Input.GetTouch(0);
                 switch (input.phase)
@@ -839,11 +839,11 @@ namespace FlowFree
             if (end)
             {
                 Vector3 tmp = transform.localPosition;
-                tmp.x += 0.02f;
+                tmp.x += -(vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime;
                 transform.localPosition = tmp;
 
                 tmp = transform.localScale;
-                tmp.x -= 0.01f;
+                tmp.x -= _baseRatio.x * Time.deltaTime;
                 transform.localScale = tmp;
 
                 if (tmp.x <= 0)
