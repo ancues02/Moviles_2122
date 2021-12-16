@@ -32,7 +32,7 @@ namespace FlowFree
                 
                 int packIndex = i;
                 packButton.setOnClick(() => {
-                    GameManager.getInstance().setLevelPack(catIndx, packIndex);
+                    GameManager.getInstance().SetLevelPack(catIndx, packIndex);
                     Debug.Log(catIndx + " " +  packIndex);
                     GameManager.getInstance().ChangeScene("Level Select");             
                 });

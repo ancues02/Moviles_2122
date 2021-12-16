@@ -94,7 +94,7 @@ namespace FlowFree
          * el lote y que lote es.
          * Se llama desde el menu     
          */
-        public void setLevelPack(int categoryIndex, int packIndex)
+        public void SetLevelPack(int categoryIndex, int packIndex)
         {
             _categoryIndex = categoryIndex;
             _packIndex = packIndex; 
@@ -131,9 +131,8 @@ namespace FlowFree
             return selectedLevel - 1 >= 0;
         }
 
-        public void prevLevel()
+        public void PrevLevel()
         {
-           
             selectedLevel = Mathf.Clamp(selectedLevel-1,0, _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length-1);
         }
 
@@ -143,11 +142,11 @@ namespace FlowFree
          */
         private void Test(int categoryIndex, int packIndex, int level)
         {
-            setLevelPack(categoryIndex, packIndex);
+            SetLevelPack(categoryIndex, packIndex);
             SetSelectedLevel(level);
         }
 
-        public bool useHint()
+        public bool UseHint()
         {
             bool ret;
             if(ret = _dataManager.GetGameData().hints > 0)
@@ -161,22 +160,28 @@ namespace FlowFree
         {
             _dataManager.modifyHint(numHints_);
             lvlManager.board.CheckHints();
+            
         }
 
-        public int getHints()
+        public int GetHints()
         {
             return _dataManager.GetGameData().hints;
         }
 
         public void LevelComplete(int moves)
         {
-            
             _dataManager.completeLevel(_instance._categoryIndex, _instance._packIndex, _instance.selectedLevel, moves);
+            Save();
+        }
+
+        public void Save()
+        {
+            _dataManager.Save();
         }
 
         private void OnApplicationQuit()
         {
-            _dataManager.Save();
+            Save();
         }
     }
 }

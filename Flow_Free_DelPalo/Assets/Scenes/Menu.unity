@@ -1061,7 +1061,7 @@ PrefabInstance:
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: categories.Array.data[4]
       value: 
-      objectReference: {fileID: 11400000, guid: af929160e6434154b8f5decaf66fec82, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: categories.Array.data[5]
       value: 

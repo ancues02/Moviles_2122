@@ -62,7 +62,7 @@ namespace FlowFree
         public void PreviousLevel()
         {
             GameManager gm = GameManager.getInstance();
-            gm.prevLevel();
+            gm.PrevLevel();
             gm.ChangeScene("Game Board");
         }
 

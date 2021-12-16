@@ -493,7 +493,7 @@ namespace FlowFree
         /// </summary>
         public void CheckHints()
         {
-            hintText.text = GameManager.getInstance().getHints() + " x ";
+            hintText.text = GameManager.getInstance().GetHints() + " x ";
         }
 
 
@@ -614,43 +614,50 @@ namespace FlowFree
         {
             for (int i = _tmpFlows.Count - 1; i >= 0; --i)
             {
-                flowText.text = _tmpFlows.Count+"";
                 List<Tile> list = _tmpFlows[i];
+                Debug.Log(toCheck.Count);
+                bool reactivate = false;
                 foreach (Tile tile in toCheck)
                 {
-
-                    if (list.Contains(tile) )
+                    foreach (Tile tmp in list)
                     {
-                        int ind = GetColorIndex(list[0].getColor());
-                        int j = _flows[ind].Count - 1;
-                        Tile t = list[j];
-                        Tile boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
-
-                        boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
-                        j++;
-                        for (; j < list.Count; ++j)
+                        if (tmp.getBoardPos() == tile.getBoardPos())
                         {
-                            if (!_flows[_flowsIndex].Contains(list[j]))
-                            {
-                                t = list[j];
-                                boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
+                            int ind = GetColorIndex(list[0].getColor());
+                            int j = _flows[ind].Count - 1;
+                            Tile t = list[j];
+                            Tile boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
 
-                                boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
-                                _flows[ind].Add(boardTile);
-                            }
-                            else
+                            boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
+                            j++;
+                            for (; j < list.Count; ++j)
                             {
-                                _flows[ind][_flows[ind].Count - 1].DeactiveOut();
-                                break;
+                                if (!_flows[_flowsIndex].Contains(list[j]))
+                                {
+                                    t = list[j];
+                                    boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
+
+                                    boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
+                                    _flows[ind].Add(boardTile);
+                                }
+                                else
+                                {
+                                    _flows[ind][_flows[ind].Count - 1].DeactiveOut();
+                                    break;
+                                }
                             }
+                            // pistas
+                            if (CheckIfHintedFlow(ind))
+                            {
+                                PutStars(ind, true);
+                            }
+                            reactivate = true;
+                             
                         }
-                        // pistas
-                        if (CheckIfHintedFlow(ind))
-                        {
-                            PutStars(ind, true);
-                        }
-                        break;
+                        
                     }
+                    if (reactivate)
+                        break;
 
                 }
 
@@ -667,7 +674,8 @@ namespace FlowFree
             int index = _flows[_flowsIndex].IndexOf(currentTile);
 
             List<Tile> toCheck = new List<Tile>();
-            for (int i = index + 1; i < _flows[_flowsIndex].Count;)
+            int i = index + 1;
+            while( i < _flows[_flowsIndex].Count)
             {
                 _flows[_flowsIndex][i].DeactiveAll();
                 toCheck.Add(_flows[_flowsIndex][i]);
@@ -960,7 +968,7 @@ namespace FlowFree
         {
             if (_hintIndexs.Count > 0  )
             {
-                if (GameManager.getInstance().useHint())
+                if (GameManager.getInstance().UseHint())
                 {
                     int index = _hintIndexs[Random.Range(0, _hintIndexs.Count)]; // Color/flow aleatorio
                     _hintIndexs.Remove(index);

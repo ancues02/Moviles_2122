@@ -4334,6 +4334,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d7e25b2b324c4e47bc170b7e859178f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AdUnityId: Rewarded_Android
+  showButton: {fileID: 7478015869271439552}
 --- !u!114 &1657832527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4346,6 +4348,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b03f989cdeda54548b522cb7e3e6c359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AdUnityId: Interstitial_Android
+  lvlManager: {fileID: 2011856597}
 --- !u!4 &1657832528
 Transform:
   m_ObjectHideFlags: 0
@@ -4372,6 +4376,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6383e7fa156a6534599ea40c3affd357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameId: 4506529
+  testMode: 0
 --- !u!1 &1728421663
 GameObject:
   m_ObjectHideFlags: 0

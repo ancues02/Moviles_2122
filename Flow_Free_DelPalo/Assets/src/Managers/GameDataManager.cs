@@ -14,7 +14,7 @@ namespace FlowFree
     public class GameDataManager
     {
         public const int MAX_HINTS = 99;
-        private string jsonFilePath = "saveFile.json";
+        private string jsonFilePath = "/saveFile.json";
         private const string pepper = "pimienta";
         GameData _gameData;
         public GameData GetGameData()
@@ -109,7 +109,8 @@ namespace FlowFree
 
         public void modifyHint(int value)
         {
-            _gameData.hints = Mathf.Clamp(_gameData.hints + value, 0, MAX_HINTS); 
+            _gameData.hints = Mathf.Clamp(_gameData.hints + value, 0, MAX_HINTS);
+            Save();
         }
 
         private bool CheckHash()
