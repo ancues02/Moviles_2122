@@ -53,10 +53,9 @@ namespace FlowFree
 
         public void NextLevel()
         {            
-            //TODO checkear que esta desbloqueado el siguiente nivel
             GameManager gm = GameManager.getInstance();
-            gm.nextLevel();
-            gm.ChangeScene("Game Board");           
+            if(gm.NextLevel())
+                gm.ChangeScene("Game Board");           
 
         }
 

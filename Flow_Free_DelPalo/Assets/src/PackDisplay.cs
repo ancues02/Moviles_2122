@@ -24,7 +24,7 @@ namespace FlowFree
                 lvlButton.setColor(pack.pages[pageIndex].color);
                 lvlButton.setBlocked(pData.lastUnlockedLevel < levelIndex);
                 lvlButton.setOnClick(() => {
-                    GameManager.getInstance().setSelectedLevel(levelIndex);
+                    GameManager.getInstance().SetSelectedLevel(levelIndex);
                     GameManager.getInstance().ChangeScene("Game Board");
                 });
 
