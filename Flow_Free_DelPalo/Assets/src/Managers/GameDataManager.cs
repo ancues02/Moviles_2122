@@ -142,7 +142,8 @@ namespace FlowFree
 
         public void completeLevel(int catInd, int pInd, int lvlInd, int moves)
         {
-            _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = Mathf.Min(_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd], moves);
+            _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] 
+                = _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] == -1 ? moves : Mathf.Min(_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd], moves);
             _gameData.categories[catInd].packs[pInd].completedLevels++;
         }
 
