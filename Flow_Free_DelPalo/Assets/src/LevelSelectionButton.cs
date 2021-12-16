@@ -10,10 +10,12 @@ namespace FlowFree
         public Button button;
 
         public Text levelNumberText;
+        public ChangeStateSprite stateSprite;
 
         public void setColor(Color color)
         {
             button.image.color = color;
+            //stateSprite.setColor(new Color(color.r, color.g, color.b, 0.5f));
         }
         
         public void setLevelNumber(int numLevel)
@@ -26,14 +28,23 @@ namespace FlowFree
             button.onClick.AddListener(action);
         }
 
+        // TODO: heredar de algo que tenga estos metodos para no repetirlos
         public void setBlocked(bool blocked)
         {
-            button.interactable = blocked;
+            button.interactable = !blocked;
+            if (blocked) stateSprite.setBlocked();
+            else         stateSprite.setNone();
         }
 
-        public void setBest()
+        public void setComplete()
         {
-            Debug.Log("Cambiar el sprite al de perfecto");
+            button.interactable = true;
+            stateSprite.setComplete();
+        }
+        public void setPerfect()
+        {
+            button.interactable = true;
+            stateSprite.setPerfect();
         }
     }
 }

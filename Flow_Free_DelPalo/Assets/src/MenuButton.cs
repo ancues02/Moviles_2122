@@ -33,8 +33,8 @@ namespace FlowFree
         public void setBlocked(bool blocked)
         {
             button.interactable = !blocked;
-            if (blocked)    stateSprite.setBlocked();
-            else            stateSprite.setNone();
+            if (blocked) stateSprite.setBlocked();
+            else         stateSprite.setNone();
         }
     }
 }
