@@ -14,7 +14,7 @@ namespace FlowFree
     public class GameDataManager
     {
         public const int MAX_HINTS = 99;
-        private string jsonFilePath = "savedData.json";
+        private string jsonFilePath = "saveFile.json";
         private const string pepper = "pimienta";
         GameData _gameData;
         public GameData GetGameData()
@@ -56,8 +56,8 @@ namespace FlowFree
          */
         public void Load()
         {
-            if (!File.Exists(jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
-            using (StreamReader rstream = new StreamReader(jsonFilePath))
+            if (!File.Exists(Application.persistentDataPath + jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
+            using (StreamReader rstream = new StreamReader(Application.persistentDataPath + jsonFilePath))
             {
                 JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), _gameData);
                 if (!CheckHash())
@@ -75,7 +75,7 @@ namespace FlowFree
          */
         public void Save()
         {
-            using (StreamWriter wstream = new StreamWriter(jsonFilePath))
+            using (StreamWriter wstream = new StreamWriter(Application.persistentDataPath + jsonFilePath))
             {
                 _gameData.hash = "";
                 _gameData.hash = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
