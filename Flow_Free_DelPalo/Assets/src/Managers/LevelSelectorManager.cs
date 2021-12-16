@@ -38,7 +38,7 @@ namespace FlowFree
         ///<summary>
         /// Establece las paginas segun el lote correspondiente
         ///</summary>
-        public void setPack(LevelPack pack)
+        public void setPack(LevelPack pack, PackData pData)
         {
             packText.text = pack.packName;
             if (pack.pages.Length <= 0) return; // si no hay ninguna pagina no hacemos nada
@@ -53,10 +53,11 @@ namespace FlowFree
             for (int i = 0; i < pack.pages.Length; i++)
             {
                 packDplay = Instantiate(levelPagePref, display).GetComponent<PackDisplay>();
-                packDplay.setAttributes(pack, i);
+                packDplay.setAttributes(pack, pData, i);
                 markerImages[i] = Instantiate(pageMarkerPref, markerDisplay).GetComponent<Image>();
             }
-            
+            markerImages[0].color = Color.white;
+
         }
 
         ///<summary>

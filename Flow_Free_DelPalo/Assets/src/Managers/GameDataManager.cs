@@ -3,187 +3,177 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using SimpleJSON;
-/**
- *  -------------------SAVED DATA JSON FORMAT--------------------------------
- *  {
- *      hash: "slajfljefja39u872895",
- *      hints: 3,
- *      categories: 
- *      [
- *          {
- *              name: "Intro"
- *              packs:
- *              [
- *                  {
- *                      name: "Classic"
- *                      blocked: false,
- *                      levels:
- *                      [
- *                          {
- *                              level: 0,
- *                              blocked: true,
- *                              best: 6
- *                          },
- *                          (...)
- *                      ]
- *                  },
- *                  (...)
- *              ]
- *          },
- *          (...)
- *      ]
- *  
- *  }
- *  
- *  {
- *      hash: "slajfljefja39u872895"
- *      hints: 4
- *      unlockedPacks:
- *      [
- *          {
- *              category: "Extreme"
- *              pack: 
- *          }
- *      ]
- *      levels:
- *      [
- *          {
- *              category: "Intro",
- *              pack: "Classic",
- *              level: 54
- *              blocked: false,
- *              best: 5
- *          },
- *          (...)
- *      ]
- *  }
+using System.Security.Cryptography;
+using System.Text;
+
+/*
+ * Se encarga de cargar y guardar datos
  */
 namespace FlowFree
 {
-
-
-    // Esto es para probar nada mas
-    public class GameDataManager : MonoBehaviour
+    public class GameDataManager
     {
-        public string jsonFilePath;
-        Dictionary<string, CategoryData> _data;
+        public const int MAX_HINTS = 99;
+        private string jsonFilePath = "saveFile.json";
+        private const string pepper = "pimienta";
         GameData _gameData;
-        /*
-         * Creamos un diccionario de guardado por defecto,
-         * con las categorias que tuviera el GM, luego leemos el
-         * archivo y cambiamos en este diccionario
-         */
-        private void Load(List<Category> categories)
+        public GameData GetGameData()
         {
-            // inicializar el _data antes de esto
-            // Si hay datos guardados, actualizamos las categorias con ellos
-            if (File.Exists(jsonFilePath))
-            {
-                JSONNode json = JSON.Parse(jsonFilePath);
-                getDataFromJson(json);
-                
-            }
-            Debug.Log(Application.persistentDataPath);
-            writeFile(3); readFile();
+            return _gameData;
         }
-
-        void Save(List<Category> categories)
+        // Hace el parse de todos los niveles y configura
+        // los datos iniciales del juego.
+        public void ParseAll(Category[] categories)
         {
-            
-        }
-
-        void getDataFromJson(JSONNode jnode)
-        {
-            // TODO: Check hash
-            //hints = jnode["hints"].AsInt;
-            //List<Category> c = new List<Category>();
-            JSONArray cats = (JSONArray)jnode["categories"];
-            for(int i = 0; i < cats.Count; i++)
+            _gameData = new GameData();
+            _gameData.hash = "";
+            _gameData.hints = 3;
+            foreach(Category cat in categories)
             {
-                // Si existe la categoria que teniamos guardada
-                if (_data.ContainsKey(cats[i]["name"]))
+                CategoryData cSave = new CategoryData(cat.categoryName);
+                _gameData.categories.Add(cSave);
+                foreach(LevelPack pack in cat.packs)
                 {
-                    JSONArray jpacks = (JSONArray)cats[i]["packs"];
-                    for (int j = 0; j < jpacks.Count; j++)
-                    {
-                        // Si la categoria tiene el pack teniamos guardado
-                        if (_data[cats[i]["name"]].packs.ContainsKey(jpacks[j]["name"]))
-                        {
-                            //Configuramos el pack segun lo guardado
-                            _data[cats[i]["name"]].packs[jpacks[j]["name"]].blocked = jpacks[j]["blocked"].AsBool;
-                            LevelData[] currentLevels = _data[cats[i]["name"]].packs[jpacks[j]["name"]].levels;
-                            JSONArray jlevels = (JSONArray)jpacks[j]["levels"];
-                            for (int m = 0; m < jlevels.Count; m++)
-                            {
-                                currentLevels[jlevels[m]["level"].AsInt] = JsonUtility.FromJson<LevelData>(jlevels[m].ToString());
-                                /*currentLevels[jlevels[m]["level"].AsInt].levelBlocked = jlevels[m]["blocked"].AsBool;
-                                currentLevels[jlevels[m]["level"].AsInt].bestMoves = jlevels[m]["best"].AsInt;*/
-                            }
-                        }
-                    }
+                    pack.Parse();
+                    PackData pData = new PackData();
+                    pData.name = pack.packName;
+                    pData.blocked = pack.blocked;
+                    pData.completedLevels = 0;
+                    pData.totalLevels = pack.getTotalLevels();
+                    pData.lastUnlockedLevel = pack.blockedLevelIndex;
+                    pData.bestMoves = new List<int>(pack.getTotalLevels());
+                    for(int i = 0; i < pack.getTotalLevels(); i++)
+                        pData.bestMoves.Add(-1);
+
+                    cSave.packs.Add(pData);
                 }
             }
+        }
 
-        }
-        private void Start()
+        /*
+         * Modificamos los datos del juego segun si
+         * habia datos ya guardados
+         */
+        public void Load()
         {
-            //writeFile(2); readFile();
-        }
-        void writeFile(int num)
-        {
-            using (StreamWriter wstream = new StreamWriter(jsonFilePath))
+            if (!File.Exists(Application.persistentDataPath + jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
+            using (StreamReader rstream = new StreamReader(Application.persistentDataPath + jsonFilePath))
             {
-
-                /*LevelData[] levelData = new LevelData[num];
-                for(int i = 0; i < num; i++)
+                JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), _gameData);
+                if (!CheckHash())
                 {
-                    levelData[i] = new LevelData();
-                    levelData[i].levelBlocked = i % 2 == 0;
-                    levelData[i].bestMoves = i;
-                }*/
-               /* string json = JsonUtility.ToJson(, true);
-                wstream.Write(json);*/
+                    Debug.LogError("File has been modified");
+                    Application.Quit();
+                    // o reseteamos los valores
+                }
+
             }
         }
-        void readFile()
+
+        /*
+         * Guardamos los datos del juego y el hash
+         */
+        public void Save()
         {
-            using (StreamReader rstream = new StreamReader(jsonFilePath))
+            using (StreamWriter wstream = new StreamWriter(Application.persistentDataPath + jsonFilePath))
             {
-                string aux = rstream.ReadToEnd();
-                //Category levelData = JsonUtility.FromJson<Category>(aux);
-                /*for (int i = 0; i < levelData.Length; i++)
-                {
-                    Debug.Log(levelData[i].bestMoves + " " + levelData[i].levelBlocked);
-                }*/
+                _gameData.hash = "";
+                _gameData.hash = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
+                string json = JsonUtility.ToJson(_gameData, true);
+                wstream.Write(json);
             }
+        }
+
+        public void completeLevel(int catInd, int pInd, int lvlInd, int moves)
+        {
+            if (_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] == -1)
+            {
+                _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = moves;
+                _gameData.categories[catInd].packs[pInd].completedLevels++;
+            }
+            else
+            {
+                _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = Mathf.Min(_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd], moves);
+            }
+            // si hemos completado el nivel, desbloqueamos el siguiente
+            if (lvlInd == _gameData.categories[catInd].packs[pInd].lastUnlockedLevel)
+                _gameData.categories[catInd].packs[pInd].lastUnlockedLevel++;
+
+        }
+
+
+        public void unlockPack(int catInd, int pInd)
+        {
+            _gameData.categories[catInd].packs[pInd].blocked = false;
+        }
+
+        public void modifyHint(int value)
+        {
+            _gameData.hints = Mathf.Clamp(_gameData.hints + value, 0, MAX_HINTS); 
+        }
+
+        private bool CheckHash()
+        {
+            string ogHash = (string)_gameData.hash.Clone();
+            _gameData.hash = "";
+            string aux = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
+            return ogHash == aux;
+        }
+
+        private string ComputeHash(string raw)
+        {
+            // Create a SHA256   
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // ComputeHash - returns byte array  
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(raw));
+
+                // Convert byte array to a string   
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }       
         }
     }
 
 
-
-
-    public class CategoryData
-    {
-        public Dictionary<string, PackData> packs;
-    }
-    public class PackData
-    {
-        public bool blocked;
-        public LevelData[] levels;
-    }
     [System.Serializable]
-    public class LevelData
-    {
-        public bool levelBlocked;
-        public int bestMoves;
-    }
-
     public class GameData
     {
         public string hash;
-        public int hintNum;
-        CategoryData[] categories;
+        public int hints;
+        public List<CategoryData> categories;
+
+        public GameData()
+        {
+            categories = new List<CategoryData>();
+        }
     }
 
+    [System.Serializable]
+    public class CategoryData
+    {
+        public string name;
+        public List<PackData> packs;
+        public CategoryData(string name_)
+        {
+            name = name_;
+            packs = new List<PackData>();
+        }
+    }
+
+    [System.Serializable]
+    public class PackData
+    {
+        public string name;
+        public bool blocked;
+        public int totalLevels;
+        public int completedLevels;
+        public int lastUnlockedLevel;
+        public List<int> bestMoves;
+    }
 
 }

@@ -49,5 +49,11 @@ namespace FlowFree
             }
         }
 
+        // TODO: poner esto como una propiedad y dar error si hay demasiadas paginas
+        public int getTotalLevels()
+        {
+            return pages.Length * Page.LEVELS_PER_PAGE;
+        }
+
     }
 }

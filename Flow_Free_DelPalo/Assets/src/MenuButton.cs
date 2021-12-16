@@ -10,8 +10,8 @@ namespace FlowFree
         public Button button;
         public Text packNameText;
 
-        // TODO: Mirar si se ha pasado niveles para esto
         public Text packLevelsText;
+        public ChangeStateSprite stateSprite;
         public void setPackName(string packName)
         {
             packNameText.text = packName;
@@ -20,14 +20,21 @@ namespace FlowFree
         {
             packNameText.color = c;
         }
-        public void setPackLevels(int numLevels)
+        public void setPackLevels(int completedLevels, int numLevels)
         {
-            packLevelsText.text = "0 / " + numLevels;
+            packLevelsText.text = completedLevels + " / " + numLevels;
         }
 
         public void setOnClick(UnityEngine.Events.UnityAction action)
         {
             button.onClick.AddListener(action);
+        }
+
+        public void setBlocked(bool blocked)
+        {
+            button.interactable = !blocked;
+            if (blocked) stateSprite.setBlocked();
+            else         stateSprite.setNone();
         }
     }
 }

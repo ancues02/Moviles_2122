@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FlowFree
 {
@@ -12,12 +13,33 @@ namespace FlowFree
         [Tooltip("El script AdsInterstitial del objeto que lo contiene en la escena")]
         public AdsInterstitial adsInterstitial;
 
+        [Tooltip("El texto del canvas del nivel")]
+        public Text levelText;
+
+        [Tooltip("El texto del canvas del tamanio del tablero")]
+        public Text sizeText;
+
+        [Tooltip("Boton de siguiente nivel de la parte inferior del canvas")]
+        public Button nextLevelButton;
+
+        [Tooltip("Boton de nivel anterior de la parte inferior del canvas")]
+        public Button prevLevelButton;
+
+        [Tooltip ("Color de los botones desactivados")]
+        [SerializeField]
+        Color disableColor;
+
+
+        public ChangeStateSprite completeLevelImage;
+
         private void Start()
         {
             if (!board )
                 Debug.LogError("Falta referencia BoardManager en LevelManager");
-            if(!adsInterstitial)
-                Debug.LogWarning("Falta referencia de adsInterstitial en LevelManager");
+
+            if(!adsInterstitial || !sizeText || !levelText || !prevLevelButton || !nextLevelButton)
+                Debug.LogWarning("Falta alguna referencia en LevelManager");
+
         }
         public void LevelEnded()
         {
@@ -31,10 +53,9 @@ namespace FlowFree
 
         public void NextLevel()
         {            
-            //TODO checkear que esta desbloqueado el siguiente nivel
             GameManager gm = GameManager.getInstance();
-            gm.nextLevel();
-            gm.ChangeScene("Game Board");           
+            if(gm.NextLevel())
+                gm.ChangeScene("Game Board");           
 
         }
 
@@ -45,23 +66,43 @@ namespace FlowFree
             gm.ChangeScene("Game Board");
         }
 
-        //TODO QUITAR
-        void Update()
+        /// <summary>
+        /// Pone los valores iniciales a textos y botones del canvas
+        /// </summary>
+        /// <param name="levelNumber"> el nivel que se esta jugando</param>
+        /// <param name="width"> el ancho del tablero</param>
+        /// <param name="height"> el alto del tablero</param>
+        /// <param name="flowNomber"> el numero de flows en el nivel</param>
+        /// <param name="firstLevelPack"> si hay nivel anterior</param>
+        /// <param name="lastLevelPack"> si hay nivel siguiente</param>
+        /// <param name="bestMove"> El mejor movimiento en ese nivel</param>
+        public void InitialParams(int levelNumber, int width, int height, int flowNomber,bool firstLevelPack, bool lastLevelPack, int bestMove)
         {
-            // Para probar cambios de escenas
-            if (Input.GetKeyDown(KeyCode.Space))
-            {              
-                NextLevel();
-            }
-            if (Input.GetKeyDown(KeyCode.Q))
+            levelText.text = "Level" + levelNumber;
+            sizeText.text = width + "x" +height;
+            if (firstLevelPack)
             {
-                PreviousLevel();
+                prevLevelButton.interactable = false;
+                prevLevelButton.GetComponent<Image>().color = disableColor;
             }
-            if (Input.GetKeyDown(KeyCode.W))
+            if (lastLevelPack)
             {
-                GameManager gm = GameManager.getInstance();               
-                gm.ChangeScene("Game Board");
+                nextLevelButton.interactable = false;
+                nextLevelButton.GetComponent<Image>().color = disableColor;
             }
+            board.best = bestMove;
+            if (flowNomber == bestMove)
+            {
+                completeLevelImage.setPerfect();
+            }
+            else if (flowNomber < bestMove)
+            {
+                completeLevelImage.setComplete();
+            }
+            else
+                completeLevelImage.setNone();
+
         }
+
     }
 }

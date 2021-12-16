@@ -9,7 +9,7 @@ namespace FlowFree
     public class GameManager : MonoBehaviour
     {
         // Categorias que contienen los lotes que estan en el juego
-        public List<Category> categories;
+        public Category[] categories;
         //public  aux;
         // Tema de colores que se usara en el juego
         public ColorTheme theme;
@@ -17,39 +17,25 @@ namespace FlowFree
         public MenuManager menuManager;
         public LevelSelectorManager lvlSelectorManager;
         public LevelManager lvlManager;
-        public BoardManager boardManager;
 
         static GameManager _instance;
 
         //int selectedCategory;
-        LevelPack selectedLevelPack;
+        int _categoryIndex, _packIndex;
         int selectedLevel;
         
         // Gestion del guardado 
         GameDataManager _dataManager;
 
-        // Para testear
-        public bool Testing;
-        public int CategoryIndex;
-        public int PackIndex;
-        public int Level;
-
-        public int numHints { get; private set; } = 3;
-
         private void Awake()
         {
-            #if UNITY_EDITOR
-                numHints=1;
-            #endif
-            if (Testing)
-                Test(CategoryIndex, PackIndex, Level);
+            
             if(!_instance)
             {
-                //selectedLevelPack = new LevelPack();
                 _dataManager = new GameDataManager();
-                /*_dataManager.initCategories();
-                _dataManager.load();*/
-                //_dataManager.Load();
+                _dataManager.ParseAll(categories);
+                _dataManager.Load();
+
                 _instance = this;
                 DontDestroyOnLoad(gameObject); 
             }
@@ -59,7 +45,7 @@ namespace FlowFree
                 _instance.menuManager = menuManager;
                 _instance.lvlSelectorManager = lvlSelectorManager;
                 _instance.lvlManager = lvlManager;
-                _instance.boardManager = boardManager;
+                
 
                 // Se destruye al final del frame asi que puede ir aqui
                 Destroy(gameObject);  
@@ -67,18 +53,27 @@ namespace FlowFree
 
             // Iniciamos los managers si toca
             if (_instance.menuManager)
-                _instance.menuManager.setCategories(_instance.categories.ToArray());
+                _instance.menuManager.setCategories(_instance.categories, _instance._dataManager.GetGameData().categories.ToArray());
 
             if (_instance.lvlSelectorManager)
-                _instance.lvlSelectorManager.setPack(_instance.selectedLevelPack);
+                _instance.lvlSelectorManager.setPack(
+                    _instance.categories[_instance._categoryIndex].packs[_instance._packIndex], 
+                    _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex]
+                );
 
             if (_instance.lvlManager)
             {
-                if (_instance.selectedLevelPack.Valid)
+                if (_instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Valid)
                 {
                     _instance.lvlManager.board.SetFlowColors(_instance.theme.colors);
                     _instance.lvlManager.board.GetCameraSize();
-                    _instance.lvlManager.board.SetMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
+                    Logic.Map map = _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps[_instance.selectedLevel];
+                    _instance.lvlManager.board.SetMap(map); 
+                    //iniciar los parametros de lvlManager, basicamente poner los textos en funcion al nivel a jugar y lo que se este guardado
+                    _instance.lvlManager.InitialParams(map.LevelNumber, map.Width,
+                        map.Height, map.FlowNumber,!_instance.DoesPrevLevelExist(), !_instance.DoesNextLevelExist() || 
+                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].lastUnlockedLevel == _instance.selectedLevel,
+                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].bestMoves[_instance.selectedLevel]);
                 }
             }
         }
@@ -101,28 +96,34 @@ namespace FlowFree
          */
         public void setLevelPack(int categoryIndex, int packIndex)
         {
-            selectedLevelPack = categories[categoryIndex].packs[packIndex];
-            selectedLevelPack.Parse();
-            if (!selectedLevelPack.Valid)
-                Debug.LogError("El lote " + selectedLevelPack.packName + " de la categoria " + categories[categoryIndex] + " no tiene el formato correcto");
-            else
-                Debug.Log("Lote cargado correctamente");
-            
+            _categoryIndex = categoryIndex;
+            _packIndex = packIndex; 
         }
 
-        public void setSelectedLevel(int levelIndex)
+        public void SetSelectedLevel(int levelIndex)
         {
             selectedLevel = levelIndex;
         }
 
         public bool DoesNextLevelExist()
         {
-            return selectedLevel + 1 < selectedLevelPack.Maps.Length;
+            return selectedLevel + 1 < _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length;
         }
 
-        public void nextLevel()
+        /// <summary>
+        /// Cambia al siguiente nivel, si no hay mas niveles, cambia al menu
+        /// </summary>
+        /// <returns>Devuelve si hay o no nivel siguiente</returns>
+        public bool NextLevel()
         {
-            selectedLevel = Mathf.Clamp(selectedLevel + 1, 0, selectedLevelPack.Maps.Length -1);
+            if(!_instance.DoesNextLevelExist())
+            {
+                ChangeScene("Menu");
+                return false;
+            }
+            else
+                selectedLevel++;
+            return true;
         }
 
         public bool DoesPrevLevelExist()
@@ -133,7 +134,7 @@ namespace FlowFree
         public void prevLevel()
         {
            
-            selectedLevel = Mathf.Clamp(selectedLevel-1,0, selectedLevelPack.Maps.Length-1);
+            selectedLevel = Mathf.Clamp(selectedLevel-1,0, _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length-1);
         }
 
         /**
@@ -143,26 +144,39 @@ namespace FlowFree
         private void Test(int categoryIndex, int packIndex, int level)
         {
             setLevelPack(categoryIndex, packIndex);
-            setSelectedLevel(level);
+            SetSelectedLevel(level);
         }
 
         public bool useHint()
         {
-            bool ret = false;
-
-            if(numHints > 0)
+            bool ret;
+            if(ret = _dataManager.GetGameData().hints > 0)
             {
-                ret = true;
-                numHints--;
-                // TODO Reescribe n�mero de hints en archivo o algo
+                _dataManager.modifyHint(-1);
             }
             return ret;
         }
 
         public void IncreaseHints(int numHints_)
         {
-            numHints += numHints_;
-            boardManager.CheckHints();
+            _dataManager.modifyHint(numHints_);
+            lvlManager.board.CheckHints();
+        }
+
+        public int getHints()
+        {
+            return _dataManager.GetGameData().hints;
+        }
+
+        public void LevelComplete(int moves)
+        {
+            
+            _dataManager.completeLevel(_instance._categoryIndex, _instance._packIndex, _instance.selectedLevel, moves);
+        }
+
+        private void OnApplicationQuit()
+        {
+            _dataManager.Save();
         }
     }
 }
