@@ -60,8 +60,9 @@ namespace FlowFree
         bool legalMove = false;
         bool changes = false; 
 
-        int totalFlows, best, totalNumPipes;
+        int totalFlows, totalNumPipes;
         int numFlows, moves, numPipes;
+        public int best { get; set; }
 
         bool win = false;
         bool continuePlaying = false;
@@ -84,7 +85,8 @@ namespace FlowFree
             {
                 moves = 0;
                 //flowText.text = "flows: 0/" + ;
-                movesText.text = "moves:" + moves + " best: -";
+                movesText.text = "moves:" + moves + " best: ";
+                movesText.text += best == -1 ? "-" : best+"";
                 pipesText.text = "pipe: 0%";
                 CheckHints();
             }
@@ -481,7 +483,8 @@ namespace FlowFree
         /// </summary>
         private void CheckMoves()
         {
-            movesText.text = "moves:" + moves + " best: -";
+            movesText.text = "moves:" + moves + " best: ";
+            movesText.text += best == -1 ? "-" : best + "";
         }
 
         /// <summary>
