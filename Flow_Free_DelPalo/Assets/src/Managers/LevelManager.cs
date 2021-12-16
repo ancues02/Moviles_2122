@@ -94,12 +94,11 @@ namespace FlowFree
             board.best = bestMove;
             if (flowNomber == bestMove)
             {
-                completeLevelImage.setPerfect(true);
+                completeLevelImage.setPerfect();
             }
             else if (flowNomber < bestMove)
             {
-                //tick
-                completeLevelImage.setComplete(true);
+                completeLevelImage.setComplete();
             }
             else
                 completeLevelImage.setNone();
