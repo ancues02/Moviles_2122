@@ -62,7 +62,9 @@ namespace FlowFree
         int numFlows, moves, numPipes;
 
         bool win = false;
-        bool end = false;
+
+        enum GamePhase { begin, mid, end, NONE };
+        GamePhase gameState = GamePhase.NONE;
 
         private List<Color> colors;
 
@@ -190,8 +192,16 @@ namespace FlowFree
             totalNumPipes = m.Width * m.Height;
             setMainTiles();
             vectorOffset = new Vector2((-m.Width / 2f) * _baseRatio.x, ((-m.Height / 2f) * _baseRatio.y) + m.Height * _baseRatio.y);
-            transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
-            transform.Translate(new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), vectorOffset.y - (0.5f * _baseRatio.y)));
+            
+            //if(beginWithAnimation)
+            transform.localScale = new Vector3(0, _baseRatio.y, 1);
+            transform.position = new Vector2(0, vectorOffset.y - (0.5f * _baseRatio.y));
+            gameState = GamePhase.begin;
+            //else
+            //transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
+            //transform.position = new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), vectorOffset.y - (0.5f * _baseRatio.y));
+            //gameState = GamePhase.mid;
+
             flowText.text = "flows: 0/" + totalFlows;
         }
 
@@ -807,16 +817,38 @@ namespace FlowFree
 
         private void Update()
         {
-#if UNITY_EDITOR
-            if (!win)
+            switch (gameState)
             {
-                if (Input.GetMouseButtonDown(0))
-                    PressInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-                if (Input.GetMouseButtonUp(0))
-                    ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-                if (Input.GetMouseButton(0))
-                    DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            }
+                case GamePhase.begin:
+                    {
+                        Vector3 tmp = transform.localScale;
+                        tmp.x += _baseRatio.x * Time.deltaTime;
+                        transform.localScale = tmp;
+
+                        tmp = transform.localPosition;
+                        tmp.x += (vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime;
+                        transform.localPosition = tmp;
+
+                        if (transform.localScale.x >= _baseRatio.x)
+                        {
+                            transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
+                            transform.position = new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), vectorOffset.y - (0.5f * _baseRatio.y));
+                            gameState = GamePhase.mid;
+                        }
+                    }
+                    break;
+                case GamePhase.mid:
+                    {
+#if UNITY_EDITOR
+                        if (!win)
+                        {
+                            if (Input.GetMouseButtonDown(0))
+                                PressInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+                            if (Input.GetMouseButtonUp(0))
+                                ReleaseInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+                            if (Input.GetMouseButton(0))
+                                DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+                        }
 #else
             if (Input.touches.Length > 0 && !win)
             {
@@ -836,21 +868,27 @@ namespace FlowFree
                 }
             }
 #endif
-            if (end)
-            {
-                Vector3 tmp = transform.localPosition;
-                tmp.x += -(vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime;
-                transform.localPosition = tmp;
+                    }
+                    break;
+                case GamePhase.end:
+                    {
+                        Vector3 tmp = transform.localPosition;
+                        tmp.x += -(vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime;
+                        transform.localPosition = tmp;
 
-                tmp = transform.localScale;
-                tmp.x -= _baseRatio.x * Time.deltaTime;
-                transform.localScale = tmp;
+                        tmp = transform.localScale;
+                        tmp.x -= _baseRatio.x * Time.deltaTime;
+                        transform.localScale = tmp;
 
-                if (tmp.x <= 0)
-                {
-                    lvlManager.LevelEnded();
-                    end = false;
-                }
+                        if (tmp.x <= 0)
+                        {
+                            lvlManager.LevelEnded();
+                            gameState = GamePhase.NONE;
+                        }
+                    }
+                    break;
+                case GamePhase.NONE:
+                    break;
             }
         }
 
@@ -872,7 +910,7 @@ namespace FlowFree
 
         public void ChangeLevel()
         {
-            end = true;
+            gameState = GamePhase.end;
             winPanel.SetActive(false);
         }
 
