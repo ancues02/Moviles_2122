@@ -56,7 +56,8 @@ namespace FlowFree
                 packDplay.setAttributes(pack, i);
                 markerImages[i] = Instantiate(pageMarkerPref, markerDisplay).GetComponent<Image>();
             }
-            
+            markerImages[0].color = Color.white;
+
         }
 
         ///<summary>

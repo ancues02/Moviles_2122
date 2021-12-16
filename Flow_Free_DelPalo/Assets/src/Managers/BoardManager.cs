@@ -16,6 +16,8 @@ namespace FlowFree
 
         public SpriteRenderer pointer;
 
+        
+
         [Tooltip("El texto del canvas de flows")]
         public Text flowText;
 
@@ -63,6 +65,7 @@ namespace FlowFree
 
         bool win = false;
         bool end = false;
+        bool continuePlaying = false;
 
         private List<Color> colors;
 
@@ -100,7 +103,8 @@ namespace FlowFree
 
         public void SetMap(Logic.Map m)
         {
-            map = m;
+            
+             map = m;
             _tiles = new Tile[m.Width, m.Height];
             _width = m.Width;
             _height = m.Height;
@@ -147,6 +151,7 @@ namespace FlowFree
                 _tiles[tile % m.Width, tile / m.Width].setIsVoid();
             }
 
+            // Muros del nivel
             foreach (Vector2Int pair in map.Walls)
             {
                 Vector2Int A = new Vector2Int(pair.x % m.Width, pair.x / m.Width);
@@ -251,7 +256,7 @@ namespace FlowFree
                 _animColor = true;
                 pressedColor = activatedTile.getColor();
                 lastConnectedTile = currentTile = activatedTile;
-                _flowsIndex = getColorIndex(currentTile.getColor());
+                _flowsIndex = GetColorIndex(currentTile.getColor());
 
                 // pistas
                 if (CheckIfHintedFlow(_flowsIndex))
@@ -280,7 +285,7 @@ namespace FlowFree
 
         void playWiggleOnExtreme(Tile start)
         {
-            int index = getColorIndex(start.getColor());
+            int index = GetColorIndex(start.getColor());
             Vector2Int target = map.Flows[index].start;
             if (start.getBoardPos() == target) 
                 target = map.Flows[index].end;
@@ -333,6 +338,13 @@ namespace FlowFree
             // comprobar si se ha ganado
             if (numFlows == totalFlows)
             {
+                //para saltarme el frame de pulsar la cruz del panel y seguir jugando
+                //si hacemos esto detecta el release de la pulsacion y vuelve a ganar
+                if (continuePlaying)
+                {
+                    continuePlaying = false;
+                    return;
+                }
                 win = true;
                 winPanel.SetActive(true);
                 panelMovesText.text = "You completed the level\n"+" in " + moves +" moves";
@@ -346,6 +358,7 @@ namespace FlowFree
         // Mira si es uno en el que se ha hecho una pista
         bool CheckIfHintedFlow(int flowsindex)
         {
+           
             bool wasHinted = !_hintIndexs.Contains(flowsindex);
             bool isCorrect = _flows[flowsindex].Count == map.Flows[flowsindex].flowPoints.Count;
             int i = 0;
@@ -468,29 +481,30 @@ namespace FlowFree
             hintText.text = GameManager.getInstance().numHints + " x ";
         }
 
+
+        
         /// <summary>
         /// Cuando se corta una tuberia con otro color
         /// Se guarda el estado de la tuberia antes de ser cortada
         /// </summary>
-        /// <param name="ind"></param>
+        /// <param name="ind"> el indice del flow que se ha cortado</param>
         private void CutFlow(int ind)
         {
-
-            foreach (List<Tile> t in _tmpFlows)
-            {
-                if (t[0].getColor() == _flows[ind][0].getColor())
-                    return;
-            }
-            List<Tile> tmpList = new List<Tile>();
-
-           
-            // pistas
+            //comprobar si se ha cortado uno con pista, entonces quitarla
             if (CheckIfHintedFlow(ind))
             {
                 Debug.Log("Desactivar");
                 PutStars(ind, false);
             }
+            //no hacer nada si ya se ha guardado durante ese drag del flow que se ha cortado la tuberia
+            foreach (List<Tile> t in _tmpFlows)
+            {
+                if (t[0].getColor() == _flows[ind][0].getColor())
+                    return;
+            }
 
+            //lista temporal donde guardar una copia clonada del flow cortado
+            List<Tile> tmpList = new List<Tile>();
             //copiar el estado de ese flow a la lista de flows cortados para poder restaurar su estado
             for (int i = 0; i < _flows[ind].Count; ++i)
             {
@@ -500,7 +514,6 @@ namespace FlowFree
                 //de donde has venido y a donde has ido en ese tile
                 if (t == currentTile)
                 {
-                    //putStars(i, false);
                     tmp.DeactiveAll();
                     int outInd = -1;
                     if (i + 1 < _flows[ind].Count)
@@ -516,10 +529,10 @@ namespace FlowFree
         /// <summary>
         /// Desactiva si una tuberia a cortado a otra
         /// </summary>
-        private void deactivateByColor(Logic.Directions dir)
+        private void DeactivateByColor(Logic.Directions dir)
         {
             int ind = 0;
-            while (!_flows[ind].Contains(currentTile) /*|| ind == _flowsIndex*/)
+            while (!_flows[ind].Contains(currentTile) )
             {
                 ind++;
             }
@@ -586,13 +599,14 @@ namespace FlowFree
         {
             for (int i = _tmpFlows.Count - 1; i >= 0; --i)
             {
+                flowText.text = _tmpFlows.Count+"";
                 List<Tile> list = _tmpFlows[i];
                 foreach (Tile tile in toCheck)
                 {
+
                     if (list.Contains(tile) )
                     {
-
-                        int ind = getColorIndex(list[0].getColor());
+                        int ind = GetColorIndex(list[0].getColor());
                         int j = _flows[ind].Count - 1;
                         Tile t = list[j];
                         Tile boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
@@ -618,7 +632,6 @@ namespace FlowFree
                         // pistas
                         if (CheckIfHintedFlow(ind))
                         {
-                            Debug.Log("Activar");
                             PutStars(ind, true);
                         }
                         break;
@@ -660,8 +673,11 @@ namespace FlowFree
             }
         }
 
-        // Desactiva el camino de una tuberia
-        private void deactivate(Logic.Directions dir)
+        /// <summary>
+        /// Desactiva el camino de una tuberia
+        /// </summary>
+        /// <param name="dir"> La direccion en la que se ha ido</param>
+        private void Deactivate(Logic.Directions dir)
         {
 
             if (lastConnectedTile.getColor() == currentTile.getColor() && !colorConflict)
@@ -670,7 +686,7 @@ namespace FlowFree
             }
             else//un color a cortado a otro
             {
-                deactivateByColor(dir);
+                DeactivateByColor(dir);
             }
             CheckFlows();
             changes = true;
@@ -732,17 +748,16 @@ namespace FlowFree
                 legalMove = false;
 
                 Logic.Directions fromDir = Logic.Directions.Right;
-                Logic.Directions toDir = Logic.Directions.Right;
                 if ((lastPos.x == newPos.x - 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido a la derecha
                 {
-                    lastConnectedTile.modify(toDir = Logic.Directions.Right, true, pressedColor);
+                    lastConnectedTile.modify( Logic.Directions.Right, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Left, true, pressedColor);
                     legalMove = true;
                 }
                 else if ((lastPos.x == newPos.x + 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido a la izquierda
                 {
-                    lastConnectedTile.modify(toDir = Logic.Directions.Left, true, pressedColor);
+                    lastConnectedTile.modify( Logic.Directions.Left, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Right, true, pressedColor);
                     legalMove = true;
@@ -750,14 +765,14 @@ namespace FlowFree
                 }
                 else if ((lastPos.y == newPos.y + 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido arriba
                 {
-                    lastConnectedTile.modify(toDir = Logic.Directions.Up, true, pressedColor);
+                    lastConnectedTile.modify( Logic.Directions.Up, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Down, true, pressedColor);
                     legalMove = true;
                 }
                 else if ((lastPos.y == newPos.y - 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido abajo
                 {
-                    lastConnectedTile.modify(toDir = Logic.Directions.Down, true, pressedColor);
+                    lastConnectedTile.modify( Logic.Directions.Down, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
                     deActivate = currentTile.modify(fromDir = Logic.Directions.Up, true, pressedColor);
                     legalMove = true;
@@ -770,7 +785,7 @@ namespace FlowFree
                 // y hay que "borrar" el camino que tenia esa tuberia, se ha cortado el flujo
                 if (deActivate)
                 {
-                    deactivate(fromDir);
+                    Deactivate(fromDir);
                     lastConnectedTile = currentTile;
                 }
                 else if (legalMove)
@@ -807,9 +822,11 @@ namespace FlowFree
 
         private void Update()
         {
-#if UNITY_EDITOR
+            //lectura de input en el editor o en windows
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
             if (!win)
             {
+                
                 if (Input.GetMouseButtonDown(0))
                     PressInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 if (Input.GetMouseButtonUp(0))
@@ -817,7 +834,8 @@ namespace FlowFree
                 if (Input.GetMouseButton(0))
                     DragInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             }
-#else
+            //lectura de input en android
+#elif UNITY_ANDROID
             if (Input.touches.Length > 0)
             {
                 Touch input = Input.GetTouch(0);
@@ -854,7 +872,12 @@ namespace FlowFree
             }
         }
 
-        int getColorIndex(Color c)
+        /// <summary>
+        /// Dependiendo del color, calcula indice en la lista de colores que tenemos
+        /// </summary>
+        /// <param name="c"> el color a checkear</param>
+        /// <returns> devuelve el indice del color en nuestra lista de colores</returns>
+        int GetColorIndex(Color c)
         {
             int index = -1;
             int i = 0;
@@ -870,13 +893,29 @@ namespace FlowFree
             return index;
         }
 
+        /// <summary>
+        /// Cuando en el panel se llama a cambiar de nivel
+        /// </summary>
         public void ChangeLevel()
         {
             end = true;
             winPanel.SetActive(false);
         }
 
+        /// <summary>
+        /// Se llama al "ganar" y activarse el panel y el jugador pulsa en la cruz
+        /// </summary>
+        public void ContinuePlaying()
+        {
+            win = false;
+            continuePlaying = true;
+            winPanel.SetActive(false);
+        }
 
+        /// <summary>
+        /// Pone una pista, se llama al pulsar el boton de pista 
+        /// Comprueba que te quedan pistas y avisa al GameManager para que actualice el valor y lo guarde
+        /// </summary>
         public void DoHint()
         {
             if (_hintIndexs.Count > 0  )
@@ -887,11 +926,12 @@ namespace FlowFree
                     _hintIndexs.Remove(index);
                     _usingHint = true;
 
+                    //Simulamos el recorrido del flow como si estuviesemos drageando
                     if (_flows[index].Count > 0)
                     {
                         PressTile(_flows[index][0].getBoardPos());
                     }
-
+                    
                     PressTile(map.Flows[index].flowPoints[0]);
 
                     for (int i = 1; i < map.Flows[index].flowPoints.Count; ++i)
@@ -908,6 +948,7 @@ namespace FlowFree
                 else
                 {
 #if UNITY_ANDROID
+                    //Si no quedan pistas, mostrar anuncio
                     adsRewarded.ShowAd();
 #endif
                 }
@@ -915,14 +956,5 @@ namespace FlowFree
             
         }
 
-        public void goToPrevLevel()
-        {
-            GameManager.getInstance().prevLevel();
-        }
-
-        public void goToNextLevel()
-        {
-            GameManager.getInstance().nextLevel();
-        }
     }
 }
