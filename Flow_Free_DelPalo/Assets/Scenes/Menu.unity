@@ -662,37 +662,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1077236072 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3776296069195461217, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
-  m_PrefabInstance: {fileID: 3776296068164177860}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1077236073
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1077236072}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 505bf43a77feacf4f802be0f0a63b593, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jsonFilePath: test.json
---- !u!114 &1077236074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1077236072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35c8bbec0e80a134789e99cccbe234b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jsonFilePath: test.json
 --- !u!1 &1235871790
 GameObject:
   m_ObjectHideFlags: 0
@@ -764,6 +733,7 @@ GameObject:
   - component: {fileID: 1285883831}
   - component: {fileID: 1285883834}
   - component: {fileID: 1285883833}
+  - component: {fileID: 1285883832}
   m_Layer: 5
   m_Name: Display
   m_TagString: Untagged
@@ -790,8 +760,22 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.000076293945}
-  m_SizeDelta: {x: 0, y: 500}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &1285883832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1285883830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!222 &1285883833
 CanvasRenderer:
   m_ObjectHideFlags: 0

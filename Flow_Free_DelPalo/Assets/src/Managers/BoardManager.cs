@@ -345,6 +345,7 @@ namespace FlowFree
             {
                 win = true;
                 winPanel.SetActive(true);
+                GameManager.getInstance().LevelComplete(moves);
                 panelMovesText.text = "You completed the level\n"+" in " + moves +" moves";
                 foreach (Tile t in _tiles)
                     if (t.getIsMain()) t.animations.Pulse();

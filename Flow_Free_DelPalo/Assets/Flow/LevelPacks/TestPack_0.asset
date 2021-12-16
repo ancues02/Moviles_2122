@@ -17,16 +17,13 @@ MonoBehaviour:
   pages:
   - name: facil
     color: {r: 0, g: 1, b: 0.7550447, a: 1}
-    blocked: 0
   - name: medio
     color: {r: 0.27058828, g: 1, b: 0.6693133, a: 1}
-    blocked: 0
   - name: dificil
     color: {r: 0.46274507, g: 0.99215686, b: 0.65441394, a: 1}
-    blocked: 0
   - name: muy dificil
     color: {r: 0.501513, g: 0.9245283, b: 0.75685894, a: 1}
-    blocked: 0
   - name: demasiado dificil
     color: {r: 0.6786668, g: 0.9528302, b: 0.8673083, a: 1}
-    blocked: 0
+  blocked: 1
+  blockedLevelIndex: 0

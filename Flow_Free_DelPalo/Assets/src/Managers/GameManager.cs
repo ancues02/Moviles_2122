@@ -9,7 +9,7 @@ namespace FlowFree
     public class GameManager : MonoBehaviour
     {
         // Categorias que contienen los lotes que estan en el juego
-        public List<Category> categories;
+        public Category[] categories;
         //public  aux;
         // Tema de colores que se usara en el juego
         public ColorTheme theme;
@@ -22,17 +22,11 @@ namespace FlowFree
         static GameManager _instance;
 
         //int selectedCategory;
-        LevelPack selectedLevelPack;
+        int _categoryIndex, _packIndex;
         int selectedLevel;
         
         // Gestion del guardado 
         GameDataManager _dataManager;
-
-        // Para testear
-        public bool Testing;
-        public int CategoryIndex;
-        public int PackIndex;
-        public int Level;
 
         public int numHints { get; private set; } = 3;
 
@@ -41,12 +35,12 @@ namespace FlowFree
             #if UNITY_EDITOR
                 numHints=1;
             #endif
-            if (Testing)
-                Test(CategoryIndex, PackIndex, Level);
             if(!_instance)
             {
                 //selectedLevelPack = new LevelPack();
                 _dataManager = new GameDataManager();
+                _dataManager.ParseAll(categories);
+                _dataManager.Load();
                 /*_dataManager.initCategories();
                 _dataManager.load();*/
                 //_dataManager.Load();
@@ -67,18 +61,21 @@ namespace FlowFree
 
             // Iniciamos los managers si toca
             if (_instance.menuManager)
-                _instance.menuManager.setCategories(_instance.categories.ToArray());
+                _instance.menuManager.setCategories(_instance.categories, _instance._dataManager.GetGameData().categories.ToArray());
 
             if (_instance.lvlSelectorManager)
-                _instance.lvlSelectorManager.setPack(_instance.selectedLevelPack);
+                _instance.lvlSelectorManager.setPack(
+                    _instance.categories[_instance._categoryIndex].packs[_instance._packIndex], 
+                    _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex]
+                );
 
             if (_instance.lvlManager)
             {
-                if (_instance.selectedLevelPack.Valid)
+                if (_instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Valid)
                 {
                     _instance.lvlManager.board.SetFlowColors(_instance.theme.colors);
                     _instance.lvlManager.board.GetCameraSize();
-                    _instance.lvlManager.board.SetMap(_instance.selectedLevelPack.Maps[_instance.selectedLevel]);
+                    _instance.lvlManager.board.SetMap(_instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps[_instance.selectedLevel]);
                 }
             }
         }
@@ -101,13 +98,8 @@ namespace FlowFree
          */
         public void setLevelPack(int categoryIndex, int packIndex)
         {
-            selectedLevelPack = categories[categoryIndex].packs[packIndex];
-            selectedLevelPack.Parse();
-            if (!selectedLevelPack.Valid)
-                Debug.LogError("El lote " + selectedLevelPack.packName + " de la categoria " + categories[categoryIndex] + " no tiene el formato correcto");
-            else
-                Debug.Log("Lote cargado correctamente");
-            
+            _categoryIndex = categoryIndex;
+            _packIndex = packIndex; 
         }
 
         public void setSelectedLevel(int levelIndex)
@@ -117,12 +109,12 @@ namespace FlowFree
 
         public bool DoesNextLevelExist()
         {
-            return selectedLevel + 1 < selectedLevelPack.Maps.Length;
+            return selectedLevel + 1 < _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length;
         }
 
         public void nextLevel()
         {
-            selectedLevel = Mathf.Clamp(selectedLevel + 1, 0, selectedLevelPack.Maps.Length -1);
+            selectedLevel = Mathf.Clamp(selectedLevel + 1, 0, _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length -1);
         }
 
         public bool DoesPrevLevelExist()
@@ -133,7 +125,7 @@ namespace FlowFree
         public void prevLevel()
         {
            
-            selectedLevel = Mathf.Clamp(selectedLevel-1,0, selectedLevelPack.Maps.Length-1);
+            selectedLevel = Mathf.Clamp(selectedLevel-1,0, _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length-1);
         }
 
         /**
@@ -163,6 +155,16 @@ namespace FlowFree
         {
             numHints += numHints_;
             boardManager.CheckHints();
+        }
+
+        public void LevelComplete(int moves)
+        {
+            _dataManager.completeLevel(_instance._categoryIndex, _instance._packIndex, _instance.selectedLevel, moves);
+        }
+
+        private void OnApplicationQuit()
+        {
+            _dataManager.Save();
         }
     }
 }

@@ -7,7 +7,7 @@ namespace FlowFree
 {
     /**
      * Scriptable Object para gestionar las categorias como datos.
-     * Contiene el nombre y los lotes de la categoría.
+     * Contiene el nombre y los lotes de la categorï¿½a.
      */
     [CreateAssetMenu(fileName = "Category",
         menuName = "Flow/Category", order = 1)]
