@@ -102,11 +102,22 @@ namespace FlowFree
                 float y = Camera.main.orthographicSize * 2;
                 float x = y * Camera.main.aspect;
                 x *= 0.99f; // Ligero margen
-                float ratio = /*(_canvasSize.rect.height - (_topSize.rect.height + _botSize.rect.height)) / _canvasSize.rect.height*/0.75f;
+                float ratio = GetVerticalRatio();
                 y *= ratio; // Lo de la UI? No sé como vamos a hacerlo
                 _cameraSize = new Vector2(x, y);
             }
             else Debug.LogError("No hay cámara, ¿qué esperabas que pasara?");
+        }
+
+        float GetVerticalRatio()
+        {
+            float sWidth = Screen.width;    // resolución de la pantalla
+            float cWidth = _canvasSize.GetComponent<CanvasScaler>().referenceResolution.x;  // resolución del canvas base
+            float ratioed = sWidth / cWidth;    // Ratio
+            float tHeight = _topSize.rect.height * ratioed; // De base a actual
+            float bHeight = _botSize.rect.height * ratioed; // Ditto
+            float total = Screen.height - (tHeight + bHeight);  // Píxeles libres
+            return total / Screen.height;   // Porcentaje libre
         }
 
         public void SetMap(Logic.Map m)

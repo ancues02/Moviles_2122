@@ -3093,7 +3093,7 @@ MonoBehaviour:
   panelMovesText: {fileID: 2077882367}
   _canvasSize: {fileID: 773023889}
   _topSize: {fileID: 1728421664}
-  _botSize: {fileID: 179812862}
+  _botSize: {fileID: 415351331}
   winPanel: {fileID: 273183314}
   _compleet:
   - {fileID: 2069978057}
