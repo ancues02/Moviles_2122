@@ -11,6 +11,7 @@ namespace FlowFree
         public Text packNameText;
 
         public Text packLevelsText;
+        public ChangeStateSprite stateSprite;
         public void setPackName(string packName)
         {
             packNameText.text = packName;
@@ -32,6 +33,8 @@ namespace FlowFree
         public void setBlocked(bool blocked)
         {
             button.interactable = !blocked;
+            if (blocked) stateSprite.setBlocked();
+            else         stateSprite.setNone();
         }
     }
 }

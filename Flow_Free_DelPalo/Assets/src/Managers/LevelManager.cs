@@ -29,6 +29,9 @@ namespace FlowFree
         [SerializeField]
         Color disableColor;
 
+
+        public ChangeStateSprite completeLevelImage;
+
         private void Start()
         {
             if (!board )
@@ -50,10 +53,9 @@ namespace FlowFree
 
         public void NextLevel()
         {            
-            //TODO checkear que esta desbloqueado el siguiente nivel
             GameManager gm = GameManager.getInstance();
-            gm.nextLevel();
-            gm.ChangeScene("Game Board");           
+            if(gm.NextLevel())
+                gm.ChangeScene("Game Board");           
 
         }
 
@@ -70,9 +72,11 @@ namespace FlowFree
         /// <param name="levelNumber"> el nivel que se esta jugando</param>
         /// <param name="width"> el ancho del tablero</param>
         /// <param name="height"> el alto del tablero</param>
+        /// <param name="flowNomber"> el numero de flows en el nivel</param>
         /// <param name="firstLevelPack"> si hay nivel anterior</param>
         /// <param name="lastLevelPack"> si hay nivel siguiente</param>
-        public void InitialParams(int levelNumber, int width, int height, bool firstLevelPack ,bool lastLevelPack)
+        /// <param name="bestMove"> El mejor movimiento en ese nivel</param>
+        public void InitialParams(int levelNumber, int width, int height, int flowNomber,bool firstLevelPack, bool lastLevelPack, int bestMove)
         {
             levelText.text = "Level" + levelNumber;
             sizeText.text = width + "x" +height;
@@ -86,6 +90,18 @@ namespace FlowFree
                 nextLevelButton.interactable = false;
                 nextLevelButton.GetComponent<Image>().color = disableColor;
             }
+            board.best = bestMove;
+            if (flowNomber == bestMove)
+            {
+                completeLevelImage.setPerfect();
+            }
+            else if (flowNomber < bestMove)
+            {
+                completeLevelImage.setComplete();
+            }
+            else
+                completeLevelImage.setNone();
+
         }
 
     }

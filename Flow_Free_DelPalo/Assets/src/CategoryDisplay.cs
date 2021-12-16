@@ -36,6 +36,11 @@ namespace FlowFree
                     Debug.Log(catIndx + " " +  packIndex);
                     GameManager.getInstance().ChangeScene("Level Select");             
                 });
+
+                /*if (cData.packs[i].completedLevels == cData.packs[i].totalLevels)
+                {
+                    packButton.set(cData.packs[i].blocked);
+                }*/
             }
         }
     }

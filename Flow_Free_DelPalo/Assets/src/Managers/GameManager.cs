@@ -69,8 +69,11 @@ namespace FlowFree
                     _instance.lvlManager.board.GetCameraSize();
                     Logic.Map map = _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps[_instance.selectedLevel];
                     _instance.lvlManager.board.SetMap(map); 
+                    //iniciar los parametros de lvlManager, basicamente poner los textos en funcion al nivel a jugar y lo que se este guardado
                     _instance.lvlManager.InitialParams(map.LevelNumber, map.Width,
-                        map.Height, !_instance.DoesPrevLevelExist(), !_instance.DoesNextLevelExist());
+                        map.Height, map.FlowNumber,!_instance.DoesPrevLevelExist(), !_instance.DoesNextLevelExist() || 
+                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].lastUnlockedLevel == _instance.selectedLevel,
+                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].bestMoves[_instance.selectedLevel]);
                 }
             }
         }
@@ -97,7 +100,7 @@ namespace FlowFree
             _packIndex = packIndex; 
         }
 
-        public void setSelectedLevel(int levelIndex)
+        public void SetSelectedLevel(int levelIndex)
         {
             selectedLevel = levelIndex;
         }
@@ -107,9 +110,20 @@ namespace FlowFree
             return selectedLevel + 1 < _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length;
         }
 
-        public void nextLevel()
+        /// <summary>
+        /// Cambia al siguiente nivel, si no hay mas niveles, cambia al menu
+        /// </summary>
+        /// <returns>Devuelve si hay o no nivel siguiente</returns>
+        public bool NextLevel()
         {
-            selectedLevel = Mathf.Clamp(selectedLevel + 1, 0, _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length -1);
+            if(!_instance.DoesNextLevelExist())
+            {
+                ChangeScene("Menu");
+                return false;
+            }
+            else
+                selectedLevel++;
+            return true;
         }
 
         public bool DoesPrevLevelExist()
@@ -130,7 +144,7 @@ namespace FlowFree
         private void Test(int categoryIndex, int packIndex, int level)
         {
             setLevelPack(categoryIndex, packIndex);
-            setSelectedLevel(level);
+            SetSelectedLevel(level);
         }
 
         public bool useHint()
@@ -156,6 +170,7 @@ namespace FlowFree
 
         public void LevelComplete(int moves)
         {
+            
             _dataManager.completeLevel(_instance._categoryIndex, _instance._packIndex, _instance.selectedLevel, moves);
         }
 
