@@ -76,6 +76,9 @@ namespace FlowFree
         private bool _usingHint = false;    // Para que las hints no se animen
         private bool _animColor = false;    // Para que el release no haga wiggle si no tocaste nada
 
+        public List<Animable> _compleet;
+        public Transform _compleetParent;
+
         private void Start()
         {
             if (!flowText || !movesText || !pipesText || !hintText
@@ -99,11 +102,22 @@ namespace FlowFree
                 float y = Camera.main.orthographicSize * 2;
                 float x = y * Camera.main.aspect;
                 x *= 0.99f; // Ligero margen
-                float ratio = (_canvasSize.rect.height - (_topSize.rect.height + _botSize.rect.height)) / _canvasSize.rect.height;
+                float ratio = GetVerticalRatio();
                 y *= ratio; // Lo de la UI? No sé como vamos a hacerlo
                 _cameraSize = new Vector2(x, y);
             }
             else Debug.LogError("No hay cámara, ¿qué esperabas que pasara?");
+        }
+
+        float GetVerticalRatio()
+        {
+            float sWidth = Screen.width;    // resolución de la pantalla
+            float cWidth = _canvasSize.GetComponent<CanvasScaler>().referenceResolution.x;  // resolución del canvas base
+            float ratioed = sWidth / cWidth;    // Ratio
+            float tHeight = _topSize.rect.height * ratioed; // De base a actual
+            float bHeight = _botSize.rect.height * ratioed; // Ditto
+            float total = Screen.height - (tHeight + bHeight);  // Píxeles libres
+            return total / Screen.height;   // Porcentaje libre
         }
 
         public void SetMap(Logic.Map m)
@@ -278,7 +292,13 @@ namespace FlowFree
                 if (currentTile.getIsMain())
                 {
                     DeactivateMain();
-                    if(!_usingHint && _animColor) playWiggleOnExtreme(currentTile);
+                    if (!_usingHint && _animColor)
+                    {
+                        Vector2Int target = map.Flows[_flowsIndex].start;
+                        _tiles[target.x, target.y].animableSprites[0].Wiggle();
+                         target = map.Flows[_flowsIndex].end;
+                        _tiles[target.x, target.y].animableSprites[0].Wiggle();
+                    }
                 }
                 else
                 {
@@ -294,15 +314,6 @@ namespace FlowFree
                 }
                 
             }
-        }
-
-        void playWiggleOnExtreme(Tile start)
-        {
-            int index = GetColorIndex(start.getColor());
-            Vector2Int target = map.Flows[index].start;
-            if (start.getBoardPos() == target) 
-                target = map.Flows[index].end;
-            _tiles[target.x, target.y].animations.Wiggle();
         }
 
         void ReleaseInput(Vector2 pos)
@@ -343,10 +354,10 @@ namespace FlowFree
                 PutStars(_flowsIndex, true);
 
             if (!_usingHint && _animColor && _flows[_flowsIndex].Count > 0)
-                if(_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
-                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.Pulse();
+                if (_flows[_flowsIndex][_flows[_flowsIndex].Count - 1].getIsMain())
+                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animableSprites[1].Pulse();
                 else
-                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animations.SmallWiggle();
+                    _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animableSprites[2].Wiggle();
 
             // comprobar si se ha ganado
             if (numFlows == totalFlows)
@@ -363,7 +374,10 @@ namespace FlowFree
                 GameManager.getInstance().LevelComplete(moves);
                 panelMovesText.text = "You completed the level\n"+" in " + moves +" moves";
                 foreach (Tile t in _tiles)
-                    if (t.getIsMain()) t.animations.Pulse();
+                    if (t.getIsMain()) t.animableSprites[1].Pulse();
+
+                if (moves > _flows.Length) _compleet[0].Pulse();
+                else _compleet[1].Pulse();
             }
 
             _animColor = false;
@@ -874,6 +888,10 @@ namespace FlowFree
                         {
                             transform.localScale = new Vector3(_baseRatio.x, _baseRatio.y, 1);
                             transform.position = new Vector2(vectorOffset.x + (0.5f * _baseRatio.x), vectorOffset.y - (0.5f * _baseRatio.y));
+
+                            _compleetParent.transform.Translate(-new Vector2(vectorOffset.x + (0.5f * _baseRatio.x),
+                                vectorOffset.y - (0.5f * _baseRatio.y)));
+
                             gameState = GamePhase.mid;
                         }
                     }
