@@ -22,14 +22,19 @@ namespace FlowFree
                 lvlButton = Instantiate(buttonPref, buttonGroup).GetComponent<LevelSelectionButton>();
                 lvlButton.setLevelNumber(pack.Maps[levelIndex].LevelNumber);
                 lvlButton.setColor(pack.pages[pageIndex].color);
-                lvlButton.setBlocked(pData.lastUnlockedLevel >= levelIndex);
+                lvlButton.setBlocked(pData.lastUnlockedLevel < levelIndex);
                 lvlButton.setOnClick(() => {
                     GameManager.getInstance().SetSelectedLevel(levelIndex);
                     GameManager.getInstance().ChangeScene("Game Board");
                 });
 
-                if (pData.bestMoves[j + pageIndex * Page.LEVELS_PER_PAGE] == pack.Maps[j + pageIndex * Page.LEVELS_PER_PAGE].FlowNumber)
-                    lvlButton.setBest();
+                if (pData.bestMoves[levelIndex] > -1)
+                {   
+                    if(pData.bestMoves[levelIndex] == pack.Maps[levelIndex].FlowNumber)
+                        lvlButton.setPerfect();
+                    else
+                        lvlButton.setComplete();
+                }       
             }                  
         }
     }

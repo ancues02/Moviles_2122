@@ -26,15 +26,20 @@ namespace FlowFree
             stateImage.sprite = BlockedSprite; 
             stateImage.enabled = true;
         }
-        public void setComplete(bool complete)
+        public void setComplete()
         {
             stateImage.sprite = CompleteSprite;
             stateImage.enabled = true;
         }
-        public void setPerfect(bool perfect)
+        public void setPerfect()
         {
             stateImage.sprite = PerfectSprite;
             stateImage.enabled = true;
+        }
+
+        public void setColor(Color c)
+        {
+            stateImage.color = c;
         }
     }
 }
