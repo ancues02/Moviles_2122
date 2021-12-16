@@ -71,6 +71,7 @@ namespace FlowFree
     {
         public const int MAX_HINTS = 99;
         private string jsonFilePath = "savedData.json";
+        private const string pepper = "pimienta";
         GameData _gameData;
         public GameData GetGameData()
         {
@@ -118,7 +119,8 @@ namespace FlowFree
                 if (!CheckHash())
                 {
                     Debug.LogError("File has been modified");
-                    //Application.Quit();
+                    Application.Quit();
+                    // o reseteamos los valores
                 }
 
             }
@@ -132,7 +134,7 @@ namespace FlowFree
             using (StreamWriter wstream = new StreamWriter(jsonFilePath))
             {
                 _gameData.hash = "";
-                _gameData.hash = ComputeHash(JsonUtility.ToJson(_gameData, true));
+                _gameData.hash = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
                 string json = JsonUtility.ToJson(_gameData, true);
                 wstream.Write(json);
             }
@@ -153,7 +155,7 @@ namespace FlowFree
         {
             string ogHash = (string)_gameData.hash.Clone();
             _gameData.hash = "";
-            string aux = ComputeHash(JsonUtility.ToJson(_gameData, true));
+            string aux = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
             return ogHash == aux;
         }
 
