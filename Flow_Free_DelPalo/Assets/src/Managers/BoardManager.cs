@@ -10,13 +10,10 @@ namespace FlowFree
         public GameObject TilePrefab;
         public LevelManager lvlManager;
 
-
         [Tooltip("El script AdsRewarded del objeto que lo contiene en la escena")]
         public AdsRewarded adsRewarded;
 
-        public SpriteRenderer pointer;
-
-        
+        public SpriteRenderer pointer;     
 
         [Tooltip("El texto del canvas de flows")]
         public Text flowText;
@@ -36,6 +33,9 @@ namespace FlowFree
         private Vector2 _cameraSize;
         private Vector2 _availableSize;
         private Vector2 _baseRatio;
+        public RectTransform _canvasSize;
+        public RectTransform _topSize;
+        public RectTransform _botSize;
 
         [Tooltip("El panel del canvas de de ganar")]
         public GameObject winPanel;
@@ -97,7 +97,8 @@ namespace FlowFree
                 float y = Camera.main.orthographicSize * 2;
                 float x = y * Camera.main.aspect;
                 x *= 0.99f; // Ligero margen
-                y *= 0.75f; // Lo de la UI? No sé como vamos a hacerlo
+                float ratio = (_canvasSize.rect.height - (_topSize.rect.height + _botSize.rect.height)) / _canvasSize.rect.height;
+                y *= ratio; // Lo de la UI? No sé como vamos a hacerlo
                 _cameraSize = new Vector2(x, y);
             }
             else Debug.LogError("No hay cámara, ¿qué esperabas que pasara?");
