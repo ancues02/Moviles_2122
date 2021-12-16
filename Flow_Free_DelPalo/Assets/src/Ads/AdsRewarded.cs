@@ -64,6 +64,7 @@ namespace FlowFree
 
         public void OnUnityAdsShowClick(string placementId)
         {
+
         }
 
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
