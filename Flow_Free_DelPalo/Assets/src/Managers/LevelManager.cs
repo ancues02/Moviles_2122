@@ -29,6 +29,9 @@ namespace FlowFree
         [SerializeField]
         Color disableColor;
 
+
+        public ChangeStateSprite completeLevelImage;
+
         private void Start()
         {
             if (!board )
@@ -89,14 +92,17 @@ namespace FlowFree
                 nextLevelButton.GetComponent<Image>().color = disableColor;
             }
             board.best = bestMove;
-            if(flowNomber == bestMove)
+            if (flowNomber == bestMove)
             {
-                //estrella
+                completeLevelImage.setPerfect(true);
             }
             else if (flowNomber < bestMove)
             {
                 //tick
+                completeLevelImage.setComplete(true);
             }
+            else
+                completeLevelImage.setNone();
 
         }
 
