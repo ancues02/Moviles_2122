@@ -3,61 +3,63 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using SimpleJSON;
+using System.Security.Cryptography;
+using System.Text;
 /**
- *  -------------------SAVED DATA JSON FORMAT--------------------------------
- *  {
- *      hash: "slajfljefja39u872895",
- *      hints: 3,
- *      categories: 
- *      [
- *          {
- *              name: "Intro"
- *              packs:
- *              [
- *                  {
- *                      name: "Classic"
- *                      blocked: false,
- *                      levels:
- *                      [
- *                          {
- *                              level: 0,
- *                              blocked: true,
- *                              best: 6
- *                          },
- *                          (...)
- *                      ]
- *                  },
- *                  (...)
- *              ]
- *          },
- *          (...)
- *      ]
- *  
- *  }
- *  
- *  {
- *      hash: "slajfljefja39u872895"
- *      hints: 4
- *      unlockedPacks:
- *      [
- *          {
- *              category: "Extreme"
- *              pack: 
- *          }
- *      ]
- *      levels:
- *      [
- *          {
- *              category: "Intro",
- *              pack: "Classic",
- *              level: 54
- *              blocked: false,
- *              best: 5
- *          },
- *          (...)
- *      ]
- *  }
- */
+*  -------------------SAVED DATA JSON FORMAT--------------------------------
+*  {
+*      hash: "slajfljefja39u872895",
+*      hints: 3,
+*      categories: 
+*      [
+*          {
+*              name: "Intro"
+*              packs:
+*              [
+*                  {
+*                      name: "Classic"
+*                      blocked: false,
+*                      levels:
+*                      [
+*                          {
+*                              level: 0,
+*                              blocked: true,
+*                              best: 6
+*                          },
+*                          (...)
+*                      ]
+*                  },
+*                  (...)
+*              ]
+*          },
+*          (...)
+*      ]
+*  
+*  }
+*  
+*  {
+*      hash: "slajfljefja39u872895"
+*      hints: 4
+*      unlockedPacks:
+*      [
+*          {
+*              category: "Extreme"
+*              pack: 
+*          }
+*      ]
+*      levels:
+*      [
+*          {
+*              category: "Intro",
+*              pack: "Classic",
+*              level: 54
+*              blocked: false,
+*              best: 5
+*          },
+*          (...)
+*      ]
+*  }
+*/
 
 /*
     Se encarga de cargar y guardar datos.
@@ -113,22 +115,24 @@ namespace FlowFree
             using (StreamReader rstream = new StreamReader(jsonFilePath))
             {
                 JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), _gameData);
-                /*GameData savedData = JsonUtility.FromJson<GameData>(rstream.ReadToEnd());
-                if (CheckHash(savedData))
+                if (!CheckHash())
                 {
-                    
-                    _gameData = savedData;  // Comprobar si ha habido algun cambio extra
-                }*/
+                    Debug.LogError("File has been modified");
+                    //Application.Quit();
+                }
+
             }
         }
 
         /*
-         * Guardamos el juego.
+         * Guardamos los datos del juego y el hash
          */
         public void Save()
         {
             using (StreamWriter wstream = new StreamWriter(jsonFilePath))
             {
+                _gameData.hash = "";
+                _gameData.hash = ComputeHash(JsonUtility.ToJson(_gameData, true));
                 string json = JsonUtility.ToJson(_gameData, true);
                 wstream.Write(json);
             }
@@ -145,14 +149,30 @@ namespace FlowFree
             _gameData.hints = Mathf.Clamp(_gameData.hints, 0, MAX_HINTS); 
         }
 
-        private bool CheckHash(GameData data)
+        private bool CheckHash()
         {
-            return true;
+            string ogHash = (string)_gameData.hash.Clone();
+            _gameData.hash = "";
+            string aux = ComputeHash(JsonUtility.ToJson(_gameData, true));
+            return ogHash == aux;
         }
 
-        private string ComputeHash(string file)
+        private string ComputeHash(string raw)
         {
-            return "";
+            // Create a SHA256   
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // ComputeHash - returns byte array  
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(raw));
+
+                // Convert byte array to a string   
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }       
         }
     }
 
