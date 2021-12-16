@@ -72,7 +72,8 @@ namespace FlowFree
         /// <param name="height"> el alto del tablero</param>
         /// <param name="firstLevelPack"> si hay nivel anterior</param>
         /// <param name="lastLevelPack"> si hay nivel siguiente</param>
-        public void InitialParams(int levelNumber, int width, int height, bool firstLevelPack ,bool lastLevelPack)
+        /// <param name="bestMove"> El mejor movimiento en ese nivel</param>
+        public void InitialParams(int levelNumber, int width, int height, bool firstLevelPack, bool lastLevelPack, int bestMove)
         {
             levelText.text = "Level" + levelNumber;
             sizeText.text = width + "x" +height;
@@ -86,6 +87,8 @@ namespace FlowFree
                 nextLevelButton.interactable = false;
                 nextLevelButton.GetComponent<Image>().color = disableColor;
             }
+            board.best = bestMove;
+
         }
 
     }
