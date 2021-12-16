@@ -27,14 +27,24 @@ namespace FlowFree
         // Gestion del guardado 
         GameDataManager _dataManager;
 
+        //Logic.GameCategory[] gameCategories;
+        Dictionary<string, Logic.GameCategory> catDict;
+
         private void Awake()
-        {
-            
+        {         
             if(!_instance)
             {
                 _dataManager = new GameDataManager();
-                _dataManager.ParseAll(categories);
+                //_dataManager.ParseAll(categories);
                 _dataManager.Load();
+                catDict = new Dictionary<string, Logic.GameCategory>();
+                Logic.GameCategory gameCategory;
+                for(int i = 0; i < categories.Length; i++)
+                {
+                    gameCategory = new Logic.GameCategory();
+                    gameCategory.Init(categories[i]);
+                }
+                _dataManager.LogicParseAll(ref catDict);
 
                 _instance = this;
                 DontDestroyOnLoad(gameObject); 
@@ -176,7 +186,7 @@ namespace FlowFree
 
         private void OnApplicationQuit()
         {
-            _dataManager.Save();
+            //_dataManager.Save();
         }
     }
 }

@@ -17,10 +17,11 @@ namespace FlowFree
         private const string jsonFilePath = "saveFile.json";
         private const string pepper = "pimienta";
         GameData _gameData;
+        
 
         // Diccionario con cada categoria y los nombres de los packs en cada una
         //Dictionary<string, string[]> _categoriesPacks; 
-
+        Dictionary<string, CategorySave> _savedCategories;
         public GameData GetGameData()
         {
             return _gameData;
@@ -60,10 +61,22 @@ namespace FlowFree
             }
         }
 
-        /*
-         * Modificamos los datos del juego segun si
-         * habia datos ya guardados
-         */
+        public void LogicParseAll(ref Dictionary<string, Logic.GameCategory> categories)
+        {
+            // Load();
+            
+            foreach(CategoryData cd in _gameData.categories)
+            {
+                if (categories.ContainsKey(cd.name))
+                {
+                    categories[cd.name].InitSaved(cd);
+                }
+            }
+        }
+            /*
+             * Modificamos los datos del juego segun si
+             * habia datos ya guardados
+             */
         public void Load()
         {
             if (!File.Exists(jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
@@ -76,19 +89,38 @@ namespace FlowFree
                     Debug.LogError("File has been modified");
                     // Si se a modificado, aplicamos los valores por defecto
                 }
-                else
-                {
-                    _gameData.safeOverride(savedData);
-                }
-
             }
         }
 
         /*
          * Guardamos los datos del juego y el hash
          */
-        public void Save()
+        public void Save(Dictionary<string, Logic.GameCategory> categories)
         {
+            List<string> catKeys = new List<string>(categories.Keys);
+            foreach(string cName in catKeys)
+            {
+                if (_savedCategories.ContainsKey(cName))
+                {
+                    List<string> packKeys = new List<string>(categories[cName].PacksDict.Keys);
+                    _gameData.categories[_savedCategories[cName].catIndex].name = cName;
+                    foreach(string pName in packKeys)
+                    {
+                        if (_savedCategories[cName].packSaves.ContainsKey(pName))
+                        {
+                            Logic.GamePack gp = categories[cName].PacksDict[pName];
+                            PackData pd = _gameData.categories[_savedCategories[cName].catIndex].packs[_savedCategories[cName].packSaves[pName]];
+                            pd.name = pName;
+                            pd.blocked = gp.Blocked;
+                            pd.totalLevels = gp.TotalLevels;    // este no hace falta
+                            pd.completedLevels = gp.CompletedLevels;
+                            pd.lastUnlockedLevel = gp.BlockedLevelIndex;
+                            pd.bestMoves = gp.BestMoves;
+                        }
+                    }
+                }
+            }
+            
             using (StreamWriter wstream = new StreamWriter(jsonFilePath))
             {
                 _gameData.hash = "";
@@ -156,6 +188,11 @@ namespace FlowFree
         }
     }
 
+    public class CategorySave
+    {
+        public int catIndex;
+        public Dictionary<string, int> packSaves;
+    }
 
     [System.Serializable]
     public class GameData
@@ -168,19 +205,6 @@ namespace FlowFree
         {
             categories = new List<CategoryData>();
         }
-        public void safeOverride(GameData otherData)
-        {
-            hash = otherData.hash;
-            hints = otherData.hints;
-            List<CategoryData> aux = otherData.categories.Count < categories.Count ? otherData.categories : categories;
-            for(int i = 0; (i < categories.Count; i++)
-            {
-                if (otherData.categories[i].name == categories[i].name)
-                {
-                    categories[i].safeOverride(otherData.categories[i]);
-                }
-            }
-        }
     }
 
     [System.Serializable]
@@ -191,17 +215,6 @@ namespace FlowFree
         public CategoryData()
         {
             packs = new List<PackData>();
-        }
-        public void safeOverride(CategoryData other)
-        {
-            name = other.name;
-            for(int i = 0; i < packs.Count; i++)
-            {
-                if (other.packs[i].name == packs[i].name)
-                {
-                    packs[i] = other.packs[i];
-                }
-            }
         }
     }
 
