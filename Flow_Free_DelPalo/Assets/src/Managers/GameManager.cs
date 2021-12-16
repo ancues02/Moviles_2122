@@ -17,7 +17,6 @@ namespace FlowFree
         public MenuManager menuManager;
         public LevelSelectorManager lvlSelectorManager;
         public LevelManager lvlManager;
-        public BoardManager boardManager;
 
         static GameManager _instance;
 
@@ -53,7 +52,7 @@ namespace FlowFree
                 _instance.menuManager = menuManager;
                 _instance.lvlSelectorManager = lvlSelectorManager;
                 _instance.lvlManager = lvlManager;
-                _instance.boardManager = boardManager;
+                
 
                 // Se destruye al final del frame asi que puede ir aqui
                 Destroy(gameObject);  
@@ -75,7 +74,10 @@ namespace FlowFree
                 {
                     _instance.lvlManager.board.SetFlowColors(_instance.theme.colors);
                     _instance.lvlManager.board.GetCameraSize();
-                    _instance.lvlManager.board.SetMap(_instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps[_instance.selectedLevel]);
+                    Logic.Map map = _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps[_instance.selectedLevel];
+                    _instance.lvlManager.board.SetMap(map); 
+                    _instance.lvlManager.InitialParams(map.LevelNumber, map.Width,
+                        map.Height, !_instance.DoesPrevLevelExist(), !_instance.DoesNextLevelExist());
                 }
             }
         }
@@ -154,7 +156,7 @@ namespace FlowFree
         public void IncreaseHints(int numHints_)
         {
             numHints += numHints_;
-            boardManager.CheckHints();
+            lvlManager.board.CheckHints();
         }
 
         public void LevelComplete(int moves)
