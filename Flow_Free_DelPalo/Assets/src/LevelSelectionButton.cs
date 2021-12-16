@@ -25,5 +25,15 @@ namespace FlowFree
         {
             button.onClick.AddListener(action);
         }
+
+        public void setBlocked(bool blocked)
+        {
+            button.interactable = blocked;
+        }
+
+        public void setBest()
+        {
+            Debug.Log("Cambiar el sprite al de perfecto");
+        }
     }
 }

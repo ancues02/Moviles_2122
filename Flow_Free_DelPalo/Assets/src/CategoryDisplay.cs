@@ -14,7 +14,7 @@ namespace FlowFree
         public Image categoryBar;
 
         int numPacks;
-        public void setAttributes(Category cat, int catIndx)
+        public void setAttributes(Category cat, CategoryData cData, int catIndx)
         {
             categoryBackground.color = new Color(cat.categoryColor.r, cat.categoryColor.g, cat.categoryColor.b, 0.6f);
             categoryBar.color = cat.categoryColor;
@@ -27,10 +27,13 @@ namespace FlowFree
                 packButton = Instantiate(buttonPref, transform).GetComponent<MenuButton>();
                 packButton.setPackName(cat.packs[i].packName);
                 packButton.setPackTextColor(cat.categoryColor);
-                packButton.setPackLevels(cat.packs[i].getTotalLevels());
+                packButton.setPackLevels(cData.packs[i].completedLevels, cat.packs[i].getTotalLevels());
+                packButton.setBlocked(cData.packs[i].blocked);
+                
                 int packIndex = i;
                 packButton.setOnClick(() => {
                     GameManager.getInstance().setLevelPack(catIndx, packIndex);
+                    Debug.Log(catIndx + " " +  packIndex);
                     GameManager.getInstance().ChangeScene("Level Select");             
                 });
             }

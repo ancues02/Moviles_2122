@@ -70,12 +70,10 @@ namespace FlowFree
         public const int MAX_HINTS = 99;
         private string jsonFilePath = "savedData.json";
         GameData _gameData;
-        /*
-         * Creamos un diccionario de guardado por defecto,
-         * con las categorias que tuviera el GM, luego leemos el
-         * archivo y cambiamos en este diccionario
-         */
-
+        public GameData GetGameData()
+        {
+            return _gameData;
+        }
         // Hace el parse de todos los niveles y configura
         // los datos iniciales del juego.
         public void ParseAll(Category[] categories)
@@ -93,6 +91,8 @@ namespace FlowFree
                     PackData pData = new PackData();
                     pData.name = pack.packName;
                     pData.blocked = pack.blocked;
+                    pData.completedLevels = 0;
+                    pData.totalLevels = pack.getTotalLevels();
                     pData.lastUnlockedLevel = pack.blockedLevelIndex;
                     pData.bestMoves = new List<int>(pack.getTotalLevels());
                     for(int i = 0; i < pack.getTotalLevels(); i++)
@@ -112,11 +112,13 @@ namespace FlowFree
             if (!File.Exists(jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
             using (StreamReader rstream = new StreamReader(jsonFilePath))
             {
-                GameData savedData = JsonUtility.FromJson<GameData>(rstream.ReadToEnd());
+                JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), _gameData);
+                /*GameData savedData = JsonUtility.FromJson<GameData>(rstream.ReadToEnd());
                 if (CheckHash(savedData))
                 {
+                    
                     _gameData = savedData;  // Comprobar si ha habido algun cambio extra
-                }
+                }*/
             }
         }
 
@@ -127,7 +129,7 @@ namespace FlowFree
         {
             using (StreamWriter wstream = new StreamWriter(jsonFilePath))
             {
-                string json = JsonUtility.ToJson(_gameData);
+                string json = JsonUtility.ToJson(_gameData, true);
                 wstream.Write(json);
             }
         }
@@ -135,6 +137,7 @@ namespace FlowFree
         public void completeLevel(int catInd, int pInd, int lvlInd, int moves)
         {
             _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = Mathf.Min(_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd], moves);
+            _gameData.categories[catInd].packs[pInd].completedLevels++;
         }
 
         public void modifyHint(int value)
@@ -172,7 +175,6 @@ namespace FlowFree
     {
         public string name;
         public List<PackData> packs;
-
         public CategoryData(string name_)
         {
             name = name_;
@@ -185,6 +187,8 @@ namespace FlowFree
     {
         public string name;
         public bool blocked;
+        public int totalLevels;
+        public int completedLevels;
         public int lastUnlockedLevel;
         public List<int> bestMoves;
     }
