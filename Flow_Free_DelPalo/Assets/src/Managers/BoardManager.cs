@@ -489,7 +489,7 @@ namespace FlowFree
         /// </summary>
         public void CheckHints()
         {
-            hintText.text = GameManager.getInstance().numHints + " x ";
+            hintText.text = GameManager.getInstance().getHints() + " x ";
         }
 
 

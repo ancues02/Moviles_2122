@@ -27,22 +27,15 @@ namespace FlowFree
         // Gestion del guardado 
         GameDataManager _dataManager;
 
-        public int numHints { get; private set; } = 3;
-
         private void Awake()
         {
-            #if UNITY_EDITOR
-                numHints=1;
-            #endif
+            
             if(!_instance)
             {
-                //selectedLevelPack = new LevelPack();
                 _dataManager = new GameDataManager();
                 _dataManager.ParseAll(categories);
                 _dataManager.Load();
-                /*_dataManager.initCategories();
-                _dataManager.load();*/
-                //_dataManager.Load();
+
                 _instance = this;
                 DontDestroyOnLoad(gameObject); 
             }
@@ -142,21 +135,23 @@ namespace FlowFree
 
         public bool useHint()
         {
-            bool ret = false;
-
-            if(numHints > 0)
+            bool ret;
+            if(ret = _dataManager.GetGameData().hints > 0)
             {
-                ret = true;
-                numHints--;
-                // TODO Reescribe n�mero de hints en archivo o algo
+                _dataManager.modifyHint(-1);
             }
             return ret;
         }
 
         public void IncreaseHints(int numHints_)
         {
-            numHints += numHints_;
+            _dataManager.modifyHint(numHints_);
             lvlManager.board.CheckHints();
+        }
+
+        public int getHints()
+        {
+            return _dataManager.GetGameData().hints;
         }
 
         public void LevelComplete(int moves)

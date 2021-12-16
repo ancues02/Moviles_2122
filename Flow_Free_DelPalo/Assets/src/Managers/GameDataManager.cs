@@ -5,65 +5,9 @@ using UnityEngine;
 using SimpleJSON;
 using System.Security.Cryptography;
 using System.Text;
-/**
-*  -------------------SAVED DATA JSON FORMAT--------------------------------
-*  {
-*      hash: "slajfljefja39u872895",
-*      hints: 3,
-*      categories: 
-*      [
-*          {
-*              name: "Intro"
-*              packs:
-*              [
-*                  {
-*                      name: "Classic"
-*                      blocked: false,
-*                      levels:
-*                      [
-*                          {
-*                              level: 0,
-*                              blocked: true,
-*                              best: 6
-*                          },
-*                          (...)
-*                      ]
-*                  },
-*                  (...)
-*              ]
-*          },
-*          (...)
-*      ]
-*  
-*  }
-*  
-*  {
-*      hash: "slajfljefja39u872895"
-*      hints: 4
-*      unlockedPacks:
-*      [
-*          {
-*              category: "Extreme"
-*              pack: 
-*          }
-*      ]
-*      levels:
-*      [
-*          {
-*              category: "Intro",
-*              pack: "Classic",
-*              level: 54
-*              blocked: false,
-*              best: 5
-*          },
-*          (...)
-*      ]
-*  }
-*/
 
 /*
-    Se encarga de cargar y guardar datos.
-
+ * Se encarga de cargar y guardar datos
  */
 namespace FlowFree
 {
@@ -142,14 +86,30 @@ namespace FlowFree
 
         public void completeLevel(int catInd, int pInd, int lvlInd, int moves)
         {
-            _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] 
-                = _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] == -1 ? moves : Mathf.Min(_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd], moves);
-            _gameData.categories[catInd].packs[pInd].completedLevels++;
+            if (_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] == -1)
+            {
+                _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = moves;
+                _gameData.categories[catInd].packs[pInd].completedLevels++;
+            }
+            else
+            {
+                _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = Mathf.Min(_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd], moves);
+            }
+            // si hemos completado el nivel, desbloqueamos el siguiente
+            if (lvlInd == _gameData.categories[catInd].packs[pInd].lastUnlockedLevel)
+                _gameData.categories[catInd].packs[pInd].lastUnlockedLevel++;
+
+        }
+
+
+        public void unlockPack(int catInd, int pInd)
+        {
+            _gameData.categories[catInd].packs[pInd].blocked = false;
         }
 
         public void modifyHint(int value)
         {
-            _gameData.hints = Mathf.Clamp(_gameData.hints, 0, MAX_HINTS); 
+            _gameData.hints = Mathf.Clamp(_gameData.hints + value, 0, MAX_HINTS); 
         }
 
         private bool CheckHash()
