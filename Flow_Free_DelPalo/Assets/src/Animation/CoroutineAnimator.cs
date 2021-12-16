@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FlowFree
 {
-    public class OurAnimator : MonoBehaviour
+    public class CoroutineAnimator : MonoBehaviour
     {
         public List<SpriteRenderer> animatedSprites;
 

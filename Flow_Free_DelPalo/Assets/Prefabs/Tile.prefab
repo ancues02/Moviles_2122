@@ -1458,7 +1458,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8712364534256855016}
   - component: {fileID: 8712364534256855022}
-  - component: {fileID: 6942744298257497141}
+  - component: {fileID: -6058508645847775922}
   m_Layer: 0
   m_Name: Tile
   m_TagString: Untagged
@@ -1518,10 +1518,10 @@ MonoBehaviour:
   - {fileID: 4311230389870132512}
   - {fileID: 1917223614624004101}
   - {fileID: 5886175243785745367}
-  animations: {fileID: 6942744298257497141}
+  animations: {fileID: -6058508645847775922}
   inIndex: -1
   outIndex: -1
---- !u!114 &6942744298257497141
+--- !u!114 &-6058508645847775922
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

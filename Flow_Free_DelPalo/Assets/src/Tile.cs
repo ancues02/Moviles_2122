@@ -40,7 +40,7 @@ namespace FlowFree
         public GameObject[] childrensWalls;
 
         [Tooltip("Animaciones de tile (en corrutinas :D)")]
-        public OurAnimator animations;
+        public CoroutineAnimator animations;
 
         //Los indices de los path de entrada o salida
         public int inIndex = -1, outIndex = -1;

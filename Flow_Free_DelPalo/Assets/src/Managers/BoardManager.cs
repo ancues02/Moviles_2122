@@ -70,7 +70,7 @@ namespace FlowFree
         private bool _usingHint = false;    // Para que las hints no se animen
         private bool _animColor = false;    // Para que el release no haga wiggle si no tocaste nada
 
-        public OurAnimator _compleetTick;
+        public CoroutineAnimator _compleetTick;
 
         private void Start()
         {
@@ -264,7 +264,13 @@ namespace FlowFree
                 if (currentTile.getIsMain())
                 {
                     DeactivateMain();
-                    if(!_usingHint && _animColor) playWiggleOnExtreme(currentTile);
+                    if (!_usingHint && _animColor)
+                    {
+                        Vector2Int target = map.Flows[_flowsIndex].start;
+                        _tiles[target.x, target.y].animations.PlayWiggle(0);
+                         target = map.Flows[_flowsIndex].end;
+                        _tiles[target.x, target.y].animations.PlayWiggle(0);
+                    }
                 }
                 else
                 {
@@ -280,15 +286,6 @@ namespace FlowFree
                 }
                 
             }
-        }
-
-        void playWiggleOnExtreme(Tile start)
-        {
-            int index = getColorIndex(start.getColor());
-            Vector2Int target = map.Flows[index].start;
-            if (start.getBoardPos() == target) 
-                target = map.Flows[index].end;
-            _tiles[target.x, target.y].animations.PlayWiggle(0);
         }
 
         void ReleaseInput(Vector2 pos)
