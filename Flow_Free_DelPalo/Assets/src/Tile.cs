@@ -24,6 +24,8 @@ namespace FlowFree
         bool isMain = false;
 
         public List<Sprite> sprites;
+        
+        public List<Animable> animableSprites;
 
         public Sprite hintedSprite;
 
@@ -38,9 +40,6 @@ namespace FlowFree
 
         [Tooltip("Paredes de tile, deben ser hijos")]
         public GameObject[] childrensWalls;
-
-        [Tooltip("Animaciones de tile (en corrutinas :D)")]
-        public CoroutineAnimator animations;
 
         //Los indices de los path de entrada o salida
         public int inIndex = -1, outIndex = -1;
@@ -94,7 +93,7 @@ namespace FlowFree
         public void SmallCircleSetActive(bool active)
         {
             childrens[4].GetComponent<SpriteRenderer>().color = tileColor;
-            childrens[4].SetActive(active);
+            childrens[4].GetComponent<SpriteRenderer>().enabled = active;
         }
 
         // Activa o desactiva el renderSprite 
@@ -171,7 +170,7 @@ namespace FlowFree
             }
             if(!isMain)
                 tileColor = Color.black;
-            childrens[4].SetActive(false);
+            childrens[4].GetComponent<SpriteRenderer>().enabled = false;
             inIndex = outIndex = -1;
         }
 

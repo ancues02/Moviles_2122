@@ -4,45 +4,10 @@ using UnityEngine;
 
 namespace FlowFree
 {
-    public class CoroutineAnimator : MonoBehaviour
+    public class CoroutineAnimator
     {
-        public List<SpriteRenderer> animatedSprites;
-
-        private List<Coroutine> animations = new List<Coroutine>();
-
-        private void Start()
-        {
-            Prod();
-        }
-
-        public void Prod()
-        {
-            for (int i = 0; i < animatedSprites.Count; i++)
-                animations.Add(null);
-        }
-
-        public void PlayWiggle(int index)
-        {
-            if (animations[index] == null)
-            {
-                //StopCoroutine(animations[index]);
-                SpriteRenderer rend = animatedSprites[index];
-                animations[index] = StartCoroutine(Wiggle(rend));
-            }
-        }
-
-        public void PlayPulse(int index)
-        {
-            if (animations[index] == null)
-            {
-                //StopCoroutine(animations[index]);
-                SpriteRenderer rend = animatedSprites[index];
-                animations[index] = StartCoroutine(Pulse(rend));
-            }
-        }
-
         // vibración del círculo main
-        IEnumerator Wiggle(SpriteRenderer wiggled)
+        public static IEnumerator Wiggle(SpriteRenderer wiggled, System.Action animEnded = null)
         {
             float i = 0;
             Vector3 oldscale = wiggled.transform.localScale;
@@ -53,16 +18,16 @@ namespace FlowFree
             }
             wiggled.transform.localScale = oldscale;
 
-            animations[animatedSprites.IndexOf(wiggled)] = null;
+            animEnded?.Invoke();
 
             yield break;
         }
 
         // pulsación del círculo
-        IEnumerator Pulse(SpriteRenderer pulsed)
+        public static IEnumerator Pulse(SpriteRenderer pulsed, System.Action animEnded = null)
         {
             float i = 0;
-            pulsed.gameObject.SetActive(true);
+            pulsed.enabled = true;
             Vector3 oldscale = pulsed.transform.localScale;
             while (i < 1f)
             {
@@ -72,9 +37,9 @@ namespace FlowFree
                 yield return null;
             }
             pulsed.transform.localScale = oldscale;
-            pulsed.gameObject.SetActive(false);
+            pulsed.enabled = false;
 
-            animations[animatedSprites.IndexOf(pulsed)] = null;
+            animEnded?.Invoke();
 
             yield break;
         }
