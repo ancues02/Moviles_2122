@@ -692,8 +692,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6383e7fa156a6534599ea40c3affd357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameId: 4506529
-  testMode: 1
 --- !u!4 &1235871792
 Transform:
   m_ObjectHideFlags: 0
@@ -720,8 +718,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af550e5f66b5304397689b61e15b7e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AdUnityId: Banner_Android
-  bannerPosition: 4
 --- !u!1 &1285883830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1053,15 +1049,15 @@ PrefabInstance:
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: categories.Array.data[2]
       value: 
-      objectReference: {fileID: 11400000, guid: cf5b2dd60fbe05844b21d3d409d4527b, type: 2}
+      objectReference: {fileID: 11400000, guid: af929160e6434154b8f5decaf66fec82, type: 2}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: categories.Array.data[3]
       value: 
-      objectReference: {fileID: 11400000, guid: af929160e6434154b8f5decaf66fec82, type: 2}
+      objectReference: {fileID: 11400000, guid: cf5b2dd60fbe05844b21d3d409d4527b, type: 2}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: categories.Array.data[4]
       value: 
-      objectReference: {fileID: 11400000, guid: af929160e6434154b8f5decaf66fec82, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 3776296069195461218, guid: 700b3aa056891cd409600d0829e3a91c, type: 3}
       propertyPath: categories.Array.data[5]
       value: 

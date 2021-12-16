@@ -14,9 +14,13 @@ namespace FlowFree
     public class GameDataManager
     {
         public const int MAX_HINTS = 99;
-        private string jsonFilePath = "saveFile.json";
+        private const string jsonFilePath = "saveFile.json";
         private const string pepper = "pimienta";
         GameData _gameData;
+
+        // Diccionario con cada categoria y los nombres de los packs en cada una
+        //Dictionary<string, string[]> _categoriesPacks; 
+
         public GameData GetGameData()
         {
             return _gameData;
@@ -25,13 +29,18 @@ namespace FlowFree
         // los datos iniciales del juego.
         public void ParseAll(Category[] categories)
         {
+            Debug.Log(Application.persistentDataPath + jsonFilePath);
+            //_categoriesPacks = new Dictionary<string, string[]>();
             _gameData = new GameData();
             _gameData.hash = "";
             _gameData.hints = 3;
             foreach(Category cat in categories)
             {
-                CategoryData cSave = new CategoryData(cat.categoryName);
+                //string[] packs;
+                CategoryData cSave = new CategoryData();
+                cSave.name = cat.name;
                 _gameData.categories.Add(cSave);
+
                 foreach(LevelPack pack in cat.packs)
                 {
                     pack.Parse();
@@ -47,6 +56,7 @@ namespace FlowFree
 
                     cSave.packs.Add(pData);
                 }
+                //_categoriesPacks(cSave.name, packs);
             }
         }
 
@@ -56,15 +66,19 @@ namespace FlowFree
          */
         public void Load()
         {
-            if (!File.Exists(Application.persistentDataPath + jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
-            using (StreamReader rstream = new StreamReader(Application.persistentDataPath + jsonFilePath))
+            if (!File.Exists(jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
+            using (StreamReader rstream = new StreamReader(jsonFilePath))
             {
-                JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), _gameData);
-                if (!CheckHash())
+                GameData savedData = JsonUtility.FromJson<GameData>(rstream.ReadToEnd());
+                Debug.Log(savedData.hash);
+                if (!CheckHash(savedData))
                 {
                     Debug.LogError("File has been modified");
-                    Application.Quit();
-                    // o reseteamos los valores
+                    // Si se a modificado, aplicamos los valores por defecto
+                }
+                else
+                {
+                    _gameData.safeOverride(savedData);
                 }
 
             }
@@ -75,7 +89,7 @@ namespace FlowFree
          */
         public void Save()
         {
-            using (StreamWriter wstream = new StreamWriter(Application.persistentDataPath + jsonFilePath))
+            using (StreamWriter wstream = new StreamWriter(jsonFilePath))
             {
                 _gameData.hash = "";
                 _gameData.hash = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
@@ -112,11 +126,14 @@ namespace FlowFree
             _gameData.hints = Mathf.Clamp(_gameData.hints + value, 0, MAX_HINTS); 
         }
 
-        private bool CheckHash()
+        private bool CheckHash(GameData gameData)
         {
-            string ogHash = (string)_gameData.hash.Clone();
-            _gameData.hash = "";
-            string aux = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
+            string ogHash = (string)gameData.hash.Clone();
+            
+            gameData.hash = "";
+            string aux = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(gameData, true) + pepper.Substring(2, 6));
+            Debug.Log(ogHash);
+            Debug.Log(aux);
             return ogHash == aux;
         }
 
@@ -151,6 +168,19 @@ namespace FlowFree
         {
             categories = new List<CategoryData>();
         }
+        public void safeOverride(GameData otherData)
+        {
+            hash = otherData.hash;
+            hints = otherData.hints;
+            List<CategoryData> aux = otherData.categories.Count < categories.Count ? otherData.categories : categories;
+            for(int i = 0; (i < categories.Count; i++)
+            {
+                if (otherData.categories[i].name == categories[i].name)
+                {
+                    categories[i].safeOverride(otherData.categories[i]);
+                }
+            }
+        }
     }
 
     [System.Serializable]
@@ -158,10 +188,20 @@ namespace FlowFree
     {
         public string name;
         public List<PackData> packs;
-        public CategoryData(string name_)
+        public CategoryData()
         {
-            name = name_;
             packs = new List<PackData>();
+        }
+        public void safeOverride(CategoryData other)
+        {
+            name = other.name;
+            for(int i = 0; i < packs.Count; i++)
+            {
+                if (other.packs[i].name == packs[i].name)
+                {
+                    packs[i] = other.packs[i];
+                }
+            }
         }
     }
 
