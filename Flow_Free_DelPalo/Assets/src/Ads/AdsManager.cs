@@ -13,7 +13,7 @@ namespace FlowFree
         [SerializeField] AdsInterstitial adsInterstitial;
         [SerializeField] AdsRewarded adsRewarded;
 
-        void Start()
+        void Awake()
         {
             // Initialize Ads service
             Advertisement.Initialize(gameId, testMode, this);
