@@ -2261,9 +2261,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1125272007}
-        m_TargetAssemblyTypeName: FlowFree.BoardManager, Assembly-CSharp
-        m_MethodName: goToNextLevel
+      - m_Target: {fileID: 2011856597}
+        m_TargetAssemblyTypeName: FlowFree.LevelManager, Assembly-CSharp
+        m_MethodName: NextLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2607,9 +2607,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1125272007}
-        m_TargetAssemblyTypeName: FlowFree.BoardManager, Assembly-CSharp
-        m_MethodName: goToPrevLevel
+      - m_Target: {fileID: 2011856597}
+        m_TargetAssemblyTypeName: FlowFree.LevelManager, Assembly-CSharp
+        m_MethodName: PreviousLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3909,7 +3909,7 @@ MonoBehaviour:
   sizeText: {fileID: 1451136790}
   nextLevelButton: {fileID: 934674486}
   prevLevelButton: {fileID: 1223121362}
-  disableColor: {r: 0, g: 0, b: 0, a: 0}
+  disableColor: {r: 0.32941177, g: 0.32941177, b: 0.32941177, a: 1}
   completeLevelImage: {fileID: 151735149}
 --- !u!4 &2011856598
 Transform:

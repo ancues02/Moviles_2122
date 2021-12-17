@@ -45,7 +45,9 @@ namespace FlowFree
         private int _width, _height;
         private Logic.Map map;
         Vector2 vectorOffset;
-       
+
+        //numero de pistas usadas en este nivel
+        int numHintUsed = 0;
 
         int totalFlows, moves;
         public int best { get; set; }
@@ -291,21 +293,27 @@ namespace FlowFree
         /// <summary>
         /// Pone una pista, se llama al pulsar el boton de pista 
         /// Comprueba que te quedan pistas y avisa al GameManager para que actualice el valor y lo guarde
+        /// Tambien descartamos que si el nivel tiene 4 flows y has pedido 4 pistas, si pides otra no te quite pistas
         /// </summary>
         public void DoHint()
         {
-            //if (_hintIndexs.Count > 0)
-            //{
+            if (numHintUsed < totalFlows)
+            {
                 if (GameManager.getInstance().UseHint())
                 {
-                    lg.DoHint();
+                    numHintUsed++;
+                    if (lg.DoHint())
+                    {
+                        win = true;
+                        Win();
+                    }
                 }
                 else
                 {
                     //Si no quedan pistas, mostrar anuncio
                     adsRewarded.ShowAd();
                 }
-            //}
+            }
             CheckHints();
         }
 

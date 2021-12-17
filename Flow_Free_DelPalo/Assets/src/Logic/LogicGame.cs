@@ -79,7 +79,7 @@ namespace FlowFree.Logic
             }
         }
 
-        // Presiona una tile específica
+        // Presiona una tile especifica
         void PressTile(Vector2Int boardPos)
         {
             Tile activatedTile = _tiles[boardPos.x, boardPos.y];
@@ -671,15 +671,14 @@ namespace FlowFree.Logic
             return index;
         }
 
-        
 
-        
 
         /// <summary>
-        /// Pone una pista, se llama al pulsar el boton de pista 
+        /// /// Pone una pista, se llama al pulsar el boton de pista 
         /// Comprueba que te quedan pistas y avisa al GameManager para que actualice el valor y lo guarde
         /// </summary>
-        public void DoHint()
+        /// <returns> Devuelve si se ha ganado o no</returns>
+        public bool DoHint()
         {
             if (_hintIndexs.Count > 0)
             {
@@ -701,13 +700,14 @@ namespace FlowFree.Logic
                     ProcessTileChange();
                 }
 
-                ReleaseInput(new Vector2(0, 0));
+                CheckFlows();
+                bool win = ReleaseInput(new Vector2(0, 0));
 
                 _usingHint = false;
-                
-                
-            }
 
+                return win;
+            }
+            return false;
         }
 
     }
