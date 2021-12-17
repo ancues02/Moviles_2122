@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace FlowFree
 {
-    public class Tile : MonoBehaviour, System.ICloneable
+    public class Tile : MonoBehaviour, System.ICloneable, System.IEquatable<Tile>
     {
         public Tile(Tile t)
         {
@@ -24,6 +25,8 @@ namespace FlowFree
         bool isMain = false;
 
         public List<Sprite> sprites;
+        
+        public List<Animable> animableSprites;
 
         public Sprite hintedSprite;
 
@@ -38,9 +41,6 @@ namespace FlowFree
 
         [Tooltip("Paredes de tile, deben ser hijos")]
         public GameObject[] childrensWalls;
-
-        [Tooltip("Aniamciones de tile (en corrutinas :D)")]
-        public TileAnimations animations;
 
         //Los indices de los path de entrada o salida
         public int inIndex = -1, outIndex = -1;
@@ -65,6 +65,7 @@ namespace FlowFree
         {
             isMain = isFlow;
             renderSprite.color = tileColor;
+            childrens[6].GetComponent<SpriteRenderer>().color = tileColor;
         }
 
         public bool getIsVoid() { return isVoid; }
@@ -93,7 +94,7 @@ namespace FlowFree
         public void SmallCircleSetActive(bool active)
         {
             childrens[4].GetComponent<SpriteRenderer>().color = tileColor;
-            childrens[4].SetActive(active);
+            childrens[4].GetComponent<SpriteRenderer>().enabled = active;
         }
 
         // Activa o desactiva el renderSprite 
@@ -170,7 +171,7 @@ namespace FlowFree
             }
             if(!isMain)
                 tileColor = Color.black;
-            childrens[4].SetActive(false);
+            childrens[4].GetComponent<SpriteRenderer>().enabled = false;
             inIndex = outIndex = -1;
         }
 
@@ -330,6 +331,11 @@ namespace FlowFree
         public object Clone()
         {
             return this.MemberwiseClone();
+        }
+
+        public bool Equals(Tile other)
+        {
+            return other.getBoardPos() == boardPos;
         }
     }
 }

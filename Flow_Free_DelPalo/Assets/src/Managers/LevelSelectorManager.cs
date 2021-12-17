@@ -41,9 +41,10 @@ namespace FlowFree
         ///<summary>
         /// Establece las paginas segun el lote correspondiente
         ///</summary>
-        public void setPack(Logic.GamePack pack)
+        public void setPack(Logic.GamePack pack, Color categoryColor)
         {
             packText.text = pack.Name;
+            packText.color = categoryColor;
             if (pack.Pages.Length <= 0) return; // si no hay ninguna pagina no hacemos nada
             markerImages = new Image[pack.Pages.Length];
 

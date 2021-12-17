@@ -19,7 +19,7 @@ namespace FlowFree
         }
 
         public const int MAX_HINTS = 99;
-        private const string jsonFilePath = "testSave.json";
+        private const string jsonFilePath = "/saveFile.json";
         private const string pepper = "pimienta";
         Serializable.GameData _gameData;     
 
@@ -34,18 +34,18 @@ namespace FlowFree
         void Deserialize(ref Serializable.GameData gameData)
         {
             // si no existe, nos quedamos con los datos iniciales
-            using (StreamReader rstream = new StreamReader(jsonFilePath))
+            using (StreamReader rstream = new StreamReader(Application.persistentDataPath + jsonFilePath))
             {
                 JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), gameData);
             }
         }
         void Serialize()
         {
-            using (StreamWriter wstream = new StreamWriter(jsonFilePath))
+            using (StreamWriter wstream = new StreamWriter(Application.persistentDataPath + jsonFilePath))
             {
                 _gameData.hash = "";
-                _gameData.hash = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
-                string json = JsonUtility.ToJson(_gameData, true);
+                _gameData.hash = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData) + pepper.Substring(2, 6));
+                string json = JsonUtility.ToJson(_gameData);
                 wstream.Write(json);
             }
         }

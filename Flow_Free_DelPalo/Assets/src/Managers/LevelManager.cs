@@ -11,7 +11,7 @@ namespace FlowFree
         public BoardManager board;
 
         [Tooltip("El script AdsInterstitial del objeto que lo contiene en la escena")]
-        public AdsInterstitial adsInterstitial;
+        public AdsManager adManager;
 
         [Tooltip("El texto del canvas del nivel")]
         public Text levelText;
@@ -37,32 +37,45 @@ namespace FlowFree
             if (!board )
                 Debug.LogError("Falta referencia BoardManager en LevelManager");
 
-            if(!adsInterstitial || !sizeText || !levelText || !prevLevelButton || !nextLevelButton)
+            if(!adManager || !sizeText || !levelText || !prevLevelButton || !nextLevelButton)
                 Debug.LogWarning("Falta alguna referencia en LevelManager");
 
         }
         public void LevelEnded()
         {
-#if UNITY_ANDROID
-            if(adsInterstitial)
-                adsInterstitial.ShowAd();
-#elif UNITY_STANDALONE_WIN
-            NextLevel();
-#endif
+            if (adManager)
+                adManager.ShowInterstitialAd();
         }
 
+        
+        /// <summary>
+        /// Avisa al boardManager para que haga su animacion de desaparecer y poder cambiar de nivel
+        /// </summary>
+        /// <param name="next"></param>
+        public void ChangeLevel(bool next)
+        {
+            board.ChangeLevel(next);
+        }
+        /// <summary>
+        /// Avisa al GameManager para cambiar de nivel
+        /// Avisa al BoardManager para que no haga mas cosas
+        /// </summary>
         public void NextLevel()
         {            
             GameManager gm = GameManager.getInstance();
+            board.Stop();
             if(gm.NextLevel())
-                gm.ChangeScene("Game Board");           
-
+                gm.ChangeScene("Game Board");   
         }
 
+        /// <summary>
+        /// Cambia el nivel anterior, avisa al BoardManager para que no haga nada mas
+        /// </summary>
         public void PreviousLevel()
         {
             GameManager gm = GameManager.getInstance();
-            gm.prevLevel();
+            board.Stop();
+            gm.PrevLevel();
             gm.ChangeScene("Game Board");
         }
 
@@ -76,9 +89,10 @@ namespace FlowFree
         /// <param name="firstLevelPack"> si hay nivel anterior</param>
         /// <param name="lastLevelPack"> si hay nivel siguiente</param>
         /// <param name="bestMove"> El mejor movimiento en ese nivel</param>
-        public void InitialParams(int levelNumber, int width, int height, int flowNomber,bool firstLevelPack, bool lastLevelPack, int bestMove)
+        public void InitialParams(int levelNumber, int width, int height, int flowNomber,bool firstLevelPack, bool lastLevelPack, int bestMove, Color categoryColor)
         {
             levelText.text = "Level" + levelNumber;
+            levelText.color = categoryColor;
             sizeText.text = width + "x" +height;
             if (firstLevelPack)
             {

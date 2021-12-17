@@ -4,20 +4,20 @@ using UnityEngine;
 using UnityEngine.Advertisements;
 namespace FlowFree
 {
-    public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
+    public class AdsManager : MonoBehaviour, IUnityAdsInitializationListener
     {
-#if UNITY_ANDROID
         [SerializeField] string gameId = "4506529";
 
         [SerializeField] bool testMode = false;
 
+        [SerializeField] AdsInterstitial adsInterstitial;
+        [SerializeField] AdsRewarded adsRewarded;
 
-        void Start()
+        void Awake()
         {
             // Initialize Ads service
             Advertisement.Initialize(gameId, testMode, this);
         }
-#endif
 
         public void OnInitializationComplete()
         {
@@ -27,6 +27,16 @@ namespace FlowFree
         public void OnInitializationFailed(UnityAdsInitializationError error, string message)
         {
             Debug.Log($"Unity Ads initialization failed: {error.ToString()} - {message}");
+        }
+
+        public void ShowRewardedAd()
+        {
+            adsRewarded.ShowAd();
+        }
+
+        public void ShowInterstitialAd()
+        {
+            adsInterstitial.ShowAd();
         }
     }
 }

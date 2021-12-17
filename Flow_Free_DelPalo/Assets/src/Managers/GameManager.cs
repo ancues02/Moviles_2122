@@ -28,7 +28,8 @@ namespace FlowFree
         Dictionary<string, Logic.GameCategory> catDict;
         List<Logic.GameCategory> catArray;
         int _categoryIndex, _packIndex, selectedLevel;
-        //Logic.GameCategory selectedCategory;
+        
+        Logic.GameCategory selectedCategory;
         Logic.GamePack selectedPack;
         Dictionary<string, int> catPos;
 
@@ -87,7 +88,8 @@ namespace FlowFree
                     _instance.lvlManager.InitialParams(map.LevelNumber, map.Width,
                         map.Height, map.FlowNumber,!_instance.DoesPrevLevelExist(), !_instance.DoesNextLevelExist() || 
                         _instance.selectedPack.LastUnlockedLevel == _instance.selectedLevel,
-                        _instance.selectedPack.BestMoves[_instance.selectedLevel]);
+                        _instance.selectedPack.BestMoves[_instance.selectedLevel],
+                        _instance.selectedCategory.Color);
                 }
             }
         }
@@ -110,6 +112,7 @@ namespace FlowFree
          */
         public void setLevelPack(string catName, int packIndex)
         {
+            _instance.selectedCategory = _instance.catDict[catName];
             _instance.selectedPack = _instance.catDict[catName].PacksArray[packIndex];
         }
 
@@ -146,10 +149,10 @@ namespace FlowFree
 
         public void prevLevel()
         {          
-            _instance.selectedLevel = Mathf.Clamp(_instance.selectedLevel-1,0, _instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex].Maps.Length-1);
+            _instance.selectedLevel = Mathf.Clamp(_instance.selectedLevel-1,0, _instance.selectedPack.TotalLevels - 1);
         }
 
-        public bool useHint()
+        public bool UseHint()
         {
             modifyHint(-1);
             _dataManager.Save(_instance.hints, _instance.catDict);
@@ -162,7 +165,7 @@ namespace FlowFree
             _instance.lvlManager.board.CheckHints();
         }
 
-        public int getHints()
+        public int GetHints()
         {
             return _instance.hints;
         }
@@ -195,6 +198,11 @@ namespace FlowFree
         private void modifyHint(int value)
         {
             _instance.hints = Mathf.Clamp(_instance.hints + value, 0, MAX_HINTS);
+        }
+
+        private void OnApplicationQuit()
+        {
+            _instance._dataManager.Save(_instance.hints, _instance.catDict);
         }
     }
 }

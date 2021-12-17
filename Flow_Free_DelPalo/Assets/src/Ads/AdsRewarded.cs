@@ -6,13 +6,9 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
-    public class AdsRewarded : MonoBehaviour
-#if UNITY_ANDROID
-        , IUnityAdsLoadListener, IUnityAdsShowListener
-#endif
+    public class AdsRewarded : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 
     {
-#if UNITY_ANDROID
         [SerializeField] string AdUnityId = "Rewarded_Android";
 
         [SerializeField] Button showButton;
@@ -64,6 +60,7 @@ namespace FlowFree
 
         public void OnUnityAdsShowClick(string placementId)
         {
+
         }
 
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
@@ -72,7 +69,6 @@ namespace FlowFree
                 GameManager.getInstance().IncreaseHints(1);
             cont = 0;
         }
-#endif
 
     }
 }
