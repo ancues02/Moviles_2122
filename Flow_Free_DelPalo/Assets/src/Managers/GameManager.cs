@@ -10,7 +10,7 @@ namespace FlowFree
     {
         // Categorias que contienen los lotes que estan en el juego
         public Category[] categories;
-        //public  aux;
+
         // Tema de colores que se usara en el juego
         public ColorTheme theme;
 
@@ -20,31 +20,26 @@ namespace FlowFree
 
         static GameManager _instance;
 
-        //int selectedCategory;
-        int _categoryIndex, _packIndex;
-        int selectedLevel;
-        
+        Dictionary<string, Logic.GameCategory> catDict;
+        List<Logic.GameCategory> catArray;
+        int _categoryIndex, _packIndex, selectedLevel;
+
         // Gestion del guardado 
         GameDataManager _dataManager;
-
-        //Logic.GameCategory[] gameCategories;
-        Dictionary<string, Logic.GameCategory> catDict;
 
         private void Awake()
         {         
             if(!_instance)
             {
                 _dataManager = new GameDataManager();
-                //_dataManager.ParseAll(categories);
-                _dataManager.Load();
                 catDict = new Dictionary<string, Logic.GameCategory>();
                 Logic.GameCategory gameCategory;
-                for(int i = 0; i < categories.Length; i++)
+                foreach(Category cat in categories)
                 {
                     gameCategory = new Logic.GameCategory();
-                    gameCategory.Init(categories[i]);
+                    gameCategory.Init(cat);
                 }
-                _dataManager.LogicParseAll(ref catDict);
+                _dataManager.Load(ref catDict);
 
                 _instance = this;
                 DontDestroyOnLoad(gameObject); 
@@ -63,7 +58,7 @@ namespace FlowFree
 
             // Iniciamos los managers si toca
             if (_instance.menuManager)
-                _instance.menuManager.setCategories(_instance.categories, _instance._dataManager.GetGameData().categories.ToArray());
+                _instance.menuManager.setCategories(catArray);
 
             if (_instance.lvlSelectorManager)
                 _instance.lvlSelectorManager.setPack(

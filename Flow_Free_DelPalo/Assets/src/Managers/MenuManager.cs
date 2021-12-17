@@ -15,14 +15,14 @@ namespace FlowFree
         /// Objeto del canvas que contendra los displays de las categorias
         ///</summary>
         public RectTransform display;
-        public void setCategories(Category[] categories, CategoryData[] csData)
+        public void setCategories(List<Logic.GameCategory> categories)
         {
             // Creamos los displays de las categorias
             CategoryDisplay categoryDplay;
-            for (int i = 0; i < categories.Length; i++)
+            for (int i = 0; i < categories.Count; i++)
             {
                 categoryDplay = Instantiate(categoryDisplayPref, display).GetComponent<CategoryDisplay>();
-                categoryDplay.setAttributes(categories[i], csData[i], i);
+                categoryDplay.setAttributes(categories[i], i);
             }
         }
     }
