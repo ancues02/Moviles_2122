@@ -11,8 +11,8 @@ namespace FlowFree
         public GameObject TilePrefab;
         public LevelManager lvlManager;
 
-        [Tooltip("El script AdsRewarded del objeto que lo contiene en la escena")]
-        public AdsRewarded adsRewarded;
+        [Tooltip("El script AdsManager del objeto que lo contiene en la escena")]
+        public AdsManager adsManager;
 
         public SpriteRenderer pointer;     
 
@@ -69,7 +69,7 @@ namespace FlowFree
         private void Start()
         {
             if (!flowText || !movesText || !pipesText || !hintText
-                || !TilePrefab || !lvlManager || !winPanel || !adsRewarded)
+                || !TilePrefab || !lvlManager || !winPanel || !adsManager)
                 Debug.LogError("Falta alguna referencia en BoardManager!");
             else
             {
@@ -319,7 +319,7 @@ namespace FlowFree
                 else
                 {
                     //Si no quedan pistas, mostrar anuncio
-                    adsRewarded.ShowAd();
+                    adsManager.ShowRewardedAd();
                 }
             }
             CheckHints();
