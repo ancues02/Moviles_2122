@@ -43,12 +43,8 @@ namespace FlowFree
         }
         public void LevelEnded()
         {
-#if UNITY_ANDROID
             if(adsInterstitial)
                 adsInterstitial.ShowAd();
-#elif UNITY_STANDALONE_WIN
-            NextLevel();
-#endif
         }
 
         public void NextLevel()

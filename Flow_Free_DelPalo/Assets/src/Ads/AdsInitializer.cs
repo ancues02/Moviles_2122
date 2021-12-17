@@ -6,7 +6,6 @@ namespace FlowFree
 {
     public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
     {
-#if UNITY_ANDROID
         [SerializeField] string gameId = "4506529";
 
         [SerializeField] bool testMode = false;
@@ -17,7 +16,6 @@ namespace FlowFree
             // Initialize Ads service
             Advertisement.Initialize(gameId, testMode, this);
         }
-#endif
 
         public void OnInitializationComplete()
         {
