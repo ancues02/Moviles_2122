@@ -5,7 +5,7 @@ namespace FlowFree.Serializable
     [System.Serializable]
     public class GameData
     {
-        public string hash;
+        public string hash = "";
         public int hints;
         public List<CategoryData> categories;
 
@@ -35,5 +35,10 @@ namespace FlowFree.Serializable
         public int completedLevels;
         public int lastUnlockedLevel;
         public List<int> bestMoves;
+
+        public PackData()
+        {
+            bestMoves = new List<int>();
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace FlowFree
 {
     public class GameManager : MonoBehaviour
     {
+        public const int MAX_HINTS = 99;
+
         // Categorias que contienen los lotes que estan en el juego
         public Category[] categories;
 
@@ -20,6 +22,7 @@ namespace FlowFree
 
         static GameManager _instance;
 
+        int hints;
         Dictionary<string, Logic.GameCategory> catDict;
         List<Logic.GameCategory> catArray;
         int _categoryIndex, _packIndex, selectedLevel;
@@ -31,6 +34,7 @@ namespace FlowFree
         {         
             if(!_instance)
             {
+                hints = 3;
                 _dataManager = new GameDataManager();
                 catDict = new Dictionary<string, Logic.GameCategory>();
                 Logic.GameCategory gameCategory;
@@ -38,8 +42,10 @@ namespace FlowFree
                 {
                     gameCategory = new Logic.GameCategory();
                     gameCategory.Init(cat);
-                }
+                    catDict.Add(cat.categoryName, gameCategory);
+                }     
                 _dataManager.Load(ref catDict);
+                catArray = new List<Logic.GameCategory>(catDict.Values);
 
                 _instance = this;
                 DontDestroyOnLoad(gameObject); 
@@ -58,27 +64,24 @@ namespace FlowFree
 
             // Iniciamos los managers si toca
             if (_instance.menuManager)
-                _instance.menuManager.setCategories(catArray);
+                _instance.menuManager.setCategories(_instance.catArray);
 
             if (_instance.lvlSelectorManager)
-                _instance.lvlSelectorManager.setPack(
-                    _instance.categories[_instance._categoryIndex].packs[_instance._packIndex], 
-                    _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex]
-                );
+                _instance.lvlSelectorManager.setPack(_instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex]);
 
             if (_instance.lvlManager)
             {
-                if (_instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Valid)
+                if (_instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex].Valid)
                 {
                     _instance.lvlManager.board.SetFlowColors(_instance.theme.colors);
                     _instance.lvlManager.board.GetCameraSize();
-                    Logic.Map map = _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps[_instance.selectedLevel];
+                    Logic.Map map = _instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex].Maps[_instance.selectedLevel];
                     _instance.lvlManager.board.SetMap(map); 
                     //iniciar los parametros de lvlManager, basicamente poner los textos en funcion al nivel a jugar y lo que se este guardado
                     _instance.lvlManager.InitialParams(map.LevelNumber, map.Width,
                         map.Height, map.FlowNumber,!_instance.DoesPrevLevelExist(), !_instance.DoesNextLevelExist() || 
-                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].lastUnlockedLevel == _instance.selectedLevel,
-                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].bestMoves[_instance.selectedLevel]);
+                        _instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex].LastUnlockedLevel == _instance.selectedLevel,
+                        _instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex].BestMoves[_instance.selectedLevel]);
                 }
             }
         }
@@ -112,7 +115,7 @@ namespace FlowFree
 
         public bool DoesNextLevelExist()
         {
-            return selectedLevel + 1 < _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length;
+            return selectedLevel + 1 < _instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex].Maps.Length;
         }
 
         /// <summary>
@@ -139,7 +142,7 @@ namespace FlowFree
         public void prevLevel()
         {
            
-            selectedLevel = Mathf.Clamp(selectedLevel-1,0, _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps.Length-1);
+            selectedLevel = Mathf.Clamp(selectedLevel-1,0, _instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex].Maps.Length-1);
         }
 
         /**
@@ -154,34 +157,50 @@ namespace FlowFree
 
         public bool useHint()
         {
-            bool ret;
-            if(ret = _dataManager.GetGameData().hints > 0)
-            {
-                _dataManager.modifyHint(-1);
-            }
-            return ret;
+            modifyHint(-1);
+            return hints <= 0;
         }
 
         public void IncreaseHints(int numHints_)
         {
-            _dataManager.modifyHint(numHints_);
+            modifyHint(numHints_);
             lvlManager.board.CheckHints();
         }
 
         public int getHints()
         {
-            return _dataManager.GetGameData().hints;
+            return hints;
         }
 
         public void LevelComplete(int moves)
         {
-            
-            _dataManager.completeLevel(_instance._categoryIndex, _instance._packIndex, _instance.selectedLevel, moves);
+            Logic.GamePack currPack = _instance.catArray[_instance._categoryIndex].PacksArray[_instance._packIndex];
+            if (currPack.BestMoves[_instance.selectedLevel] == -1)
+            {
+                currPack.BestMoves[_instance._packIndex] = moves;
+                currPack.CompletedLevels++;
+            }
+            else
+            {
+                currPack.BestMoves[_instance._packIndex] = Mathf.Min(currPack.BestMoves[_instance._packIndex], moves);
+            }
+            // Si hemos completado el nivel, desbloqueamos el siguiente
+            if (_instance.selectedLevel == currPack.LastUnlockedLevel)
+               currPack.LastUnlockedLevel++;
+
+            // Guardamos cada vez que se pase el nivel
+            _instance._dataManager.Save(catDict);
         }
 
-        private void OnApplicationQuit()
+        public void unlockPack(int catInd, int pInd)
         {
-            //_dataManager.Save();
+            _instance.catArray[catInd].PacksArray[pInd].Blocked = false;
+        }
+
+        // usar este para todo o cambiar los otros
+        private void modifyHint(int value)
+        {
+            hints = Mathf.Clamp(hints + value, 0, MAX_HINTS);
         }
     }
 }

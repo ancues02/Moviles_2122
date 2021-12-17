@@ -692,6 +692,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6383e7fa156a6534599ea40c3affd357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameId: 4506529
+  testMode: 0
 --- !u!4 &1235871792
 Transform:
   m_ObjectHideFlags: 0
@@ -718,6 +720,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af550e5f66b5304397689b61e15b7e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AdUnityId: Banner_Android
+  bannerPosition: 6
 --- !u!1 &1285883830
 GameObject:
   m_ObjectHideFlags: 0

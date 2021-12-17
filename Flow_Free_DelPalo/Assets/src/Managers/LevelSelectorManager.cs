@@ -33,27 +33,26 @@ namespace FlowFree
         ///</summary>
         public Text packText;
 
+        ///<summary>
+        /// Imagenes de los marcadores de pagina
+        ///</summary>
         Image[] markerImages;
 
         ///<summary>
         /// Establece las paginas segun el lote correspondiente
         ///</summary>
-        public void setPack(LevelPack pack, PackData pData)
+        public void setPack(Logic.GamePack pack)
         {
-            packText.text = pack.packName;
-            if (pack.pages.Length <= 0) return; // si no hay ninguna pagina no hacemos nada
-           
-            markerImages = new Image[pack.pages.Length];
-            // Ajustamos el display segun el nº de paginas
-            /*float newX = display.sizeDelta.x + pack.pages.Length * ((RectTransform)levelPagePref.transform).sizeDelta.x;
-            display.sizeDelta = new Vector2(newX, display.sizeDelta.y);*/
+            packText.text = pack.Name;
+            if (pack.Pages.Length <= 0) return; // si no hay ninguna pagina no hacemos nada
+            markerImages = new Image[pack.Pages.Length];
 
             // Creamos los displays de las paginas y los marcadores
             PackDisplay packDplay;
-            for (int i = 0; i < pack.pages.Length; i++)
+            for (int i = 0; i < pack.Pages.Length; i++)
             {
                 packDplay = Instantiate(levelPagePref, display).GetComponent<PackDisplay>();
-                packDplay.setAttributes(pack, pData, i);
+                packDplay.setAttributes(pack, i);
                 markerImages[i] = Instantiate(pageMarkerPref, markerDisplay).GetComponent<Image>();
             }
             markerImages[0].color = Color.white;

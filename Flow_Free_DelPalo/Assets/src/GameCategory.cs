@@ -54,7 +54,7 @@ namespace FlowFree.Logic
             CompletedLevels = 0;
             BestMoves = new List<int>();
             for (int i = 0; i < TotalLevels; i++)
-                BestMoves[i] = -1;
+                BestMoves.Add(-1);
             Parse(levelPack.maps);
         }
 

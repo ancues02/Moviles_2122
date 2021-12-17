@@ -12,25 +12,25 @@ namespace FlowFree
 
         public Transform buttonGroup;
         public Text pageName;
-        public void setAttributes(LevelPack pack, PackData pData, int pageIndex)
+        public void setAttributes(Logic.GamePack pack, int pageIndex)
         {
-            pageName.text = pack.pages[pageIndex].name;
+            pageName.text = pack.Pages[pageIndex].name;
             LevelSelectionButton lvlButton;
             for (int j = 0; j < Page.LEVELS_PER_PAGE; j++)
             {
                 int levelIndex = j + pageIndex * Page.LEVELS_PER_PAGE;
                 lvlButton = Instantiate(buttonPref, buttonGroup).GetComponent<LevelSelectionButton>();
                 lvlButton.setLevelNumber(pack.Maps[levelIndex].LevelNumber);
-                lvlButton.setColor(pack.pages[pageIndex].color);
-                lvlButton.setBlocked(pData.lastUnlockedLevel < levelIndex);
+                lvlButton.setColor(pack.Pages[pageIndex].color);
+                lvlButton.setBlocked(pack.LastUnlockedLevel < levelIndex);
                 lvlButton.setOnClick(() => {
                     GameManager.getInstance().SetSelectedLevel(levelIndex);
                     GameManager.getInstance().ChangeScene("Game Board");
                 });
 
-                if (pData.bestMoves[levelIndex] > -1)
+                if (pack.BestMoves[levelIndex] > -1)
                 {   
-                    if(pData.bestMoves[levelIndex] == pack.Maps[levelIndex].FlowNumber)
+                    if(pack.BestMoves[levelIndex] == pack.Maps[levelIndex].FlowNumber)
                         lvlButton.setPerfect();
                     else
                         lvlButton.setComplete();

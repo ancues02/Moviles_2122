@@ -19,7 +19,7 @@ namespace FlowFree
         }
 
         public const int MAX_HINTS = 99;
-        private const string jsonFilePath = "saveFile.json";
+        private const string jsonFilePath = "testSave.json";
         private const string pepper = "pimienta";
         Serializable.GameData _gameData;     
 
@@ -31,12 +31,12 @@ namespace FlowFree
          * Modificamos los datos del juego segun si
          * habia datos ya guardados
          */
-        void Deserialize()
+        void Deserialize(ref Serializable.GameData gameData)
         {
-            if (!File.Exists(jsonFilePath)) return; // si no existe, nos quedamos con los datos iniciales
+            // si no existe, nos quedamos con los datos iniciales
             using (StreamReader rstream = new StreamReader(jsonFilePath))
             {
-                JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), _gameData);
+                JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), gameData);
             }
         }
         void Serialize()
@@ -51,37 +51,25 @@ namespace FlowFree
         }
         public void Load(ref Dictionary<string, Logic.GameCategory> categories)
         {
-            Deserialize();
-            if (!CheckHash())
-            {
-                Debug.LogError("Save file has been modified");
-                return;
-            }
-            // Check hash and do things
-            List<string> catKeys = new List<string>(categories.Keys);
-            foreach (string cName in catKeys)
-            {
-                if (_savedCategories.ContainsKey(cName))
-                {
-                    categories[cName].Name = _gameData.categories[_savedCategories[cName].catIndex].name;
-                    List<string> packKeys = new List<string>(categories[cName].PacksDict.Keys);
-                    foreach (string pName in packKeys)
-                    {
-                        if (_savedCategories[cName].packSaves.ContainsKey(pName))
-                        {
-                            Serializable.PackData pd = _gameData.categories[_savedCategories[cName].catIndex].packs[_savedCategories[cName].packSaves[pName]];
-                            Logic.GamePack gp = categories[cName].PacksDict[pName];
+            Serializable.GameData gameData = new Serializable.GameData();
+            _savedCategories = new Dictionary<string, CategorySave>();
 
-                            gp.Name = pd.name;
-                            gp.Blocked = pd.blocked;
-                            gp.TotalLevels = pd.totalLevels; // este no hace falta
-                            gp.CompletedLevels = pd.completedLevels;
-                            gp.LastUnlockedLevel = pd.lastUnlockedLevel;
-                            gp.BestMoves = pd.bestMoves;
-                        }
-                    }
+            if (File.Exists(jsonFilePath))
+            {
+                Deserialize(ref gameData);
+                if (!CheckHash(gameData))
+                {
+                    Debug.LogError("Save file has been modified");
+                    LoadDefault(categories);
+                }
+                else
+                {
+                    _gameData = gameData;
+                    LoadFile(categories);
                 }
             }
+            else
+                LoadDefault(categories);
         }
 
         /*
@@ -111,17 +99,106 @@ namespace FlowFree
                         }
                     }
                 }
+                else
+                {
+                    Serializable.CategoryData cd = new Serializable.CategoryData();
+                    cd.name = cName;
+                    Serializable.PackData pd;
+                    foreach (Logic.GamePack gp in categories[cName].PacksArray) {
+                        pd = new Serializable.PackData();
+                        pd.name = gp.Name;
+                        pd.blocked = gp.Blocked;
+                        pd.totalLevels = gp.TotalLevels;    // este no hace falta
+                        pd.completedLevels = gp.CompletedLevels;
+                        pd.lastUnlockedLevel = gp.LastUnlockedLevel;
+                        pd.bestMoves = gp.BestMoves;
+                        cd.packs.Add(pd);
+                    }
+                    _gameData.categories.Add(cd);
+                }
             }
 
             Serialize();
         }
 
-        private bool CheckHash()
-        {
-            string ogHash = (string)_gameData.hash.Clone();
 
-            _gameData.hash = "";
-            string aux = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, true) + pepper.Substring(2, 6));
+        private void LoadFile(Dictionary<string, Logic.GameCategory> categories)
+        {
+            // Initialize file dict with stored data
+            for(int i = 0; i < _gameData.categories.Count; i++)
+            {
+                CategorySave cs = new CategorySave();
+                cs.catIndex = i;
+                cs.packSaves = new Dictionary<string, int>();
+                for (int j = 0; j < _gameData.categories[i].packs.Count; j++)
+                {
+                    cs.packSaves.Add(_gameData.categories[i].packs[j].name, j);
+                }
+                _savedCategories.Add(_gameData.categories[i].name, cs);
+            }
+
+            // Compare and overwrite categories with its stored data
+            List<string> catKeys = new List<string>(categories.Keys);
+            foreach (string cName in catKeys)
+            {
+                if (_savedCategories.ContainsKey(cName))
+                {
+                    categories[cName].Name = _gameData.categories[_savedCategories[cName].catIndex].name;
+                    List<string> packKeys = new List<string>(categories[cName].PacksDict.Keys);
+                    foreach (string pName in packKeys)
+                    {
+                        if (_savedCategories[cName].packSaves.ContainsKey(pName))
+                        {
+                            Serializable.PackData pd = _gameData.categories[_savedCategories[cName].catIndex].packs[_savedCategories[cName].packSaves[pName]];
+                            Logic.GamePack gp = categories[cName].PacksDict[pName];
+
+                            gp.Name = pd.name;
+                            gp.Blocked = pd.blocked;
+                            gp.TotalLevels = pd.totalLevels; // este no hace falta
+                            gp.CompletedLevels = pd.completedLevels;
+                            gp.LastUnlockedLevel = pd.lastUnlockedLevel;
+                            gp.BestMoves = pd.bestMoves;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Usa de las categorias del juego para crear las 
+        /// estructuras que nos permiten guardar el juego posteriormente.
+        /// Este metodo se llama cuando no se ha iniciado el juego previamente
+        /// o si alguien ha modificado el archivo de guardado.
+        /// </summary>
+        /// <param name="categories"> Diccionario de categorias que se qiuere cargar</param>
+        private void LoadDefault(Dictionary<string, Logic.GameCategory> categories)
+        {
+            _gameData = new Serializable.GameData();
+            //_gameData.categories = new List<Serializable.CategoryData>();
+            List<string> catKeys = new List<string>(categories.Keys);
+            for (int i = 0; i < catKeys.Count; i++)
+            {
+                Serializable.CategoryData cd = new Serializable.CategoryData();
+                CategorySave cs = new CategorySave();
+                cs.packSaves = new Dictionary<string, int>();
+                cs.catIndex = i;
+                List<string> packKeys = new List<string>(categories[catKeys[i]].PacksDict.Keys);
+                for(int j = 0; j < packKeys.Count; j++)
+                {
+                    //Serializable.PackData pd = ;
+                    cs.packSaves.Add(packKeys[j], j);
+                    cd.packs.Add(new Serializable.PackData());
+                }
+                _gameData.categories.Add(cd);
+                _savedCategories.Add(catKeys[i], cs);
+            }
+        }
+
+        private bool CheckHash(Serializable.GameData gameData)
+        {
+            string ogHash = (string)gameData.hash.Clone();
+            gameData.hash = "";
+            string aux = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(gameData, true) + pepper.Substring(2, 6));
             Debug.Log(ogHash);
             Debug.Log(aux);
             return ogHash == aux;
@@ -142,37 +219,7 @@ namespace FlowFree
                     builder.Append(bytes[i].ToString("x2"));
                 }
                 return builder.ToString();
-            }       
-        }
-
-        // Estos metodos no harian falta
-        public void completeLevel(int catInd, int pInd, int lvlInd, int moves)
-        {
-            if (_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] == -1)
-            {
-                _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = moves;
-                _gameData.categories[catInd].packs[pInd].completedLevels++;
             }
-            else
-            {
-                _gameData.categories[catInd].packs[pInd].bestMoves[lvlInd] = Mathf.Min(_gameData.categories[catInd].packs[pInd].bestMoves[lvlInd], moves);
-            }
-            // si hemos completado el nivel, desbloqueamos el siguiente
-            if (lvlInd == _gameData.categories[catInd].packs[pInd].lastUnlockedLevel)
-                _gameData.categories[catInd].packs[pInd].lastUnlockedLevel++;
-
         }
-
-
-        public void unlockPack(int catInd, int pInd)
-        {
-            _gameData.categories[catInd].packs[pInd].blocked = false;
-        }
-
-        public void modifyHint(int value)
-        {
-            _gameData.hints = Mathf.Clamp(_gameData.hints + value, 0, MAX_HINTS); 
-        }
-
     }
 }
