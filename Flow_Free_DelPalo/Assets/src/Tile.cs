@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace FlowFree
 {
-    public class Tile : MonoBehaviour, System.ICloneable
+    public class Tile : MonoBehaviour, System.ICloneable, System.IEquatable<Tile>
     {
         public Tile(Tile t)
         {
@@ -330,6 +331,11 @@ namespace FlowFree
         public object Clone()
         {
             return this.MemberwiseClone();
+        }
+
+        public bool Equals(Tile other)
+        {
+            return other.getBoardPos() == boardPos;
         }
     }
 }

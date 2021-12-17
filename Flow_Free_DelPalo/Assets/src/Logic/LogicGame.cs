@@ -414,52 +414,51 @@ namespace FlowFree.Logic
         /// <summary>
         /// Reactiva un camino que se habia cortado durante ese mismo movimiento
         /// </summary>
-        /// <param name="toCheck"></param>
+        /// <param name="toCheck">Del flow que estas drageando, los tiles que estaban puestos de ese color
+        /// y al cortarte a ti mismo han desaparecido</param>
         private void ReactivateFlow(List<Tile> toCheck)
         {
+            //Comprobar en todos los flows cortados
             for (int i = _tmpFlows.Count - 1; i >= 0; --i)
             {
                 List<Tile> list = _tmpFlows[i];
                 bool reactivate = false;
+                //Comprobar por todos los tiles que se han borrado y puede que antes hubiese otro flow
                 foreach (Tile tile in toCheck)
                 {
-                    foreach (Tile tmp in list)
+                    if(list.Contains(tile))
                     {
-                        if (tmp.getBoardPos() == tile.getBoardPos())
+                        int ind = GetColorIndex(list[0].getColor());
+                        int j = _flows[ind].Count - 1;
+                        Tile t = list[j];
+                        Tile boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
+
+                        boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
+                        j++;
+                        while( j < list.Count )
                         {
-                            int ind = GetColorIndex(list[0].getColor());
-                            int j = _flows[ind].Count - 1;
-                            Tile t = list[j];
-                            Tile boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
-
-                            boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
-                            j++;
-                            for (; j < list.Count; ++j)
+                            if (!_flows[_flowsIndex].Contains(list[j]))
                             {
-                                if (!_flows[_flowsIndex].Contains(list[j]))
-                                {
-                                    t = list[j];
-                                    boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
+                                t = list[j];
+                                boardTile = _tiles[t.getBoardPos().x, t.getBoardPos().y];
 
-                                    boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
-                                    if (!_flows[ind].Contains(boardTile))
-                                        _flows[ind].Add(boardTile);
-
-                                }
-                                else
-                                {
-                                    _flows[ind][_flows[ind].Count - 1].DeactiveOut();
-                                    break;
-                                }
+                                boardTile.resetTile(t.inIndex, t.outIndex, t.getColor());
+                                if (!_flows[ind].Contains(boardTile))
+                                    _flows[ind].Add(boardTile);
                             }
-                            // pistas
-                            if (CheckIfHintedFlow(ind))
+                            else
                             {
-                                PutStars(ind, true);
+                                _flows[ind][_flows[ind].Count - 1].DeactiveOut();
+                                break;
                             }
-                            reactivate = true;
-
+                            ++j;
                         }
+                        // pistas
+                        if (CheckIfHintedFlow(ind))
+                        {
+                            PutStars(ind, true);
+                        }
+                        reactivate = true;
 
                     }
                     if (reactivate)
