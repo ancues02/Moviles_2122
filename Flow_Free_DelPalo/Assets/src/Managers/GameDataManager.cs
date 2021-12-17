@@ -49,7 +49,7 @@ namespace FlowFree
                 wstream.Write(json);
             }
         }
-        public void Load(ref Dictionary<string, Logic.GameCategory> categories)
+        public void Load(ref Dictionary<string, Logic.GameCategory> categories, ref int hints)
         {
             Serializable.GameData gameData = new Serializable.GameData();
             _savedCategories = new Dictionary<string, CategorySave>();
@@ -65,6 +65,7 @@ namespace FlowFree
                 else
                 {
                     _gameData = gameData;
+                    hints = _gameData.hints;
                     LoadFile(categories);
                 }
             }
@@ -75,7 +76,7 @@ namespace FlowFree
         /*
          * Guardamos los datos del juego
          */
-        public void Save(Dictionary<string, Logic.GameCategory> categories)
+        public void Save(int hints, Dictionary<string, Logic.GameCategory> categories)
         {
             List<string> catKeys = new List<string>(categories.Keys);
             foreach(string cName in catKeys)
@@ -117,7 +118,7 @@ namespace FlowFree
                     _gameData.categories.Add(cd);
                 }
             }
-
+            _gameData.hints = hints;
             Serialize();
         }
 

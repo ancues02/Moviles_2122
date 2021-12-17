@@ -13,7 +13,7 @@ namespace FlowFree
         public Image categoryBackground;
         public Image categoryBar;
 
-        public void setAttributes(Logic.GameCategory cat, int catIndx)
+        public void setAttributes(Logic.GameCategory cat, string catName)
         {
             categoryBackground.color = new Color(cat.Color.r, cat.Color.g, cat.Color.b, 0.6f);
             categoryBar.color = cat.Color;
@@ -30,7 +30,7 @@ namespace FlowFree
                 
                 int packIndex = i;
                 packButton.setOnClick(() => {
-                    GameManager.getInstance().setLevelPack(catIndx, packIndex);
+                     GameManager.getInstance().setLevelPack(catName, packIndex);
                     GameManager.getInstance().ChangeScene("Level Select");             
                 });
 

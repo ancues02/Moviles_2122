@@ -22,7 +22,7 @@ namespace FlowFree
             for (int i = 0; i < categories.Count; i++)
             {
                 categoryDplay = Instantiate(categoryDisplayPref, display).GetComponent<CategoryDisplay>();
-                categoryDplay.setAttributes(categories[i], i);
+                categoryDplay.setAttributes(categories[i], categories[i].Name);
             }
         }
     }

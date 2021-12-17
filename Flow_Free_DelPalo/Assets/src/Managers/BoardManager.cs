@@ -960,7 +960,7 @@ namespace FlowFree
         {
             if (_hintIndexs.Count > 0  )
             {
-                if (GameManager.getInstance().useHint())
+                if (!GameManager.getInstance().useHint())
                 {
                     int index = _hintIndexs[Random.Range(0, _hintIndexs.Count)]; // Color/flow aleatorio
                     _hintIndexs.Remove(index);
