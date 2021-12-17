@@ -833,7 +833,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameId: 4506529
-  testMode: 0
+  testMode: 1
   adsInterstitial: {fileID: 0}
   adsRewarded: {fileID: 0}
 --- !u!4 &1235871792
