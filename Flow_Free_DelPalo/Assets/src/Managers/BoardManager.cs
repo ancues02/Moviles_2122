@@ -288,8 +288,6 @@ namespace FlowFree
         }
 
 
-
-
         /// <summary>
         /// Pone una pista, se llama al pulsar el boton de pista 
         /// Comprueba que te quedan pistas y avisa al GameManager para que actualice el valor y lo guarde
@@ -367,23 +365,31 @@ namespace FlowFree
                             }
                         }
 #elif UNITY_ANDROID
-            if (Input.touches.Length > 0 && !win)
-            {
-                Touch input = Input.GetTouch(0);
-                switch (input.phase)
-                {
-                    case TouchPhase.Began:
-                        lg.PressInput(Camera.main.ScreenToWorldPoint(input.position));
-                        break;
-                    case TouchPhase.Moved:
-                    case TouchPhase.Stationary:
-                        lg.DragInput(Camera.main.ScreenToWorldPoint(input.position));
-                        break;
-                    case TouchPhase.Ended:
-                        lg.ReleaseInput(Camera.main.ScreenToWorldPoint(input.position));
-                        break;
-                }
-            }
+                        if (Input.touches.Length > 0 && !win)
+                        {
+                            Touch input = Input.GetTouch(0);
+                            switch (input.phase)
+                            {
+                                case TouchPhase.Began:
+                                    lg.PressInput(Camera.main.ScreenToWorldPoint(input.position));
+                                    break;
+                                case TouchPhase.Moved:
+                                case TouchPhase.Stationary:
+                                    lg.DragInput(Camera.main.ScreenToWorldPoint(input.position));
+                                    break;
+                                case TouchPhase.Ended:
+                                    if (!continuePlaying)
+                                        win = lg.ReleaseInput(Camera.main.ScreenToWorldPoint(input.position));
+                                    else
+                                        continuePlaying = false;
+                                    break;
+                            }
+                            CheckTexts();
+                            if (win)
+                            {
+                                Win();
+                            }
+                        }
 #endif
                     }
                     break;

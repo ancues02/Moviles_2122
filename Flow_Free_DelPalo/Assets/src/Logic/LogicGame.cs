@@ -671,10 +671,8 @@ namespace FlowFree.Logic
             return index;
         }
 
-
-
         /// <summary>
-        /// /// Pone una pista, se llama al pulsar el boton de pista 
+        /// Pone una pista, se llama al pulsar el boton de pista 
         /// Comprueba que te quedan pistas y avisa al GameManager para que actualice el valor y lo guarde
         /// </summary>
         /// <returns> Devuelve si se ha ganado o no</returns>
