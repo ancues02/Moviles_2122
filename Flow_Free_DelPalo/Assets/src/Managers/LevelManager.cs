@@ -47,17 +47,25 @@ namespace FlowFree
                 adsInterstitial.ShowAd();
         }
 
+        /// <summary>
+        /// Avisa al GameManager para cambiar de nivel
+        /// Avisa al BoardManager para que no haga mas cosas
+        /// </summary>
         public void NextLevel()
         {            
             GameManager gm = GameManager.getInstance();
+            board.Stop();
             if(gm.NextLevel())
-                gm.ChangeScene("Game Board");           
-
+                gm.ChangeScene("Game Board");   
         }
 
+        /// <summary>
+        /// Cambia el nivel anterior, avisa al BoardManager para que no haga nada mas
+        /// </summary>
         public void PreviousLevel()
         {
             GameManager gm = GameManager.getInstance();
+            board.Stop();
             gm.PrevLevel();
             gm.ChangeScene("Game Board");
         }

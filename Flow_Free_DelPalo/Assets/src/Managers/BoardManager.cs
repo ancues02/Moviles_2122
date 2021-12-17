@@ -54,6 +54,7 @@ namespace FlowFree
 
         bool win = false;
         bool continuePlaying = false;
+        bool stop = false;
 
         enum GamePhase { begin, mid, end, NONE };
         GamePhase gameState = GamePhase.NONE;
@@ -274,17 +275,26 @@ namespace FlowFree
             CheckFlows();
             CheckPipes();
         }
+
+        public void Stop()
+        {
+            stop = true;
+        }
+
         private void Win()
         {
-            winPanel.SetActive(true);
-            bool perfect = lg.WinAttributes(out moves);
-            GameManager.getInstance().LevelComplete(moves);
-            panelMovesText.text = "You completed the level\n" + " in " + moves + " moves";
-            foreach (Tile t in _tiles)
-                if (t.getIsMain()) t.animableSprites[1].Pulse();
+            if (!stop)
+            {
+                winPanel.SetActive(true);
+                bool perfect = lg.WinAttributes(out moves);
+                GameManager.getInstance().LevelComplete(moves);
+                panelMovesText.text = "You completed the level\n" + " in " + moves + " moves";
+                foreach (Tile t in _tiles)
+                    if (t.getIsMain()) t.animableSprites[1].Pulse();
 
-            if (perfect) _compleet[0].Pulse();
-            else _compleet[1].Pulse();
+                if (perfect) _compleet[0].Pulse();
+                else _compleet[1].Pulse();
+            }
         }
 
 
