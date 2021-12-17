@@ -399,7 +399,6 @@ namespace FlowFree.Logic
             for (int j = 0; j < _flows[ind].Count; ++j)
             {
                 Tile tmp = _flows[ind][j];
-
                 //donde se ha cortado volver a poner bien los caminos 
                 //de donde has venido y a donde has ido en ese tile
                 if (tmp == currentTile)
@@ -407,9 +406,9 @@ namespace FlowFree.Logic
 
                     if (_flows[ind][_flows[ind].Count - 1].getIsMain())
                     {
-                        if(halfUp)
+                        if(halfUp && !_flows[ind][j - 1].getIsMain())
                             _flows[ind][j - 1].animableSprites[1].Pulse(_flows[ind][0].getColor());
-                        else
+                        else if(!_flows[ind][j + 1].getIsMain())
                             _flows[ind][j + 1].animableSprites[1].Pulse(_flows[ind][0].getColor());
                     }
 

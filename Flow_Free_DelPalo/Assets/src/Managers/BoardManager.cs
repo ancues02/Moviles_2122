@@ -191,7 +191,7 @@ namespace FlowFree
 
             totalFlows = map.FlowNumber;
             //totalNumPipes = m.Width * m.Height;
-            setMainTiles();
+            SetMainTiles();
             vectorOffset = new Vector2((-m.Width / 2f) * _baseRatio.x, ((-m.Height / 2f) * _baseRatio.y) + m.Height * _baseRatio.y);
 
             //if(beginWithAnimation)
@@ -205,6 +205,7 @@ namespace FlowFree
 
             //flowText.text = "flows: 0/" + totalFlows;
             lg = new Logic.LogicGame(_tiles, _width, _height, map, colors, _baseRatio, vectorOffset, pointer);
+            CheckFlows();
         }
 
         public void SetFlowColors(Color[] cs)
@@ -219,7 +220,7 @@ namespace FlowFree
 
         // Dice que Tiles son main, es decir, los circulos grandes,
         // les pone su color y tambien en los a?adimos a los flows del boardManager
-        private void setMainTiles()
+        private void SetMainTiles()
         {
             List<Logic.Map.Flow> flows = map.Flows;
             int i = 0;
