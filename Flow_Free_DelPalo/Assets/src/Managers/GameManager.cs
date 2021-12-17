@@ -74,7 +74,7 @@ namespace FlowFree
                 _instance.menuManager.setCategories(_instance.catArray);
 
             if (_instance.lvlSelectorManager)
-                _instance.lvlSelectorManager.setPack(_instance.selectedPack);
+                _instance.lvlSelectorManager.setPack(_instance.selectedPack, _instance.selectedCategory.Color);
 
             if (_instance.lvlManager)
             {
@@ -147,7 +147,7 @@ namespace FlowFree
             return _instance.selectedLevel - 1 >= 0;
         }
 
-        public void prevLevel()
+        public void PrevLevel()
         {          
             _instance.selectedLevel = Mathf.Clamp(_instance.selectedLevel-1,0, _instance.selectedPack.TotalLevels - 1);
         }
@@ -156,7 +156,7 @@ namespace FlowFree
         {
             modifyHint(-1);
             _dataManager.Save(_instance.hints, _instance.catDict);
-            return _instance.hints <= 0;
+            return _instance.hints > 0;
         }
 
         public void IncreaseHints(int numHints_)

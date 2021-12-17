@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a53d842ff84f84e8c2b771089ad179, type: 3}
+  m_Name: ClassicPackTest
+  m_EditorClassIdentifier: 
+  packName: Classic Pack Ttest
+  maps: {fileID: 4900000, guid: 5dbf294cf0cd6e241a07d97d22865873, type: 3}
+  pages:
+  - name: "5x5 - f\xE1cil"
+    color: {r: 0.011158126, g: 0.6886792, b: 0, a: 1}
+  - name: 6x6
+    color: {r: 0.008547783, g: 0, b: 1, a: 1}
+  - name: 7x7 - medio
+    color: {r: 0.9511088, g: 1, b: 0, a: 1}
+  - name: 8x8
+    color: {r: 1, g: 0.5907618, b: 0, a: 1}
+  - name: "9x9 - dif\xEDcil"
+    color: {r: 1, g: 0.019191347, b: 0, a: 1}
+  blocked: 0
+  blockedLevelIndex: 150
