@@ -23,10 +23,10 @@ namespace FlowFree
                 switch (type)
                 {
                     case ChangeLevelType.Next:
-                        lvlManager.NextLevel();
+                        lvlManager.ChangeLevel(true);
                         break;
                     case ChangeLevelType.Previous:
-                        lvlManager.PreviousLevel();
+                        lvlManager.ChangeLevel(false);
                         break;
                 }
             });

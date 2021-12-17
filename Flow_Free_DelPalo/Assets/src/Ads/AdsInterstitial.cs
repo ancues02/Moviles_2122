@@ -54,7 +54,7 @@ namespace FlowFree
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
         {
             if(lvlManager)
-                lvlManager.NextLevel();
+                lvlManager.ChangeLevel(true);
             Debug.Log("Anuncio Insterstital acabado"); 
         }
 

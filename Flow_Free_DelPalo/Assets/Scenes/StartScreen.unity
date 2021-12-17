@@ -608,7 +608,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: juego libre
+  m_Text: Free Play
 --- !u!222 &496333163
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -834,6 +834,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameId: 4506529
   testMode: 1
+  adsInterstitial: {fileID: 0}
+  adsRewarded: {fileID: 0}
 --- !u!4 &1235871792
 Transform:
   m_ObjectHideFlags: 0

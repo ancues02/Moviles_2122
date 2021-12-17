@@ -58,7 +58,8 @@ namespace FlowFree
             if (_instance.lvlSelectorManager)
                 _instance.lvlSelectorManager.setPack(
                     _instance.categories[_instance._categoryIndex].packs[_instance._packIndex], 
-                    _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex]
+                    _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex],
+                    _instance.categories[_instance._categoryIndex].categoryColor
                 );
 
             if (_instance.lvlManager)
@@ -66,14 +67,15 @@ namespace FlowFree
                 if (_instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Valid)
                 {
                     _instance.lvlManager.board.SetFlowColors(_instance.theme.colors);
-                    _instance.lvlManager.board.GetCameraSize();
+                    _instance.lvlManager.board.GetCameraSize(); 
                     Logic.Map map = _instance.categories[_instance._categoryIndex].packs[_instance._packIndex].Maps[_instance.selectedLevel];
                     _instance.lvlManager.board.SetMap(map); 
                     //iniciar los parametros de lvlManager, basicamente poner los textos en funcion al nivel a jugar y lo que se este guardado
                     _instance.lvlManager.InitialParams(map.LevelNumber, map.Width,
                         map.Height, map.FlowNumber,!_instance.DoesPrevLevelExist(), !_instance.DoesNextLevelExist() || 
                         _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].lastUnlockedLevel == _instance.selectedLevel,
-                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].bestMoves[_instance.selectedLevel]);
+                        _instance._dataManager.GetGameData().categories[_instance._categoryIndex].packs[_instance._packIndex].bestMoves[_instance.selectedLevel],
+                        _instance.categories[_instance._categoryIndex].categoryColor);
                 }
             }
         }

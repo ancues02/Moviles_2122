@@ -38,9 +38,10 @@ namespace FlowFree
         ///<summary>
         /// Establece las paginas segun el lote correspondiente
         ///</summary>
-        public void setPack(LevelPack pack, PackData pData)
+        public void setPack(LevelPack pack, PackData pData, Color categoryColor)
         {
             packText.text = pack.packName;
+            packText.color = categoryColor;
             if (pack.pages.Length <= 0) return; // si no hay ninguna pagina no hacemos nada
            
             markerImages = new Image[pack.pages.Length];

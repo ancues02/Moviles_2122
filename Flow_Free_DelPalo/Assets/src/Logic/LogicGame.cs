@@ -6,7 +6,6 @@ namespace FlowFree.Logic
 {
     public class LogicGame 
     {
-
         SpriteRenderer _pointer;
         Vector2 _baseRatio;
         Tile[,] _tiles;
@@ -19,6 +18,7 @@ namespace FlowFree.Logic
         int _circleFlowsIndex = -1;//el indice de la tuberia que tiene el circulo pequenio
 
         List<List<Tile>> _tmpFlows;//flows que se han cortado mientras estas pulsando
+        List<Tile> _touchFlow; //el flow que se ha tocado, para ver si ha tenido cambios y aniadir un movimiento
 
         Vector2 _vectorOffset;
         Color pressedColor = Color.black,
@@ -52,7 +52,8 @@ namespace FlowFree.Logic
             _vectorOffset = vectorOffset;
             _flows = new List<Tile>[map.FlowNumber];
             _tmpFlows = new List<List<Tile>>();
-            for(int i = 0; i< map.FlowNumber; ++i)
+            _touchFlow = new List<Tile>();
+            for (int i = 0; i< map.FlowNumber; ++i)
             {
                 _flows[i] = new List<Tile>();
             }
@@ -63,9 +64,14 @@ namespace FlowFree.Logic
             totalNumPipes = _width * _height;
         }
 
+        /// <summary>
+        /// Cuando se presiona, ver si es sobre el tablero y 
+        /// calcular la tile sobre la que se esta pulsando y activar el puntero en ese color
+        /// </summary>
+        /// <param name="pos"> La posicion en la que se ha presionado</param>
         public void PressInput(Vector2 pos)
         {
-            Vector2Int boardPos = getBoardTile(pos);
+            Vector2Int boardPos = GetBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _width &&
                 boardPos.y >= 0 && boardPos.y < _height)
             {
@@ -79,7 +85,10 @@ namespace FlowFree.Logic
             }
         }
 
-        // Presiona una tile especifica
+        /// <summary>
+        /// Presiona una tile especifica
+        /// </summary>
+        /// <param name="boardPos"> La posicion de la tile que se ha pulsado</param>
         void PressTile(Vector2Int boardPos)
         {
             Tile activatedTile = _tiles[boardPos.x, boardPos.y];
@@ -89,7 +98,10 @@ namespace FlowFree.Logic
                 pressedColor = activatedTile.getColor();
                 lastConnectedTile = currentTile = activatedTile;
                 _flowsIndex = GetColorIndex(currentTile.getColor());
-
+                foreach(Tile t in _flows[_flowsIndex])
+                {
+                    _touchFlow.Add((Tile)t.Clone());
+                }
                 // pistas
                 if (CheckIfHintedFlow(_flowsIndex))
                     PutStars(_flowsIndex, false);
@@ -113,7 +125,7 @@ namespace FlowFree.Logic
                     //si no eres el final, desactivar el resto
                     if (_flows[_flowsIndex][lastInd] != activatedTile)
                     {
-                        DeactivateItSelf(Logic.Directions.None);
+                        DeactivateItSelf(Directions.None);
                         changes = true;
                     }
                 }
@@ -124,9 +136,25 @@ namespace FlowFree.Logic
         public bool ReleaseInput(Vector2 pos)
         {
             lastConnectedTile = null;
-            //Aumentar numero de movimientos si ha habido algun cambio
+            //Aumentar numero de movimientos si ha habido algun cambio en la tuberia que has tocado
             //y es un color diferente al anterior con el que se ha aumentado el numero de movimientos
-            if ( changes && lastMoveColor != pressedColor)
+            bool diff = false;
+            if (_touchFlow.Count != _flows[_flowsIndex].Count)
+                diff = true;
+            else
+            {
+                foreach (Tile t in _touchFlow)
+                {
+                    if (!_flows[_flowsIndex].Contains(t))
+                    {
+                        diff = true;
+                        break;
+                    }
+                }
+            }
+            _touchFlow.Clear();
+
+            if (diff && lastMoveColor != pressedColor)
             {
                 lastMoveColor = pressedColor;
                 moves++;
@@ -199,9 +227,15 @@ namespace FlowFree.Logic
             }
         }
 
-        void PorcessDragInput(Vector2 pos)
+        /// <summary>
+        /// Procesa que se este drageando sobre el tablero de juego
+        /// Consigue la Tile del tablero sobre la que se esta drageando
+        /// Si se dragea sobre un main de tu mismo color se unen las tuberias, tambien se modifica el alpha del puntero 
+        /// </summary>
+        /// <param name="pos"> posicion en la que se esta drageando</param>
+        void ProcessDragInput(Vector2 pos)
         {
-            Vector2Int boardPos = getBoardTile(pos);
+            Vector2Int boardPos = GetBoardTile(pos);
             if (boardPos.x >= 0 && boardPos.x < _width &&
                 boardPos.y >= 0 && boardPos.y < _height)
             {
@@ -230,14 +264,21 @@ namespace FlowFree.Logic
             currentTile = _tiles[boardPos.x, boardPos.y];
         }
 
-        private Vector2Int getBoardTile(Vector2 pos)
+        /// <summary>
+        /// En funcion a la posicion que recibe, se calcula la posicion que seria respecto al tablero
+        /// </summary>
+        /// <param name="pos">la posicion en la que se ha pulsado</param>
+        /// <returns> Devuelve la posicion en el tablero</returns>
+        private Vector2Int GetBoardTile(Vector2 pos)
         {
             int x = Mathf.FloorToInt((pos - _vectorOffset).x / _baseRatio.x);
             int y = Mathf.FloorToInt(-(pos - _vectorOffset).y / _baseRatio.y);
             return new Vector2Int(x, y);
         }
 
-        // Si se pulsa en un Tile main, se desactiva todo el flow que tenia
+        /// <summary>
+        /// Si se pulsa en un Tile main, se desactiva todo el flow que tenia
+        /// </summary>
         private void DeactivateMain()
         {
 
@@ -250,9 +291,6 @@ namespace FlowFree.Logic
                 _flows[_flowsIndex][0].DeactiveAll();
                 _flows[_flowsIndex].RemoveAt(0);
             }
-            //CheckPipes();
-            //CheckFlows();
-
         }
 
         /// <summary>
@@ -302,7 +340,6 @@ namespace FlowFree.Logic
             //comprobar si se ha cortado uno con pista, entonces quitarla
             if (CheckIfHintedFlow(ind))
             {
-                Debug.Log("Desactivar");
                 PutStars(ind, false);
             }
             //no hacer nada si ya se ha guardado durante ese drag del flow que se ha cortado la tuberia
@@ -331,7 +368,6 @@ namespace FlowFree.Logic
                 }
                 tmpList.Add(tmp);
             }
-
             _tmpFlows.Add(tmpList);
         }
 
@@ -458,11 +494,9 @@ namespace FlowFree.Logic
                         {
                             PutStars(ind, true);
                         }
-                        reactivate = true;
-
-                    }
-                    if (reactivate)
                         break;
+                    }
+                    
                 }
 
             }
@@ -475,7 +509,6 @@ namespace FlowFree.Logic
         private void DeactivateItSelf(Directions dir)
         {
             int index = _flows[_flowsIndex].IndexOf(currentTile);
-
             List<Tile> toCheck = new List<Tile>();
             int i = index + 1;
             while (i < _flows[_flowsIndex].Count)
@@ -484,15 +517,13 @@ namespace FlowFree.Logic
                 toCheck.Add(_flows[_flowsIndex][i]);
                 _flows[_flowsIndex].RemoveAt(i);
             }
-            if (dir != Logic.Directions.None)
+
+            if (dir != Directions.None)
             {
                 toCheck.Reverse();
                 ReactivateFlow(toCheck);
             }
-            if (index == -1)
-            {
-                Debug.Log("Se ha roto");
-            }
+
             if (!_flows[_flowsIndex][index].getIsMain())
                 _flows[_flowsIndex][index].NotDeactiveIn();
             if (_flows[_flowsIndex].Count == 1)
@@ -517,12 +548,17 @@ namespace FlowFree.Logic
             {
                 DeactivateByColor(dir);
             }
-            //CheckFlows();
             changes = true;
         }
 
 
         // Comprueba si hay que cambiar el color de una tuberia
+        /// <summary>
+        /// Comprobaciones para poder dragear.
+        /// Basicamente que no estes sobre un main de otro color, no estes sobre ti mismo
+        /// no haya muros entre las dos tiles 
+        /// </summary>
+        /// <returns></returns>
         private bool CanActivate()
         {
             return lastConnectedTile != null && currentTile != lastConnectedTile &&
@@ -532,6 +568,12 @@ namespace FlowFree.Logic
                 && !IsThereWall(lastConnectedTile, currentTile);
         }
 
+        /// <summary>
+        /// Comprueba si hay muro
+        /// </summary>
+        /// <param name="AT">Posicion de una tile</param>
+        /// <param name="BT">Posicion de la otra tile</param>
+        /// <returns>Devuelve true si hay muro entre las dos tiles</returns>
         bool IsThereWall(Tile AT, Tile BT)
         {
             bool ret = false;
@@ -550,6 +592,10 @@ namespace FlowFree.Logic
             return ret;
         }
 
+        /// <summary>
+        /// Procesa el drag como tal.
+        /// Tiene muchas comprobaciones previas para poder dragear
+        /// </summary>
         void ProcessTileChange()
         {
             if (CanActivate())
@@ -576,34 +622,37 @@ namespace FlowFree.Logic
 
                 legalMove = false;
 
-                Directions fromDir = Logic.Directions.Right;
-                if ((lastPos.x == newPos.x - 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido a la derecha
+                Directions fromDir = Directions.Right;
+                Directions toDir = Directions.Right;
+                //Comprueba en que direccion te mueves.
+                //Solo dejamos mover a uno de distancia de donde estabas drageando
+                if (lastPos.x == newPos.x - 1 && lastPos.y == newPos.y)//has ido a la derecha
                 {
-                    lastConnectedTile.modify(Logic.Directions.Right, true, pressedColor);
-                    colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
-                    deActivate = currentTile.modify(fromDir = Logic.Directions.Left, true, pressedColor);
-                    legalMove = true;
+                    toDir = Directions.Right;
+                    fromDir = Directions.Left;
                 }
-                else if ((lastPos.x == newPos.x + 1 && lastPos.y == newPos.y) || _flows[_flowsIndex].Contains(currentTile))//has ido a la izquierda
+                else if (lastPos.x == newPos.x + 1 && lastPos.y == newPos.y)//has ido a la izquierda
                 {
-                    lastConnectedTile.modify(Logic.Directions.Left, true, pressedColor);
-                    colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
-                    deActivate = currentTile.modify(fromDir = Logic.Directions.Right, true, pressedColor);
-                    legalMove = true;
+                    toDir = Directions.Left;
+                    fromDir = Directions.Right;
+                }
+                else if (lastPos.y == newPos.y + 1 && lastPos.x == newPos.x)//has ido arriba
+                {
+                    toDir = Directions.Up;
+                    fromDir = Directions.Down;
+                }
+                else if (lastPos.y == newPos.y - 1 && lastPos.x == newPos.x)//has ido abajo
+                {
+                    toDir = Directions.Down;
+                    fromDir = Directions.Up;
+                }
 
-                }
-                else if ((lastPos.y == newPos.y + 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido arriba
+                //si te has movido a uno de distancia o sobre ti mismo
+                if(toDir != fromDir || _flows[_flowsIndex].Contains(currentTile))
                 {
-                    lastConnectedTile.modify(Logic.Directions.Up, true, pressedColor);
+                    lastConnectedTile.modify(toDir, true, pressedColor);
                     colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
-                    deActivate = currentTile.modify(fromDir = Logic.Directions.Down, true, pressedColor);
-                    legalMove = true;
-                }
-                else if ((lastPos.y == newPos.y - 1 && lastPos.x == newPos.x) || _flows[_flowsIndex].Contains(currentTile))//has ido abajo
-                {
-                    lastConnectedTile.modify(Logic.Directions.Down, true, pressedColor);
-                    colorConflict = currentTile.getColor() != Color.black && currentTile.getColor() != pressedColor;
-                    deActivate = currentTile.modify(fromDir = Logic.Directions.Up, true, pressedColor);
+                    deActivate = currentTile.modify(fromDir , true, pressedColor);
                     legalMove = true;
                 }
 
@@ -617,16 +666,14 @@ namespace FlowFree.Logic
                     Deactivate(fromDir);
                     lastConnectedTile = currentTile;
                 }
-                else if (legalMove)
+                else if (legalMove)//si te has movido de manera "legal", es decir a una casilla adyacente o sobre un flow de tu color
                 {
-                    if (!_flows[_flowsIndex].Contains(currentTile))
+                    if (!_flows[_flowsIndex].Contains(currentTile))//tuberia nueva
                     {
                         _flows[_flowsIndex].Add(currentTile);
                         numPipes++;
-                        //if (currentTile.getIsMain())
-                            //CheckFlows();
                     }
-                    else
+                    else//estas cortando a tu misma tuberia
                     {
                         lastConnectedTile.DeactiveIn();
                         if (!currentTile.getIsMain())
@@ -638,14 +685,18 @@ namespace FlowFree.Logic
                     }
                     lastConnectedTile = currentTile;
                 }
-                //CheckPipes();
             }
 
         }
 
+        /// <summary>
+        /// Encargado de dragear, primero procesa el drag con la posicion del puntero y luego
+        /// actualiza el estado del tablero en funcion a ese proceso de drag
+        /// </summary>
+        /// <param name="pos"></param>
         public void DragInput(Vector3 pos)
         {
-            PorcessDragInput(pos);
+            ProcessDragInput(pos);
             ProcessTileChange();
         }
 

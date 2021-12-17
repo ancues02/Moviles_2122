@@ -66,6 +66,8 @@ namespace FlowFree
 
         Logic.LogicGame lg;
 
+        bool nextLevel = false;
+
         private void Start()
         {
             if (!flowText || !movesText || !pipesText || !hintText
@@ -332,11 +334,11 @@ namespace FlowFree
                 case GamePhase.begin:
                     {
                         Vector3 tmp = transform.localScale;
-                        tmp.x += _baseRatio.x * Time.deltaTime;
+                        tmp.x += _baseRatio.x * Time.deltaTime * 1.5f;
                         transform.localScale = tmp;
 
                         tmp = transform.localPosition;
-                        tmp.x += (vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime;
+                        tmp.x += (vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime * 1.5f;
                         transform.localPosition = tmp;
 
                         if (transform.localScale.x >= _baseRatio.x)
@@ -406,16 +408,19 @@ namespace FlowFree
                 case GamePhase.end:
                     {
                         Vector3 tmp = transform.localPosition;
-                        tmp.x += -(vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime;
+                        tmp.x += -(vectorOffset.x + (0.5f * _baseRatio.x)) * Time.deltaTime * 1.5f;
                         transform.localPosition = tmp;
 
                         tmp = transform.localScale;
-                        tmp.x -= _baseRatio.x * Time.deltaTime;
+                        tmp.x -= _baseRatio.x * Time.deltaTime * 1.5f;
                         transform.localScale = tmp;
 
                         if (tmp.x <= 0)
                         {
-                            lvlManager.LevelEnded();
+                            if (nextLevel)
+                                lvlManager.NextLevel();
+                            else
+                                lvlManager.PreviousLevel();
                             gameState = GamePhase.NONE;
                         }
                     }
@@ -428,9 +433,10 @@ namespace FlowFree
         /// <summary>
         /// Cuando en el panel se llama a cambiar de nivel
         /// </summary>
-        public void ChangeLevel()
+        public void ChangeLevel(bool next)
         {
             gameState = GamePhase.end;
+            nextLevel = next;
             winPanel.SetActive(false);
         }
 
