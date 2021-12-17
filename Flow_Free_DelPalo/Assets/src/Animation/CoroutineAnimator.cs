@@ -43,5 +43,26 @@ namespace FlowFree
 
             yield break;
         }
+
+        // pulsación de cortado, es similar a la de acabar una tuberia pero mas rapida y con el color que le pasamos
+        public static IEnumerator Pulse(SpriteRenderer pulsed, Color color,System.Action animEnded = null)
+        {
+            float i = 0;
+            pulsed.enabled = true;
+            Vector3 oldscale = pulsed.transform.localScale;
+            while (i < 0.4f)
+            {
+                i += Time.deltaTime;
+                pulsed.transform.localScale = new Vector3((0.5f + 2 * i) * oldscale.x, (0.5f + 2 * i) * oldscale.y, oldscale.z);
+                pulsed.color = new Color(color.r, color.g, color.b, 1f - i);
+                yield return null;
+            }
+            pulsed.transform.localScale = oldscale;
+            pulsed.enabled = false;
+
+            animEnded?.Invoke();
+
+            yield break;
+        }
     }
 }

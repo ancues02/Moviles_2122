@@ -129,7 +129,6 @@ namespace FlowFree.Logic
                         changes = true;
                     }
                 }
-
             }
         }
 
@@ -205,7 +204,6 @@ namespace FlowFree.Logic
         // Mira si es uno en el que se ha hecho una pista
         bool CheckIfHintedFlow(int flowsindex)
         {
-
             bool wasHinted = !_hintIndexs.Contains(flowsindex);
             bool isCorrect = _flows[flowsindex].Count == _map.Flows[flowsindex].flowPoints.Count;
             int i = 0;
@@ -346,7 +344,9 @@ namespace FlowFree.Logic
             foreach (List<Tile> t in _tmpFlows)
             {
                 if (t[0].getColor() == _flows[ind][0].getColor())
+                {
                     return;
+                }
             }
 
             //lista temporal donde guardar una copia clonada del flow cortado
@@ -394,8 +394,28 @@ namespace FlowFree.Logic
             }
 
             int index = _flows[ind].IndexOf(currentTile);
-
+            
             bool halfUp = _flows[ind].Count / 2 <= index;
+            for (int j = 0; j < _flows[ind].Count; ++j)
+            {
+                Tile tmp = _flows[ind][j];
+
+                //donde se ha cortado volver a poner bien los caminos 
+                //de donde has venido y a donde has ido en ese tile
+                if (tmp == currentTile)
+                {
+
+                    if (_flows[ind][_flows[ind].Count - 1].getIsMain())
+                    {
+                        if(halfUp)
+                            _flows[ind][j - 1].animableSprites[1].Pulse(_flows[ind][0].getColor());
+                        else
+                            _flows[ind][j + 1].animableSprites[1].Pulse(_flows[ind][0].getColor());
+                    }
+
+                }
+            }
+
             int i = 0;
             //te cortan por la primera mitad y estaba finalizada la tuberia
             if (!halfUp && _flows[ind][_flows[ind].Count - 1].getIsMain())
@@ -441,6 +461,7 @@ namespace FlowFree.Logic
                 }
                 _flows[ind][_flows[ind].Count - 1].DeactiveOut();
             }
+
 
             _flows[_flowsIndex].Add(currentTile);
             currentTile.modify(dir, true, pressedColor);

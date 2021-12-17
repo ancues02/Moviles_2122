@@ -24,5 +24,14 @@ public class Animable : MonoBehaviour
         }
     }
 
+    public void Pulse(Color color)
+    {
+        if (_animationAvailable)
+        {
+            _animationAvailable = false;
+            StartCoroutine(FlowFree.CoroutineAnimator.Pulse(GetComponent<SpriteRenderer>(), color,setAvailable));
+        }
+    }
+
     void setAvailable() { _animationAvailable = true; }
 }
