@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: TestPack_5
   m_EditorClassIdentifier: 
   packName: Hourglass
-  maps: {fileID: 4900000, guid: 6a539e46f3b6e9947b33d29f56ddfcbb, type: 3}
+  maps: {fileID: 4900000, guid: 37c2996d66f05134396ab42db8a58a1e, type: 3}
   pages:
   - name: "El hourglass en cuesti\xF3n"
     color: {r: 0.6063456, g: 0.5518868, b: 1, a: 1}
+  blocked: 0
+  blockedLevelIndex: 0
