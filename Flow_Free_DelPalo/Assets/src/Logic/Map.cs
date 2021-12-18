@@ -4,37 +4,37 @@ using UnityEngine;
 
 namespace FlowFree.Logic
 {
+    /**
+    *  Mapa logico con sus datos correspondientes
+    */
     public class Map
-    {
-        /**
-         *  Recibe el mapa en forma de cadena y lo parsea a un mapa de juego
-         *  
-         *  Devuelve false si hay algun error
-         */
-        int width = -1, height = -1,    //5 = mismo ancho y alto, 5:6 = 5 de ancho y 6 de alto
-            reserved = 0,   //siempre es 0
+    {        
+        int width = -1, height = -1,    // 5 = mismo ancho y alto, 5:6 = 5 de ancho y 6 de alto
+            reserved = 0,   // siempre es 0
             levelNumber = -1,   // el numero del nivel
             flowNumber = -1;    // numero de flujos
         //opcionales
-        List<int> bridges;  //separadas por dos puntos son sus ubicaciones
-        List<int> voids;    //separadas por dos puntos son sus ubicaciones
-        List<Vector2Int> walls; //separadas por dos puntos son sus ubicaciones, cada muro viene dado por dos casillas 2|9 
-        bool bordered;
+        List<int> bridges;  // separadas por dos puntos son sus ubicaciones
+        List<int> voids;    // separadas por dos puntos son sus ubicaciones
+        List<Vector2Int> walls; // separadas por dos puntos son sus ubicaciones, cada muro viene dado por dos casillas 2|9 
+        bool bordered;  // Si esta rodeado el tablero
 
-        List<Flow> flows;//las tuberias
+        List<Flow> flows;   // las tuberias
 
-        public List<Flow> Flows { get => flows; }
-        public int Width { get => width; }
-        public int Height { get => height; }
-        public int Reserved { get => reserved;  }
-        public int LevelNumber { get => levelNumber;  }
-        public int FlowNumber { get => flowNumber;  }
-        public List<int> Bridges { get => bridges;  }
-        public List<int> Voids { get => voids; }
-        public List<Vector2Int> Walls { get => walls;  }
+        public List<Flow> Flows { get => flows; }   // Lista de tuberias publica
+        public int Width { get => width; }      // Anchura del mapa en tiles
+        public int Height { get => height; }    // Altura del mapa en tiles
+        public int Reserved { get => reserved;  }   // Numero reservado en el parseo
+        public int LevelNumber { get => levelNumber;  } // Numero del nivel
+        public int FlowNumber { get => flowNumber;  }   // Numero de flows
+        public List<int> Bridges { get => bridges;  }   // Lista de puentes
+        public List<int> Voids { get => voids; }        // Lista de vacios
+        public List<Vector2Int> Walls { get => walls;  }    // Lista de parejas de tiles con paredes entre medias
 
-        //Tuberia, contiene una lista de puntos que es la solucion a esa tuberia
-        //tiene dos puntos, el inicio y el fin
+        /**
+         * Tuberia, contiene una lista de puntos que es la solucion a esa tuberia
+         * tiene dos puntos, el inicio y el fin
+         */
         public struct Flow
         {
             public List<Vector2Int> flowPoints;
@@ -42,7 +42,11 @@ namespace FlowFree.Logic
 
         }
 
-        //Le llega un entero y lo parsea a fila/columna del nivel
+        /// <summary>
+        /// Parsea las fila y columna en nivel a partir de una posicion
+        /// </summary>
+        /// <param name="pos">Posicion a parsear</param>
+        /// <returns>La posicion parseada</returns>
         Vector2Int parsePoint(int pos)
         {
             Vector2Int p = new Vector2Int();
@@ -51,52 +55,52 @@ namespace FlowFree.Logic
             return p;
         }
 
-        /*
-         * Le llega una cadena que es el nivel
-         */ 
+        /// <summary>
+        /// Parsea el nivel a partir de una cadena de texto
+        /// </summary>
+        /// <param name="str">Cadena de texto con los datos del nivel</param>
+        /// <returns>Si el parseo ha sido correcto</returns>
         public bool Parse(string str)
         {
-            
-            /*str = "5,0,1,5;" +//, (puentes) , (vacio) 5:4:6:23, (paredes) 2|7:3|8,
-                "18,17,12;" +
-                "21,16,11,6;" +
-                "3,4,9;" +
-                "0,1,2,7,8,13,14,19,24,23,22;" +
-                "20,15,10,5";*/
-
             string[] lvl = str.Split(';');
-            levelAttributes(lvl[0]);
+            levelAttributes(lvl[0]);    // Atributos iniciales y opcionales del nivel
             flows = new List<Flow>();
             Flow flow;
             string[] flowPoints;
 
-            for (int i= 1; i <= FlowNumber; ++i)//recorre todos los flows
+            for (int i= 1; i <= FlowNumber; ++i)    // recorre todos los flows
             {
                 flow = new Flow();
                 flow.flowPoints = new List<Vector2Int>();
                 flowPoints = lvl[i].Split(',');
 
-                //inicio de una tuberia
+                // inicio de una tuberia
                 int tmp = int.Parse(flowPoints[0]);
                 Vector2Int pos = parsePoint(tmp);
                 flow.flowPoints.Add(pos);
                 flow.start = pos;
 
-                //calcular el recorrido de la tuberia
-                for (int j = 1; j < flowPoints.Length - 1; ++j) {//recorre cada flow
+                // calcular el recorrido de la tuberia
+                for (int j = 1; j < flowPoints.Length - 1; ++j) {   // recorre cada flow
                     tmp = int.Parse(flowPoints[j]);
                     flow.flowPoints.Add(parsePoint(tmp));
                 }
-                //fin de la tuberia
+
+                // fin de la tuberia
                 tmp = int.Parse(flowPoints[flowPoints.Length - 1]);
                 pos = parsePoint(tmp);
                 flow.flowPoints.Add(pos);
                 flow.end = pos;
-                flows.Add(flow);    //añadir el nuevo flow con todas sus posiciones en el mapa              
+                flows.Add(flow);    // añadir el nuevo flow con todas sus posiciones en el mapa              
             }
             return true;
         }
 
+        /// <summary>
+        /// Parsea los atributos del bloque inical del nivel
+        /// Datos basicos y opcionales
+        /// </summary>
+        /// <param name="str"></param>
         void levelAttributes(string str)
         {
             string[] attr = str.Split(',');
@@ -106,16 +110,20 @@ namespace FlowFree.Logic
             flowNumber = int.Parse(attr[3]);
             voids = new List<int>();
             walls = new List<Vector2Int>();
-            if (attr.Length > 5)//checkear opcionales
+            if (attr.Length > 5)    // checkear opcionales
             {
-                //int.Parse(attr[4]);//puentes que no queremos
+                //int.Parse(attr[4]);   // (saltandonos puentes, ya que no son necesarios todavia)
                 getVoids(attr[5]);
                 if (attr.Length > 6) 
                     getWalls(attr[6]);
             }
         }
 
-        //Pone el tamanio del tablero
+        /// <summary>
+        /// Pone el tamaño del tablero
+        /// Y si debe estar rodeado de bordes
+        /// </summary>
+        /// <param name="str">Texto con los datos del tamaño</param>
         void getSize(string str)
         {
             string[] attr = str.Split(':');
@@ -130,6 +138,10 @@ namespace FlowFree.Logic
             }
         }
 
+        /// <summary>
+        /// Parsea las posiciones de los vacios
+        /// </summary>
+        /// <param name="str">Texto con los datos de los vacios</param>
         void getVoids(string str)
         {
             string[] attr = str.Split(':');
@@ -139,6 +151,10 @@ namespace FlowFree.Logic
             }
         }
 
+        /// <summary>
+        /// Parsea los tamaños de las paredes
+        /// </summary>
+        /// <param name="str">Texto con los datos de las paredes</param>
         void getWalls(string str)
         {        
             string[] attr = str.Split(':');
@@ -150,13 +166,21 @@ namespace FlowFree.Logic
             }
         }
 
-        // Devuelve si está rodeado de bordes
+        /// <summary>
+        /// Devuelve si esta rodeado de bordes
+        /// </summary>
+        /// <returns>Si esta rodeado de paredes</returns>
         public bool isBordered() 
         {
             return bordered;
         }
 
-        //devuelve si es inicio o fin de una tuberia
+        /// <summary>
+        /// Devuelve si es inicio o final de una tuberia
+        /// </summary>
+        /// <param name="i">Posicion en x de la tile</param>
+        /// <param name="j">Posicion en y de la tile</param>
+        /// <returns>Si es incio o final de tuberia</returns>
         public bool IsFlow(int i, int j)
         {
             Vector2Int index = new Vector2Int(i, j);

@@ -4,40 +4,54 @@ using UnityEngine;
 
 namespace FlowFree.Logic
 {
+    /**
+     * Clase que maeja la logica del juego
+     */
     public class LogicGame 
     {
-        SpriteRenderer _pointer;
-        Vector2 _baseRatio;
-        Tile[,] _tiles;
-        int _width, _height;
-        Map _map;
+        SpriteRenderer _pointer;    // Puntero circular
+        Vector2 _baseRatio; // Proporcion etre el tamaño disponible y las dimensiones del tablero
+        Tile[,] _tiles;     // Tiles del tablero
+        int _width, _height;    // Dimensiones del tablero
+        Map _map;   // Mapa
 
-        //los caminos que hay en el tablero durante el juego
-        List<Tile>[] _flows;
-        int _flowsIndex;//el indice de la tuberia que se esta modificando
-        int _circleFlowsIndex = -1;//el indice de la tuberia que tiene el circulo pequenio
+        // los caminos que hay en el tablero durante el juego
+        List<Tile>[] _flows;    // Lista de tiles que representan los flows
+        int _flowsIndex;    // el indice de la tuberia que se esta modificando
+        int _circleFlowsIndex = -1; // el indice de la tuberia que tiene el circulo pequenio
 
-        List<List<Tile>> _tmpFlows;//flows que se han cortado mientras estas pulsando
-        List<Tile> _touchFlow; //el flow que se ha tocado, para ver si ha tenido cambios y aniadir un movimiento
+        List<List<Tile>> _tmpFlows; // flows que se han cortado mientras estas pulsando
+        List<Tile> _touchFlow;  // el flow que se ha tocado, para ver si ha tenido cambios y aniadir un movimiento
 
-        Vector2 _vectorOffset;
-        Color pressedColor = Color.black,
-            lastMoveColor = Color.black;
-        Tile currentTile;
-        Tile lastConnectedTile;
-        bool colorConflict = false;
-        bool legalMove = false;
-        bool changes = false;
+        Vector2 _vectorOffset;  // Traslacion desde (0, 0) para centrar el tablero
+        Color pressedColor = Color.black,   // Color presionado por ultima vez
+            lastMoveColor = Color.black;    // Color del ultimo movimiento hecho
+        Tile currentTile;       // Tile sobre la que se esta actuando
+        Tile lastConnectedTile; // Ultima tile que se conecto a otra
+        bool colorConflict = false; // Si ha habido conflicto de caminos en una tile
+        bool legalMove = false;     // Si ha habido un movimiento posible (a tile adjacente por la qu se puede pasar)
+        bool changes = false;   // Si ha habido cambios en flows
 
-        int totalFlows, totalNumPipes;
-        int numFlows, moves, numPipes;
+        int totalFlows, totalNumPipes;  // Numero de flows y trozos de flow totales del mapa
+        int numFlows, moves, numPipes;  // Numeros actuales de flows, trozos de flow y movimientos
 
-        List<Color> _colors;
+        List<Color> _colors;    // Lista de colores sacados de la piel actual
 
-        List<int> _hintIndexs;
+        List<int> _hintIndexs;  // Lista de flows en los que pueden ser usada una pista
         bool _usingHint = false;    // Para que las hints no se animen
         bool _animColor = false;    // Para que el release no haga wiggle si no tocaste 
 
+        /// <summary>
+        /// Genera Logic Game con datos externos
+        /// </summary>
+        /// <param name="tiles">Tiles del tablero</param>
+        /// <param name="width">Anchura del tablero</param>
+        /// <param name="height">Altura del tablero</param>
+        /// <param name="map">Mapa correspondiente al nivel</param>
+        /// <param name="colors">Colores de los elementos</param>
+        /// <param name="baseRatio">Proporcion etre tamaño disponible y dimensiones del tablero</param>
+        /// <param name="vectorOffset">Vector de traslacion del tablero</param>
+        /// <param name="pointer">Pntero circular</param>
         public LogicGame(Tile[,] tiles, int width, int height,
             Map map, List<Color> colors, Vector2 baseRatio, Vector2 vectorOffset,
             SpriteRenderer pointer)
@@ -132,11 +146,16 @@ namespace FlowFree.Logic
             }
         }
 
+        /// <summary>
+        /// Accion de soltar input en un posicion especifica
+        /// </summary>
+        /// <param name="pos">Posicion especifica</param>
+        /// <returns>Devuelve si se han completado todos los flows, ganando</returns>
         public bool ReleaseInput(Vector2 pos)
         {
             lastConnectedTile = null;
-            //Aumentar numero de movimientos si ha habido algun cambio en la tuberia que has tocado
-            //y es un color diferente al anterior con el que se ha aumentado el numero de movimientos
+            // Aumentar numero de movimientos si ha habido algun cambio en la tuberia que has tocado
+            // y es un color diferente al anterior con el que se ha aumentado el numero de movimientos
             bool diff = false;
             if (_touchFlow.Count != _flows[_flowsIndex].Count)
                 diff = true;
@@ -159,13 +178,13 @@ namespace FlowFree.Logic
                 moves++;
             }
 
-            //Desactivar o activar el circulo pequenio solo si se ha cambiado alguna tuberia
+            // Desactivar o activar el circulo pequenio solo si se ha cambiado alguna tuberia
             if (changes)
             {
-                //desactivar el que esta activo (el anterior que se ha activado)
+                // desactivar el que esta activo (el anterior que se ha activado)
                 if (_circleFlowsIndex != -1 && _flows[_circleFlowsIndex].Count > 1)
                     _flows[_circleFlowsIndex][_flows[_circleFlowsIndex].Count - 1].SmallCircleSetActive(false);
-                //activar el nuevo, el de la tuberia que se ha modificado
+                // activar el nuevo, el de la tuberia que se ha modificado
                 if (_flows[_flowsIndex].Count > 1)
                 {
                     _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].SmallCircleSetActive(true);
@@ -190,18 +209,27 @@ namespace FlowFree.Logic
                 else
                     _flows[_flowsIndex][_flows[_flowsIndex].Count - 1].animableSprites[2].Wiggle();
 
-           
             _animColor = false;
             return numFlows == totalFlows;
         }
 
+        /// <summary>
+        /// Devuelve informacion para poner en 
+        /// los textos de complecion de nivel
+        /// </summary>
+        /// <param name="moves">Movimientos realizados</param>
+        /// <returns>Si no es una partida perfecta</returns>
         public bool WinAttributes(out int moves)
         {
             moves = this.moves;
             return moves > _flows.Length;
         }
 
-        // Mira si es uno en el que se ha hecho una pista
+        /// <summary>
+        /// Comprueba si un flow ya ha recibido pista
+        /// </summary>
+        /// <param name="flowsindex">indice del flow a comprobar</param>
+        /// <returns>Si se ha usado una pista sobre ese flow</returns>
         bool CheckIfHintedFlow(int flowsindex)
         {
             bool wasHinted = !_hintIndexs.Contains(flowsindex);
@@ -215,7 +243,12 @@ namespace FlowFree.Logic
             return wasHinted && isCorrect;
         }
 
-        // Pone o no estrellas en los extremos main
+        /// <summary>
+        /// Activa o desactiva estrellas en los extremos de un flow
+        /// tan solo si estos son circulos grandes
+        /// </summary>
+        /// <param name="flowsindex">Indice del flow</param>
+        /// <param name="toggle">Si se activan o desactivan las estrellas</param>
         void PutStars(int flowsindex, bool toggle)
         {
             if (_flows[flowsindex].Count > 0)
@@ -230,7 +263,7 @@ namespace FlowFree.Logic
         /// Consigue la Tile del tablero sobre la que se esta drageando
         /// Si se dragea sobre un main de tu mismo color se unen las tuberias, tambien se modifica el alpha del puntero 
         /// </summary>
-        /// <param name="pos"> posicion en la que se esta drageando</param>
+        /// <param name="pos"> Posicion en la que se esta drageando</param>
         void ProcessDragInput(Vector2 pos)
         {
             Vector2Int boardPos = GetBoardTile(pos);
@@ -256,7 +289,10 @@ namespace FlowFree.Logic
             _pointer.transform.position = new Vector3(pos.x, pos.y, -2);
         }
 
-        // Hace drag sobre una tile específica
+        /// <summary>
+        /// Hace drag sobre una tile especifica
+        /// </summary>
+        /// <param name="boardPos">Posicion de la tile</param>
         void DragTile(Vector2Int boardPos)
         {
             currentTile = _tiles[boardPos.x, boardPos.y];
@@ -377,16 +413,16 @@ namespace FlowFree.Logic
         /// </summary>
         private void DeactivateByColor(Logic.Directions dir)
         {
-            //encontrar el indice del flow cortado
+            // encontrar el indice del flow cortado
             int ind = 0;
             while (!_flows[ind].Contains(currentTile))
             {
                 ind++;
             }
-            //guardar el estado de la tuberia cortada(si es necesario)
+            // guardar el estado de la tuberia cortada(si es necesario)
             CutFlow(ind);
 
-            //encontrar el indice de las tuberias cortadas
+            // encontrar el indice de las tuberias cortadas
             int tmpInd = 0;
             while (!_tmpFlows[tmpInd].Contains(currentTile))
             {
@@ -399,8 +435,8 @@ namespace FlowFree.Logic
             for (int j = 0; j < _flows[ind].Count; ++j)
             {
                 Tile tmp = _flows[ind][j];
-                //donde se ha cortado volver a poner bien los caminos 
-                //de donde has venido y a donde has ido en ese tile
+                // donde se ha cortado volver a poner bien los caminos 
+                // de donde has venido y a donde has ido en ese tile
                 if (tmp == currentTile)
                 {
 
@@ -416,7 +452,7 @@ namespace FlowFree.Logic
             }
 
             int i = 0;
-            //te cortan por la primera mitad y estaba finalizada la tuberia
+            // te cortan por la primera mitad y estaba finalizada la tuberia
             if (!halfUp && _flows[ind][_flows[ind].Count - 1].getIsMain())
             {
                 for (int j = 0; j <= index && index < _flows[ind].Count; j++)
@@ -425,7 +461,7 @@ namespace FlowFree.Logic
                     _flows[ind].RemoveAt(i);
                 }
                 _flows[ind][0].DeactiveIn();
-                //volteamos el sentido de la tuberia
+                // volteamos el sentido de la tuberia
                 _flows[ind].Reverse();
                 foreach (Tile t in _flows[ind])
                 {
@@ -436,7 +472,7 @@ namespace FlowFree.Logic
                 {
                     t.Swap();
                 }
-            }//te cortan por la segunda mitad y estaba finalizada la tuberia
+            }// te cortan por la segunda mitad y estaba finalizada la tuberia
             else if (_flows[ind][_flows[ind].Count - 1].getIsMain())
             {
                 i = index;
@@ -448,7 +484,7 @@ namespace FlowFree.Logic
                 }
                 _flows[ind][_flows[ind].Count - 1].DeactiveOut();
 
-            }//te cortan por la segunda mitad y estaba finalizada la tuberia
+            }// te cortan por la segunda mitad y estaba finalizada la tuberia
             else
             {
                 i = index;
@@ -474,12 +510,12 @@ namespace FlowFree.Logic
         /// y al cortarte a ti mismo han desaparecido</param>
         private void ReactivateFlow(List<Tile> toCheck)
         {
-            //Comprobar en todos los flows cortados
+            // Comprobar en todos los flows cortados
             for (int i = _tmpFlows.Count - 1; i >= 0; --i)
             {
                 List<Tile> list = _tmpFlows[i];
                 bool reactivate = false;
-                //Comprobar por todos los tiles que se han borrado y puede que antes hubiese otro flow
+                // Comprobar por todos los tiles que se han borrado y puede que antes hubiese otro flow
                 foreach (Tile tile in toCheck)
                 {
                     if(list.Contains(tile))
@@ -572,13 +608,12 @@ namespace FlowFree.Logic
         }
 
 
-        // Comprueba si hay que cambiar el color de una tuberia
         /// <summary>
         /// Comprobaciones para poder dragear.
         /// Basicamente que no estes sobre un main de otro color, no estes sobre ti mismo
         /// no haya muros entre las dos tiles 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Si puedes moverte a esa tile</returns>
         private bool CanActivate()
         {
             return lastConnectedTile != null && currentTile != lastConnectedTile &&
@@ -593,7 +628,7 @@ namespace FlowFree.Logic
         /// </summary>
         /// <param name="AT">Posicion de una tile</param>
         /// <param name="BT">Posicion de la otra tile</param>
-        /// <returns>Devuelve true si hay muro entre las dos tiles</returns>
+        /// <returns>Si hay muro entre las dos tiles</returns>
         bool IsThereWall(Tile AT, Tile BT)
         {
             bool ret = false;
@@ -686,14 +721,14 @@ namespace FlowFree.Logic
                     Deactivate(fromDir);
                     lastConnectedTile = currentTile;
                 }
-                else if (legalMove)//si te has movido de manera "legal", es decir a una casilla adyacente o sobre un flow de tu color
+                else if (legalMove) // si te has movido de manera "legal", es decir a una casilla adyacente o sobre un flow de tu color
                 {
                     if (!_flows[_flowsIndex].Contains(currentTile))//tuberia nueva
                     {
                         _flows[_flowsIndex].Add(currentTile);
                         numPipes++;
                     }
-                    else//estas cortando a tu misma tuberia
+                    else    // estas cortando a tu misma tuberia
                     {
                         lastConnectedTile.DeactiveIn();
                         if (!currentTile.getIsMain())
@@ -754,7 +789,7 @@ namespace FlowFree.Logic
                 _hintIndexs.Remove(index);
                 _usingHint = true;
 
-                //Simulamos el recorrido del flow como si estuviesemos drageando
+                // Simulamos el recorrido del flow como si estuviesemos drageando
                 if (_flows[index].Count > 0)
                 {
                     PressTile(_flows[index][0].getBoardPos());
