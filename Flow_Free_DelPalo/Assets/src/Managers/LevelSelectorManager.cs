@@ -6,6 +6,10 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
+    /**
+     * Se encarga de la creacion de los elementos de la
+     * escena de Seleccion de Nivel. 
+     */
     public class LevelSelectorManager : MonoBehaviour
     {
         ///<summary>

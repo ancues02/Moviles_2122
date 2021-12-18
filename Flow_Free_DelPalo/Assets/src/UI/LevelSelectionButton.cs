@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
+    /**
+     * Boton de seleccion de nivel
+     */
     public class LevelSelectionButton : MonoBehaviour
     {
         public Button button;
@@ -28,7 +31,6 @@ namespace FlowFree
             button.onClick.AddListener(action);
         }
 
-        // TODO: heredar de algo que tenga estos metodos para no repetirlos
         public void setBlocked(bool blocked)
         {
             button.interactable = !blocked;
