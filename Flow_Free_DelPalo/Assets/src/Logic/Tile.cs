@@ -55,9 +55,7 @@ namespace FlowFree
             if (childrens.Length < 4)
                 Debug.LogError("Espabila, que te faltan referencias de los hijos");
 
-            renderSprite.sprite = sprites[0];
-            //renderSprite.color = Color.black;
-           
+            renderSprite.sprite = sprites[0];           
         }
 
         public bool getIsMain() { return isMain; }
