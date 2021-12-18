@@ -10,7 +10,7 @@ namespace FlowFree
         [Tooltip ("El BoardManager de la escena")]
         public BoardManager board;
 
-        [Tooltip("El script AdsInterstitial del objeto que lo contiene en la escena")]
+        [Tooltip("El script AdsManager del objeto que lo contiene en la escena")]
         public AdsManager adManager;
 
         [Tooltip("El texto del canvas del nivel")]
@@ -118,6 +118,26 @@ namespace FlowFree
             else
                 completeLevelImage.setNone();
 
+        }
+
+        /// <summary>
+        /// Metodo que se llama cuando se pide una pista y no quedan
+        /// Se podria mostrar un panel con lo que quiera hacer el jugador (en el juego es comprar pistas)
+        /// pero lanzamos directamente un anuncio
+        /// </summary>
+        void NoHints()
+        {
+            adManager.ShowRewardedAd();
+        }
+
+        public void DoHint()
+        {
+            if (GameManager.getInstance().GetHints() > 0)
+            {
+                board.DoHint();
+            }
+            else
+                NoHints();
         }
 
     }

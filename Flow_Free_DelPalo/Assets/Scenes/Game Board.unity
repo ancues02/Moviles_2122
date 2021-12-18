@@ -1491,6 +1491,7 @@ GameObject:
   - component: {fileID: 529613800}
   - component: {fileID: 529613799}
   - component: {fileID: 529613798}
+  - component: {fileID: 529613801}
   m_Layer: 5
   m_Name: Pista
   m_TagString: Untagged
@@ -1561,19 +1562,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 529613799}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1125272007}
-        m_TargetAssemblyTypeName: FlowFree.BoardManager, Assembly-CSharp
-        m_MethodName: DoHint
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &529613799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1612,6 +1601,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529613796}
   m_CullTransparentMesh: 1
+--- !u!114 &529613801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529613796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ca3c0981faf7849826edcfe7e248ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lvlManager: {fileID: 2011856597}
+  button: {fileID: 529613798}
 --- !u!1 &531463511
 GameObject:
   m_ObjectHideFlags: 0
@@ -2392,7 +2395,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TilePrefab: {fileID: 8712364534256855023, guid: 55d97be62e4bde343b69825d87f59694, type: 3}
   lvlManager: {fileID: 2011856597}
-  adsManager: {fileID: 1657832529}
   pointer: {fileID: 74543543}
   flowText: {fileID: 1274124511}
   movesText: {fileID: 838881991}
@@ -3433,6 +3435,7 @@ MonoBehaviour:
   testMode: 0
   adsInterstitial: {fileID: 1657832527}
   adsRewarded: {fileID: 1657832526}
+  adsBanner: {fileID: 0}
 --- !u!1 &1728421663
 GameObject:
   m_ObjectHideFlags: 0
@@ -3823,7 +3826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 1125272007}
-  adManager: {fileID: 0}
+  adManager: {fileID: 1657832529}
   levelText: {fileID: 1363443351}
   sizeText: {fileID: 1451136790}
   nextLevelButton: {fileID: 934674486}

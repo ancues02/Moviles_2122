@@ -11,9 +11,6 @@ namespace FlowFree
         public GameObject TilePrefab;
         public LevelManager lvlManager;
 
-        [Tooltip("El script AdsManager del objeto que lo contiene en la escena")]
-        public AdsManager adsManager;
-
         public SpriteRenderer pointer;     
 
         [Tooltip("El texto del canvas de flows")]
@@ -71,7 +68,7 @@ namespace FlowFree
         private void Start()
         {
             if (!flowText || !movesText || !pipesText || !hintText
-                || !TilePrefab || !lvlManager || !winPanel || !adsManager)
+                || !TilePrefab || !lvlManager || !winPanel )
                 Debug.LogError("Falta alguna referencia en BoardManager!");
             else
             {
@@ -303,14 +300,20 @@ namespace FlowFree
 
         /// <summary>
         /// Pone una pista, se llama al pulsar el boton de pista 
-        /// Comprueba que te quedan pistas y avisa al GameManager para que actualice el valor y lo guarde
+        /// Comprueba que te quedan pistas (aunque no hace falta) y avisa al GameManager para que actualice el valor y lo guarde
         /// Tambien descartamos que si el nivel tiene 4 flows y has pedido 4 pistas, si pides otra no te quite pistas
+        /// Si esta el panel de victoria activo, lo desactivamos y no usamos pista
         /// </summary>
         public void DoHint()
         {
-            if (numHintUsed < totalFlows)
+            if (numHintUsed < totalFlows )
             {
-                if (GameManager.getInstance().UseHint())
+                //Si estas con el panel activo, lo desactivamos
+                if (win) 
+                    ContinuePlaying();
+                //Decimos al Game Manager que hemos usado una pista. 
+                //No haria falta comprobar que queden pistas pero por si acaso
+                else if (GameManager.getInstance().UseHint())
                 {
                     numHintUsed++;
                     if (lg.DoHint())
@@ -318,11 +321,6 @@ namespace FlowFree
                         win = true;
                         Win();
                     }
-                }
-                else
-                {
-                    //Si no quedan pistas, mostrar anuncio
-                    adsManager.ShowRewardedAd();
                 }
             }
             CheckHints();
