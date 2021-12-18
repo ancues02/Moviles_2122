@@ -6,40 +6,90 @@ using UnityEngine.SceneManagement;
 
 namespace FlowFree
 {
+    /// <summary>
+    /// Singleton que gestiona los recursos logicos del juego
+    /// y controla el paso de informacion entre escenas.
+    /// </summary>
     public class GameManager : MonoBehaviour
     {
         public const int MAX_HINTS = 99;
 
-        // Categorias que contienen los lotes que estan en el juego
+        /// <summary>
+        /// Categorias que contienen los lotes que estan en el juego
+        /// </summary>
         public Category[] categories;
 
-        // Tema de colores que se usara en el juego
+        /// <summary>
+        /// Tema de colores que se usara en el juego
+        /// </summary>
         public ColorTheme theme;
 
+        /// <summary>
+        /// Manager del menu
+        /// </summary>
         public MenuManager menuManager;
+
+        /// <summary>
+        /// Manager de la seleccion de niveles
+        /// </summary>
         public LevelSelectorManager lvlSelectorManager;
+
+        /// <summary>
+        /// Manager del nivel
+        /// </summary>
         public LevelManager lvlManager;
 
-        static GameManager _instance;
-
-        int hints;
-
-        
-        Dictionary<string, Logic.GameCategory> catDict;
-        List<Logic.GameCategory> catArray;
-        int _categoryIndex, _packIndex, selectedLevel;
-        
-        Logic.GameCategory selectedCategory;
-        Logic.GamePack selectedPack;
-        Dictionary<string, int> catPos;
-
-
-        // Gestion del guardado 
+        /// <summary>
+        /// Manager del guardado  
+        /// </summary>
         GameDataManager _dataManager;
 
+        /// <summary>
+        /// Instancia estatica para el Singleton
+        /// </summary>
+        static GameManager _instance;
+
+        /// <summary>
+        /// Pistas disponibles
+        /// </summary>
+        int hints;
+  
+        /// <summary>
+        /// Diccionario para la gestion de categorias logicas 
+        /// identificadas con su nombre.
+        /// </summary>
+        Dictionary<string, Logic.GameCategory> catDict;
+
+        /// <summary>
+        /// Lista de las categorias logicas. Se configura
+        /// segun las categorias presentes en el diccionario
+        /// </summary>
+        List<Logic.GameCategory> catArray;
+
+        /// <summary>
+        /// Nivel seleccionado
+        /// </summary>
+        int selectedLevel;
+        
+        /// <summary>
+        /// Categoria seleccionada
+        /// </summary>
+        Logic.GameCategory selectedCategory;
+
+        /// <summary>
+        /// Lote seleccionado
+        /// </summary>
+        Logic.GamePack selectedPack;
+
+        /// <summary>
+        /// Configuramos la instancia segun si es la primera o no. Si es la primera,
+        /// creamos y configuramos las categorias logicas segun los assets de las categorias
+        /// y teniendo en cuenta los datos guardados. También hacemos que nos destruya en el 
+        /// cambio de escenas.
+        /// Configuramos los managers de cada escena segun la escena en la que estemos
+        /// </summary>
         private void Awake()
         {
-            Debug.Log(Application.persistentDataPath);
             if(!_instance)
             {
                 hints = 3;
@@ -95,34 +145,50 @@ namespace FlowFree
             }
         }
 
+        /// <summary>
+        /// Devuelve la instancia estatica del GameManager
+        /// </summary>
+        /// <returns></returns>
         public static GameManager getInstance()
         {
             return _instance;   
         }
 
+        /// <summary>
+        /// Cambia de escenas
+        /// </summary>
+        /// <param name="sceneName"> La siguiente escena</param>
         public void ChangeScene(string sceneName)
         {
             SceneManager.LoadScene(sceneName);
         }
 
-        /**
-         * Establece el lote que hemos seleccionado,
-         * necesita saber desde que categoria se selecciona
-         * el lote y que lote es.
-         * Se llama desde el menu     
-         */
+        /// <summary>
+        /// Establece el lote que hemos seleccionado,
+        /// necesita saber desde que categoria se selecciona
+        /// el lote y que lote es. Se llama desde el menu.
+        /// </summary>
+        /// <param name="catName"> Nombre de la categoria</param>
+        /// <param name="packIndex"> El indice del lote en el array de lotes</param>
         public void setLevelPack(string catName, int packIndex)
         {
             _instance.selectedCategory = _instance.catDict[catName];
             _instance.selectedPack = _instance.catDict[catName].PacksArray[packIndex];
         }
 
+        /// <summary>
+        /// Establece el nivel seleccionado del lote actual
+        /// </summary>
+        /// <param name="levelIndex"> El indice del nivel</param>
         public void SetSelectedLevel(int levelIndex)
         {
             _instance.selectedLevel = levelIndex;
         }
 
-        public bool DoesNextLevelExist()
+        /// <summary>
+        /// Devuelve si existe o no el nivel posterior
+        /// </summary>
+        bool DoesNextLevelExist()
         {
             return _instance.selectedLevel + 1 < _instance.selectedPack.TotalLevels;
         }
@@ -133,26 +199,36 @@ namespace FlowFree
         /// <returns>Devuelve si hay o no nivel siguiente</returns>
         public bool NextLevel()
         {
-            if(!_instance.DoesNextLevelExist())
-            {
-                ChangeScene("Menu");
-                return false;
-            }
-            else
+            bool exist = _instance.DoesNextLevelExist();
+            if (exist)
                 _instance.selectedLevel++;
-            return true;
+            return exist;
         }
 
-        public bool DoesPrevLevelExist()
+        /// <summary>
+        /// Devuelve si existe o no el nivel anterior
+        /// </summary>
+        bool DoesPrevLevelExist()
         {
             return _instance.selectedLevel - 1 >= 0;
         }
 
-        public void PrevLevel()
+        /// <summary>
+        /// Cambia al siguiente nivel, si no hay mas niveles, cambia al menu
+        /// </summary>
+        /// <returns>Devuelve si hay o no nivel siguiente</returns>
+        public bool PrevLevel()
         {          
-            _instance.selectedLevel = Mathf.Clamp(_instance.selectedLevel-1,0, _instance.selectedPack.TotalLevels - 1);
+            bool exist = _instance.DoesPrevLevelExist();
+            if (exist)
+                _instance.selectedLevel--;
+            return exist;
         }
 
+        /// <summary>
+        /// Utiliza una pista y guarda las pistas tras utilizarla
+        /// </summary>
+        /// <returns> Devuelve si hay o no pistas</returns>
         public bool UseHint()
         {
             bool hintsLeft = _instance.hints > 0;
@@ -164,17 +240,30 @@ namespace FlowFree
             return hintsLeft;
         }
 
+        /// <summary>
+        /// Aumenta el numero de pistas
+        /// </summary>
+        /// <param name="numHints_"> El aumento de pistas</param>
         public void IncreaseHints(int numHints_)
         {
             modifyHint(numHints_);
             _instance.lvlManager.board.CheckHints();
         }
 
+        /// <summary>
+        /// Devuelve el numero de pistas
+        /// </summary>
         public int GetHints()
         {
             return _instance.hints;
         }
 
+        /// <summary>
+        /// Completa un nivel con los movimientos correspondientes
+        /// y comprueba si se habia completado antes y si es o no perfecto.
+        /// Guarda el estado tras pasar el nivel.
+        /// </summary>
+        /// <param name="moves"> El numero de movimientos</param>
         public void LevelComplete(int moves)
         {           
             if (_instance.selectedPack.BestMoves[_instance.selectedLevel] == -1)
@@ -194,17 +283,28 @@ namespace FlowFree
             _instance._dataManager.Save(_instance.hints, _instance.catDict);
         }
 
-        public void unlockPack(int catInd, int pInd)
+        /// <summary>
+        /// Desbloquea un lote
+        /// </summary>
+        /// <param name="catName"> el nombre de la categoria</param>
+        /// <param name="pInd"> el indice del lote</param>
+        public void unlockPack(string catName, int pInd)
         {
-            _instance.catArray[catInd].PacksArray[pInd].Blocked = false;
+            _instance.catDict[catName].PacksArray[pInd].Blocked = false;
         }
 
-        // TODO: usar este para todo o cambiar los otros
-        private void modifyHint(int value)
+        /// <summary>
+        /// Modifica el numero de pistas
+        /// </summary>
+        /// <param name="value"> El numero con el que se modifican las pistas</param>
+        void modifyHint(int value)
         {
             _instance.hints = Mathf.Clamp(_instance.hints + value, 0, MAX_HINTS);
         }
 
+        /// <summary>
+        /// Guardamos el estado cada vez que se cierre la aplicacion por si acaso
+        /// </summary>
         private void OnApplicationQuit()
         {
             _instance._dataManager.Save(_instance.hints, _instance.catDict);
