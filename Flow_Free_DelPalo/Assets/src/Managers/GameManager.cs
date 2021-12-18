@@ -170,10 +170,10 @@ namespace FlowFree
         /// </summary>
         /// <param name="catName"> Nombre de la categoria</param>
         /// <param name="packIndex"> El indice del lote en el array de lotes</param>
-        public void setLevelPack(string catName, int packIndex)
+        public void SetLevelPack(string catName, int packIndex)
         {
-            _instance.selectedCategory = _instance.catDict[catName];
-            _instance.selectedPack = _instance.catDict[catName].PacksArray[packIndex];
+            selectedCategory = catDict[catName];
+            selectedPack = catDict[catName].PacksArray[packIndex];
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace FlowFree
         /// <param name="levelIndex"> El indice del nivel</param>
         public void SetSelectedLevel(int levelIndex)
         {
-            _instance.selectedLevel = levelIndex;
+            selectedLevel = levelIndex;
         }
 
         /// <summary>
@@ -199,9 +199,9 @@ namespace FlowFree
         /// <returns>Devuelve si hay o no nivel siguiente</returns>
         public bool NextLevel()
         {
-            bool exist = _instance.DoesNextLevelExist();
+            bool exist = DoesNextLevelExist();
             if (exist)
-                _instance.selectedLevel++;
+                selectedLevel++;
             return exist;
         }
 
@@ -219,9 +219,9 @@ namespace FlowFree
         /// <returns>Devuelve si hay o no nivel siguiente</returns>
         public bool PrevLevel()
         {          
-            bool exist = _instance.DoesPrevLevelExist();
+            bool exist = DoesPrevLevelExist();
             if (exist)
-                _instance.selectedLevel--;
+                selectedLevel--;
             return exist;
         }
 
@@ -231,11 +231,11 @@ namespace FlowFree
         /// <returns> Devuelve si hay o no pistas</returns>
         public bool UseHint()
         {
-            bool hintsLeft = _instance.hints > 0;
+            bool hintsLeft = hints > 0;
             if (hintsLeft)
             {
                 modifyHint(-1);
-                _dataManager.Save(_instance.hints, _instance.catDict);
+                _dataManager.Save(hints, catDict);
             }
             return hintsLeft;
         }
@@ -247,7 +247,7 @@ namespace FlowFree
         public void IncreaseHints(int numHints_)
         {
             modifyHint(numHints_);
-            _instance.lvlManager.board.CheckHints();
+            lvlManager.board.CheckHints();
         }
 
         /// <summary>
@@ -255,7 +255,7 @@ namespace FlowFree
         /// </summary>
         public int GetHints()
         {
-            return _instance.hints;
+            return hints;
         }
 
         /// <summary>
@@ -266,21 +266,21 @@ namespace FlowFree
         /// <param name="moves"> El numero de movimientos</param>
         public void LevelComplete(int moves)
         {           
-            if (_instance.selectedPack.BestMoves[_instance.selectedLevel] == -1)
+            if (selectedPack.BestMoves[selectedLevel] == -1)
             {
-                _instance.selectedPack.BestMoves[_instance.selectedLevel] = moves;
-                _instance.selectedPack.CompletedLevels++;
+                selectedPack.BestMoves[selectedLevel] = moves;
+                selectedPack.CompletedLevels++;
             }
             else
             {
-                _instance.selectedPack.BestMoves[_instance.selectedLevel] = Mathf.Min(_instance.selectedPack.BestMoves[_instance.selectedLevel], moves);
+                selectedPack.BestMoves[selectedLevel] = Mathf.Min(selectedPack.BestMoves[selectedLevel], moves);
             }
             // Si hemos completado el nivel, desbloqueamos el siguiente
-            if (_instance.selectedLevel == _instance.selectedPack.LastUnlockedLevel)
-                _instance.selectedPack.LastUnlockedLevel++;
+            if (selectedLevel == selectedPack.LastUnlockedLevel)
+                selectedPack.LastUnlockedLevel++;
 
             // Guardamos cada vez que se pase el nivel
-            _instance._dataManager.Save(_instance.hints, _instance.catDict);
+            _dataManager.Save(hints, catDict);
         }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace FlowFree
         /// <param name="pInd"> el indice del lote</param>
         public void unlockPack(string catName, int pInd)
         {
-            _instance.catDict[catName].PacksArray[pInd].Blocked = false;
+            catDict[catName].PacksArray[pInd].Blocked = false;
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace FlowFree
         /// <param name="value"> El numero con el que se modifican las pistas</param>
         void modifyHint(int value)
         {
-            _instance.hints = Mathf.Clamp(_instance.hints + value, 0, MAX_HINTS);
+            hints = Mathf.Clamp(hints + value, 0, MAX_HINTS);
         }
 
         /// <summary>
