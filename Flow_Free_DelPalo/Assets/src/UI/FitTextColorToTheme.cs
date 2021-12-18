@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
+    /**
+     * Ajusta cada letra del texto al tema actual del juego
+     */
     public class FitTextColorToTheme : MonoBehaviour
     {
         public Text Text;

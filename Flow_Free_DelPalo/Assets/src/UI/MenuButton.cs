@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
+    /**
+     * Boton de seleccion de paquete (en el menu)
+     */
     public class MenuButton : MonoBehaviour
     {
         public Button button;

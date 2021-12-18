@@ -5,15 +5,37 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
+    /**
+     * Display de una categoria logica.
+     * Se usa en la escena de Menu
+     */
     public class CategoryDisplay : MonoBehaviour
     {
+        /// <summary>
+        /// Prefab del boton de seleccion de lote
+        /// </summary>
         public GameObject buttonPref;
+
+        /// <summary>
+        /// Texto con el nombre de la categoria
+        /// </summary>
         public Text categoryName;
 
+        /// <summary>
+        /// Fondo del texto del nombre de la categoria
+        /// </summary>
         public Image categoryBackground;
+
+        /// <summary>
+        /// Barra inferior del nombre de la categoria
+        /// </summary>
         public Image categoryBar;
 
-        public void setAttributes(Logic.GameCategory cat, string catName)
+        /// <summary>
+        /// Configura el display segun las caracteristicas de la categoria logica.
+        /// </summary>
+        /// <param name="cat"> Categoria logica</param>
+        public void setAttributes(Logic.GameCategory cat)
         {
             categoryBackground.color = new Color(cat.Color.r, cat.Color.g, cat.Color.b, 0.6f);
             categoryBar.color = cat.Color;
@@ -30,7 +52,7 @@ namespace FlowFree
                 
                 int packIndex = i;
                 packButton.setOnClick(() => {
-                     GameManager.getInstance().setLevelPack(catName, packIndex);
+                     GameManager.getInstance().setLevelPack(cat.Name, packIndex);
                     GameManager.getInstance().ChangeScene("Level Select");             
                 });
 

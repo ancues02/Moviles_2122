@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-/*
- * Cambia el sprite segun si el nivel/pack
- * esta bloqueado, completado o perfecto.
- */
 namespace FlowFree
 {
+    /**
+     * Cambia el sprite segun si el nivel/pack
+     * esta bloqueado, completado o perfecto.
+     */
     public class ChangeStateSprite : MonoBehaviour
     {
         public Image stateImage;

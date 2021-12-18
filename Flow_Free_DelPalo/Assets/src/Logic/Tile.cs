@@ -5,8 +5,15 @@ using UnityEngine;
 
 namespace FlowFree
 {
+    /**
+    *  Tile logica con sus datos correspondientes
+    */
     public class Tile : MonoBehaviour, System.ICloneable, System.IEquatable<Tile>
     {
+        /// <summary>
+        /// Constructor que copia los datos de otra tile
+        /// </summary>
+        /// <param name="t">Tile de la que se copian datos</param>
         public Tile(Tile t)
         {
             isMain = t.isMain;
@@ -16,24 +23,24 @@ namespace FlowFree
             outIndex = t.outIndex;
         }
 
-        Vector2Int boardPos;
+        Vector2Int boardPos;    // Posicion en el mapa
 
-        Color tileColor;
+        Color tileColor;    // Color de la tile
 
-        bool isVoid = false;
+        bool isVoid = false;    // Si es un vacio
 
-        bool isMain = false;
+        bool isMain = false;    // Si es un final o inicio de flow
 
-        public List<Sprite> sprites;
+        public List<Sprite> sprites;    // Sprites asocioados a la tile
         
-        public List<Animable> animableSprites;
+        public List<Animable> animableSprites;  // Animables asociados a la tile
 
-        public Sprite hintedSprite;
+        public Sprite hintedSprite; // Sprite usado para la pista
 
         [Tooltip("Sprite del circulo")]
         public SpriteRenderer renderSprite;
 
-        [Tooltip("Bordes del tile y circulo pequeño")]
+        [Tooltip("Bordes del tile y circulo pequenio")]
         public GameObject[] childrens;
 
         [Tooltip("Caminos del tile, deben ser hijos")]
@@ -42,10 +49,13 @@ namespace FlowFree
         [Tooltip("Paredes de tile, deben ser hijos")]
         public GameObject[] childrensWalls;
 
-        //Los indices de los path de entrada o salida
+        //Los indices (direcciones) de los path de entrada o salida
         public int inIndex = -1, outIndex = -1;
 
-
+        /// <summary>
+        /// Comrpueba si las referncias estan en orden
+        /// Asigna su sprite principal
+        /// </summary>
         void Start()
         {
             if (renderSprite == null) 
@@ -58,7 +68,17 @@ namespace FlowFree
             renderSprite.sprite = sprites[0];           
         }
 
+        /// <summary>
+        /// Devuelve si es main
+        /// </summary>
+        /// <returns>Si es main</returns>
         public bool getIsMain() { return isMain; }
+
+        /// <summary>
+        /// Asigna si es main segun un valor dado
+        /// Asigna el color que usaran a sus sprites
+        /// </summary>
+        /// <param name="isFlow">Si es main o no</param>
         public void setIsMain(bool isFlow)
         {
             isMain = isFlow;
@@ -66,8 +86,15 @@ namespace FlowFree
             childrens[6].GetComponent<SpriteRenderer>().color = tileColor;
         }
 
+        /// <summary>
+        /// Devuelve si es un vacio
+        /// </summary>
+        /// <returns>Si e sun vacio</returns>
         public bool getIsVoid() { return isVoid; }
 
+        /// <summary>
+        /// Asigna la tile a vacio
+        /// </summary>
         public void setIsVoid()
         {
             isVoid = true;
@@ -76,50 +103,79 @@ namespace FlowFree
             renderSprite.color = Color.black;
         }
 
-        // Cambia el color que tiene en ese momento el tile
+        /// <summary>
+        /// Cambia el color asigando a la tile
+        /// </summary>
+        /// <param name="color">Color que se asigna</param>
         public void ChangeColor(Color color)
         {
             tileColor = color;
             
         }
 
-        // Devuelve el color que tiene en ese momento el tile
+        /// <summary>
+        /// Devuelve el color asignado a la tile
+        /// </summary>
+        /// <returns>Color asignado a la tile</returns>
         public Color getColor()
         {
             return tileColor;
         }
 
+        /// <summary>
+        /// Activa o desactiva el sprite del circulo 
+        /// pequenio del extremo de flow no conectado
+        /// </summary>
+        /// <param name="active">Si es activo o no</param>
         public void SmallCircleSetActive(bool active)
         {
             childrens[4].GetComponent<SpriteRenderer>().color = tileColor;
             childrens[4].GetComponent<SpriteRenderer>().enabled = active;
         }
 
-        // Activa o desactiva el renderSprite 
+        /// <summary>
+        /// Cambia visibilidad del circulo 
+        /// principal de la tile
+        /// </summary>
+        /// <param name="visible">Si es viisble o no</param>
         public void setVisible(bool visible)
         {
             renderSprite.enabled = visible;
         }
 
-        // Pone la posicion que tiene el tile en el tablero
+        /// <summary>
+        /// Asigna la posicion en el tablero
+        /// </summary>
+        /// <param name="pos">Posicion en el tablero</param>
         public void setBoardPos(Vector2Int pos)
         {
             boardPos = pos;
         }
 
-        // Devuelve la posicion del tile en el tablero
+        /// <summary>
+        /// Devuelve la posicion de la tile en el tablero
+        /// </summary>
+        /// <returns>Posicion de la tile en el tablero</returns>
         public Vector2Int getBoardPos()
         {
             return boardPos;
         }
 
-        // Activa la linea de arriba del tile
-
+       
+        /// <summary>
+        /// Activa la pared de la tile en una direccion
+        /// </summary>
+        /// <param name="dir">Direccion en la que se activa la pared</param>
         public void setActiveWall(Logic.Directions dir)
         {
             childrensWalls[(int)dir].SetActive(true);
         }
 
+        /// <summary>
+        /// Devuelve si una pared esta activa
+        /// </summary>
+        /// <param name="dir">Direccion de la pared</param>
+        /// <returns>Si la pared esta activa</returns>
         public bool getActiveWall(Logic.Directions dir)
         {
             return childrensWalls[(int)dir].activeSelf;
@@ -253,37 +309,10 @@ namespace FlowFree
 
         }
 
-        ///// <summary>
-        ///// Desactiva todos los caminos menos el que recibe
-        ///// </summary>
-        //public void notDeactivateAll(Logic.Directions dir)
-        //{
-        //    SpriteRenderer SpriteR = null;
-        //    switch (dir)
-        //    {
-        //        case Logic.Directions.Right:
-        //            SpriteR = childrensPaths[0];
-        //            break;
-
-        //        case Logic.Directions.Down:
-        //            SpriteR = childrensPaths[1];
-        //            break;
-
-        //        case Logic.Directions.Left:
-        //            SpriteR = childrensPaths[2];
-        //            break;
-
-        //        case Logic.Directions.Up:
-        //            SpriteR = childrensPaths[3];
-        //            break;
-
-        //    }
-        //    foreach (SpriteRenderer sp in childrensPaths)
-        //        if(sp != SpriteR)
-        //            sp.enabled = false;
-        //}
-
-        // Desactiva en esa direccion
+        /// <summary>
+        /// Desactiva el camino en una direccion
+        /// </summary>
+        /// <param name="dir">Direccion en la que se desactive</param>
         private void deactive(Logic.Directions dir)
         {
             childrensPaths[(int)dir].enabled = false;
@@ -291,7 +320,7 @@ namespace FlowFree
 
 
         /// <summary>
-        ///  Modifica un camino en funcion a la direccion que recibe.
+        /// Modifica un camino en funcion a la direccion que recibe.
         /// </summary>
         /// <param name="dir"> Direccion a comprobar</param>
         /// <param name="active_">  Si es true lo activa, si es false lo desactiva </param>
@@ -308,6 +337,13 @@ namespace FlowFree
                 return active(dir, c);
         }
 
+        /// <summary>
+        /// Resetea el estado de la tile, asigna los indices
+        /// de entrada y salida y un nuevo color a la tile
+        /// </summary>
+        /// <param name="inIndex_">Indice de entrada</param>
+        /// <param name="outIndex_">Indice de salida</param>
+        /// <param name="c">Color a asignar</param>
         public void resetTile(int inIndex_, int outIndex_, Color c)
         {
             DeactiveAll();
@@ -326,11 +362,21 @@ namespace FlowFree
             }
         }
 
+        /// <summary>
+        /// Clona la tile
+        /// </summary>
+        /// <returns>La tile clonada en object</returns>
         public object Clone()
         {
             return this.MemberwiseClone();
         }
 
+        /// <summary>
+        /// Comprueba si la esta tile y otra estan 
+        /// en la misma posicion en el mapa
+        /// </summary>
+        /// <param name="other">Tile con la que se compara</param>
+        /// <returns>Si estan ambas en la misma posicion</returns>
         public bool Equals(Tile other)
         {
             return other.getBoardPos() == boardPos;

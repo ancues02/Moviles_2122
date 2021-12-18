@@ -5,12 +5,13 @@ using UnityEngine;
 
 namespace FlowFree
 {
+    [CreateAssetMenu(fileName = "Category",
+        menuName = "Flow/Category", order = 1)]
+
     /**
      * Scriptable Object para gestionar las categorias como datos.
      * Contiene el nombre y los lotes de la categor�a.
      */
-    [CreateAssetMenu(fileName = "Category",
-        menuName = "Flow/Category", order = 1)]
     public class Category : ScriptableObject
     {
         [Tooltip("Nombre de la categoria")]

@@ -6,7 +6,12 @@ namespace FlowFree
 {
     public class CoroutineAnimator
     {
-        // vibración del círculo main
+        /// <summary>
+        /// Corrutina que hace que un sprite oscile su tamaño vibrando.
+        /// </summary>
+        /// <param name="wiggled">Sprite a animar</param>
+        /// <param name="animEnded">Callback que invocar tras hacer la animacion</param>
+        /// <returns></returns>
         public static IEnumerator Wiggle(SpriteRenderer wiggled, System.Action animEnded = null)
         {
             float i = 0;
@@ -23,7 +28,12 @@ namespace FlowFree
             yield break;
         }
 
-        // pulsación del círculo
+        /// <summary>
+        /// Corrutina que hace que un sprite se active, se expanda y se tranparente hasta desparecer.
+        /// </summary>
+        /// <param name="pulsed">Sprite a animar</param>
+        /// <param name="animEnded">Callback que invocar tras hacer la animacion</param>
+        /// <returns></returns>
         public static IEnumerator Pulse(SpriteRenderer pulsed, System.Action animEnded = null)
         {
             float i = 0;
@@ -44,8 +54,14 @@ namespace FlowFree
             yield break;
         }
 
-        // pulsación de cortado, es similar a la de acabar una tuberia pero mas rapida y con el color que le pasamos
-        public static IEnumerator Pulse(SpriteRenderer pulsed, Color color,System.Action animEnded = null)
+        /// <summary>
+        /// Corrutina que hace que un sprite se active, se expanda y se tranparente hasta desparecer.
+        /// </summary>
+        /// <param name="pulsed">Sprite a animar</param>
+        /// <param name="color">Color que otorgar al sprite</param>
+        /// <param name="animEnded">Callback que invocar tras hacer la animacion</param>
+        /// <returns></returns>
+        public static IEnumerator Pulse(SpriteRenderer pulsed, Color color, System.Action animEnded = null)
         {
             float i = 0;
             pulsed.enabled = true;
