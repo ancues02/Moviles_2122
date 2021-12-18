@@ -1,5 +1,9 @@
 using System.Collections.Generic;
 
+/// <summary>
+/// Estructuras poder guardar 
+/// el estado del juego serializado
+/// </summary>
 namespace FlowFree.Serializable
 {
     [System.Serializable]
@@ -31,7 +35,6 @@ namespace FlowFree.Serializable
     {
         public string name;
         public bool blocked;
-        public int totalLevels;
         public int completedLevels;
         public int lastUnlockedLevel;
         public List<int> bestMoves;

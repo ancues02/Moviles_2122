@@ -1,48 +1,74 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Security.Cryptography;
 using System.Text;
 
-/*
- * Se encarga de cargar y guardar datos
- */
 namespace FlowFree
 {
+    /// <summary>
+    /// Clase para gestionar el guardado y la recuperacion
+    /// de los datos del juego.
+    /// </summary>
     public class GameDataManager
     {
+        /// <summary>
+        ///  Estructura auxiliar para identificar a las categorias
+        ///  y sus posicion en el array en las estructuras de serializacion
+        /// </summary>
         struct CategorySave
         {
             public int catIndex;
             public Dictionary<string, int> packSaves;
         }
+        
+        /// <summary>
+        /// Ruta relativa del archivo de guardado
+        /// </summary>
+        private const string jsonFilePath = "/saveFile.json";
 
-        public const int MAX_HINTS = 99;
-        private const string jsonFilePath = "saveFile.json";
+        /// <summary>
+        /// String arbitrario para modificar aniadir "pimienta"
+        /// en las comprobaciones de integridad con el hash
+        /// </summary>
         private const string pepper = "pimienta";
-        Serializable.GameData _gameData;
-        bool _prettyJson = true;
 
-        // Diccionario con para identificar las categorias
-        // y lotes en las estructuras serializables
+        /// <summary>
+        /// Datos del juego guardados
+        /// </summary>
+        Serializable.GameData _gameData;
+
+        /// <summary>
+        /// Variable para debuggear el guardado en json
+        /// </summary>
+        bool _prettyJson = false;
+
+        ///<summary>
+        /// Diccionario con para identificar las categorias
+        /// y lotes en las estructuras serializables
+        ///</summary>
         Dictionary<string, CategorySave> _savedCategories;
 
-        /*
-         * Modificamos los datos del juego segun si
-         * habia datos ya guardados
-         */
+        /// <summary>
+        /// Deserializa la estructura del estado 
+        /// del juego del archivo del guardado
+        /// </summary>
         void Deserialize(ref Serializable.GameData gameData)
         {
             // si no existe, nos quedamos con los datos iniciales
-            using (StreamReader rstream = new StreamReader(jsonFilePath))
+            using (StreamReader rstream = new StreamReader(Application.persistentDataPath + jsonFilePath))
             {
                 JsonUtility.FromJsonOverwrite(rstream.ReadToEnd(), gameData);
             }
         }
+
+        /// <summary>
+        /// Serializa la estructura del estado 
+        /// del juego y la guarda en el archivo
+        /// </summary>
         void Serialize()
         {
-            using (StreamWriter wstream = new StreamWriter(jsonFilePath))
+            using (StreamWriter wstream = new StreamWriter(Application.persistentDataPath + jsonFilePath))
             {
                 _gameData.hash = "";
                 _gameData.hash = ComputeHash(pepper.Substring(0, 2) + JsonUtility.ToJson(_gameData, _prettyJson) + pepper.Substring(2, 6));
@@ -50,17 +76,27 @@ namespace FlowFree
                 wstream.Write(json);
             }
         }
+
+         /// <summary>
+         /// Cargamos el estado del juego si estaba guardado.
+         /// Si el archivo de guardado ha sido modificado
+         /// por algun medio externo, se borra todo el archivo
+         /// de guardado y se empieza el juego de cero
+         /// </summary>
+         /// <param name="categories">Categorias a guardar</param>
+         /// <param name="hints">Pistas a guardar</param>
         public void Load(ref Dictionary<string, Logic.GameCategory> categories, ref int hints)
         {
             Serializable.GameData gameData = new Serializable.GameData();
             _savedCategories = new Dictionary<string, CategorySave>();
 
-            if (File.Exists(jsonFilePath))
+            if (File.Exists(Application.persistentDataPath + jsonFilePath))
             {
                 Deserialize(ref gameData);
                 if (!CheckHash(gameData))
                 {
                     Debug.LogError("Save file has been modified");
+                    File.Delete(Application.persistentDataPath + jsonFilePath);
                     LoadDefault(categories);
                 }
                 else
@@ -74,38 +110,44 @@ namespace FlowFree
                 LoadDefault(categories);
         }
 
-        /*
-         * Guardamos los datos del juego
-         */
+         /// <summary>
+         /// Guarda el estado del juego.
+         /// Serializa las pistas y los diccionarios que se utilizan
+         /// en la logica del juego en las estructuras de serializacion
+         /// y se guardan en un archivo .json
+         /// </summary>
+         /// <param name="hints">Pistas a guardar</param>
+         /// <param name="categories">Categorias a guardar</param>
         public void Save(int hints, Dictionary<string, Logic.GameCategory> categories)
         {
             List<string> catKeys = new List<string>(categories.Keys);
             foreach(string cName in catKeys)
             {
+                // Sobreescribimos las categorias de las que ya teniamos datos guardados
                 if (_savedCategories.ContainsKey(cName))
                 {
                     _gameData.categories[_savedCategories[cName].catIndex].name = cName;
                     List<string> packKeys = new List<string>(categories[cName].PacksDict.Keys);
                     foreach(string pName in packKeys)
                     {
+                        // Sobreescribimos los lotes de los que ya teniamos datos guardados
                         if (_savedCategories[cName].packSaves.ContainsKey(pName))
                         {
                             Logic.GamePack gp = categories[cName].PacksDict[pName];
                             Serializable.PackData pd = _gameData.categories[_savedCategories[cName].catIndex].packs[_savedCategories[cName].packSaves[pName]];
                             pd.name = pName;
                             pd.blocked = gp.Blocked;
-                            pd.totalLevels = gp.TotalLevels;    // este no hace falta
                             pd.completedLevels = gp.CompletedLevels;
                             pd.lastUnlockedLevel = gp.LastUnlockedLevel;
                             pd.bestMoves = gp.BestMoves;
                         }
+                        // Si tenemos un lote que no habiamos guardado, lo guardamos
                         else
                         {
                             Logic.GamePack gp = categories[cName].PacksDict[pName];
                             Serializable.PackData pd = new Serializable.PackData();
                             pd.name = pName;
                             pd.blocked = gp.Blocked;
-                            pd.totalLevels = gp.TotalLevels;    // este no hace falta
                             pd.completedLevels = gp.CompletedLevels;
                             pd.lastUnlockedLevel = gp.LastUnlockedLevel;
                             pd.bestMoves = gp.BestMoves;
@@ -115,6 +157,7 @@ namespace FlowFree
                         }
                     }
                 }
+                // Si tenemos una categoria que no habiamos guardado, la guardamos
                 else
                 {
                     Serializable.CategoryData cd = new Serializable.CategoryData();
@@ -129,7 +172,6 @@ namespace FlowFree
 
                         pd.name = gp.Name;
                         pd.blocked = gp.Blocked;
-                        pd.totalLevels = gp.TotalLevels;    // este no hace falta
                         pd.completedLevels = gp.CompletedLevels;
                         pd.lastUnlockedLevel = gp.LastUnlockedLevel;
                         pd.bestMoves = gp.BestMoves;
@@ -145,10 +187,14 @@ namespace FlowFree
             Serialize();
         }
 
-
+        /// <summary>
+        /// Compara las categorias del juego con los datos guardados.
+        /// Si habia datos guardados relativos al contenido actual del juego, se sobreescriben.
+        /// </summary>
+        /// <param name="categories">Diccionario de categorias que se quiere cargar</param>
         private void LoadFile(Dictionary<string, Logic.GameCategory> categories)
         {
-            // Initialize file dict with stored data
+            // Inicializa el diccionario de las categorias con los datos guardados
             for(int i = 0; i < _gameData.categories.Count; i++)
             {
                 CategorySave cs = new CategorySave();
@@ -161,7 +207,7 @@ namespace FlowFree
                 _savedCategories.Add(_gameData.categories[i].name, cs);
             }
 
-            // Compare and overwrite categories with its stored data
+            // Sobreescribe los datos del juego con lo que estuviera guardado
             List<string> catKeys = new List<string>(categories.Keys);
             foreach (string cName in catKeys)
             {
@@ -178,7 +224,6 @@ namespace FlowFree
 
                             gp.Name = pd.name;
                             gp.Blocked = pd.blocked;
-                            gp.TotalLevels = pd.totalLevels; // este no hace falta
                             gp.CompletedLevels = pd.completedLevels;
                             gp.LastUnlockedLevel = pd.lastUnlockedLevel;
                             gp.BestMoves = pd.bestMoves;
@@ -189,12 +234,12 @@ namespace FlowFree
         }
 
         /// <summary>
-        /// Usa de las categorias del juego para crear las 
+        /// Usa de las categorias del juego para inicializar las 
         /// estructuras que nos permiten guardar el juego posteriormente.
         /// Este metodo se llama cuando no se ha iniciado el juego previamente
         /// o si alguien ha modificado el archivo de guardado.
         /// </summary>
-        /// <param name="categories"> Diccionario de categorias que se qiuere cargar</param>
+        /// <param name="categories"> Diccionario de categorias que se quiere cargar</param>
         private void LoadDefault(Dictionary<string, Logic.GameCategory> categories)
         {
             _gameData = new Serializable.GameData();
@@ -218,6 +263,12 @@ namespace FlowFree
             }
         }
 
+        /// <summary>
+        /// Comprueba la integridad de los datos
+        /// usando el hash y la "pimienta"
+        /// </summary>
+        /// <param name="gameData"> Los datos que se comprueban </param>
+        /// <returns></returns>
         private bool CheckHash(Serializable.GameData gameData)
         {
             string ogHash = (string)gameData.hash.Clone();
@@ -228,6 +279,11 @@ namespace FlowFree
             return ogHash == aux;
         }
 
+        /// <summary>
+        /// Calcula el hash de un string (el archivo de texto)
+        /// </summary>
+        /// <param name="raw"> El texto con el que calcular le hash</param>
+        /// <returns> El hash generado a partir del texto </returns>
         private string ComputeHash(string raw)
         {
             // Create a SHA256   

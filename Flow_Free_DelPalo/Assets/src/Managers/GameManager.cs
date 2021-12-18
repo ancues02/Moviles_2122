@@ -38,7 +38,8 @@ namespace FlowFree
         GameDataManager _dataManager;
 
         private void Awake()
-        {         
+        {
+            Debug.Log(Application.persistentDataPath);
             if(!_instance)
             {
                 hints = 3;
@@ -154,9 +155,13 @@ namespace FlowFree
 
         public bool UseHint()
         {
-            modifyHint(-1);
-            _dataManager.Save(_instance.hints, _instance.catDict);
-            return _instance.hints > 0;
+            bool hintsLeft = _instance.hints > 0;
+            if (hintsLeft)
+            {
+                modifyHint(-1);
+                _dataManager.Save(_instance.hints, _instance.catDict);
+            }
+            return hintsLeft;
         }
 
         public void IncreaseHints(int numHints_)
@@ -174,12 +179,12 @@ namespace FlowFree
         {           
             if (_instance.selectedPack.BestMoves[_instance.selectedLevel] == -1)
             {
-                _instance.selectedPack.BestMoves[_instance._packIndex] = moves;
+                _instance.selectedPack.BestMoves[_instance.selectedLevel] = moves;
                 _instance.selectedPack.CompletedLevels++;
             }
             else
             {
-                _instance.selectedPack.BestMoves[_instance._packIndex] = Mathf.Min(_instance.selectedPack.BestMoves[_instance._packIndex], moves);
+                _instance.selectedPack.BestMoves[_instance.selectedLevel] = Mathf.Min(_instance.selectedPack.BestMoves[_instance.selectedLevel], moves);
             }
             // Si hemos completado el nivel, desbloqueamos el siguiente
             if (_instance.selectedLevel == _instance.selectedPack.LastUnlockedLevel)
@@ -194,7 +199,7 @@ namespace FlowFree
             _instance.catArray[catInd].PacksArray[pInd].Blocked = false;
         }
 
-        // usar este para todo o cambiar los otros
+        // TODO: usar este para todo o cambiar los otros
         private void modifyHint(int value)
         {
             _instance.hints = Mathf.Clamp(_instance.hints + value, 0, MAX_HINTS);
