@@ -5,13 +5,32 @@ using UnityEngine.UI;
 
 namespace FlowFree
 {
+    /**
+     * Display de un lote logico.
+     * Se usa en la escena de seleccion de nivel
+     */
     public class PackDisplay : MonoBehaviour
     {
-
+        /// <summary>
+        /// Prefab del boton de seleccion de nivel
+        /// </summary>
         public GameObject buttonPref;
 
+        /// <summary>
+        /// Objeto padre de todos los botones
+        /// </summary>
         public Transform buttonGroup;
+
+        /// <summary>
+        /// Texto del nombre de la pagina
+        /// </summary>
         public Text pageName;
+
+        /// <summary>
+        /// Configura el display segun las caracteristicas del lote logico
+        /// </summary>
+        /// <param name="pack"> Lote logico</param>
+        /// <param name="pageIndex"> Indice de la pagina de niveles</param>
         public void setAttributes(Logic.GamePack pack, int pageIndex)
         {
             pageName.text = pack.Pages[pageIndex].name;

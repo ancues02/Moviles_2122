@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-/**
- * TODO: Esto se puede poner en los demas botones
- * + comprobar errores
- */
 namespace FlowFree
 {
+    /**
+     * Cambia al nivel anterior o posterior l pulsar el boton
+     */
     public class ChangeLevelOnButtonClick : MonoBehaviour
     {
         public enum ChangeLevelType { Next, Previous};
