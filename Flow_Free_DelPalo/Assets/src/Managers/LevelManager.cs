@@ -64,8 +64,10 @@ namespace FlowFree
         {            
             GameManager gm = GameManager.getInstance();
             board.Stop();
-            if(gm.NextLevel())
-                gm.ChangeScene("Game Board");   
+            if (gm.NextLevel())
+                gm.ChangeScene("Game Board");
+            else
+                gm.ChangeScene("Menu");
         }
 
         /// <summary>
