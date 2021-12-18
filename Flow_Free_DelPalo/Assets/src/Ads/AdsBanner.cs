@@ -9,8 +9,7 @@ namespace FlowFree
     public class AdsBanner : MonoBehaviour
     {
         [SerializeField] string AdUnityId = "Banner_Android";
-        [SerializeField] BannerPosition bannerPosition = BannerPosition.CENTER;
-
+        [SerializeField] BannerPosition bannerPosition = BannerPosition.BOTTOM_CENTER;
 
         private void Start()
         {

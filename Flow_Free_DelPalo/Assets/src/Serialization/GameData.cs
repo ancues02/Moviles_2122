@@ -9,12 +9,13 @@ namespace FlowFree.Serializable
     [System.Serializable]
     public class GameData
     {
-        public string hash = "";
+        public string hash;
         public int hints;
         public List<CategoryData> categories;
 
         public GameData()
         {
+            hash = "";
             categories = new List<CategoryData>();
         }
     }
