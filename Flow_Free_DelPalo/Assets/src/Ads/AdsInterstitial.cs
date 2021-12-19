@@ -12,17 +12,16 @@ namespace FlowFree
         [SerializeField] string AdUnityId = "Interstitial_Android";
 
         /// <summary>
-        /// Enlace al lvlManager, necesita poder comunicarle que ha acabado el anuncio
+        /// El AdsManager para avisar que ha terminado el anuncio
         /// </summary>
-        [SerializeField] LevelManager lvlManager;
+        [Tooltip("El script AdsManager del objeto que lo contiene en la escena")]
+        [SerializeField] AdsManager adManager;
 
         /// <summary>
         /// Cargamos el tipo interstitial al empezar la escena
         /// </summary>
         private void Start()
         {
-            if (!lvlManager)
-                Debug.LogWarning("Falta referencia de LevelManager en AdsInterstitial");
             LoadAd();
         }
 
@@ -76,9 +75,7 @@ namespace FlowFree
         /// <param name="showCompletionState"></param>
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
         {
-            if(lvlManager)
-                lvlManager.ChangeLevel(true);
-            Debug.Log("Anuncio Insterstital acabado"); 
+            adManager.OnInterstitialAdEnded();
         }
     }
 }

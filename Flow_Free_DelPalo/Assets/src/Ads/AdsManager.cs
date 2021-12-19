@@ -75,6 +75,12 @@ namespace FlowFree
                 adsRewarded.ShowAd();
         }
 
+        public void OnRewardedAdEnded()
+        {
+            if(GameManager.getInstance())
+                GameManager.getInstance().IncreaseHints(1);
+        }
+
         /// <summary>
         /// Mostrar un anuncio de tipo Interstitial. Solo se llama al pasar de nivel
         /// asi que si no se ha iniciado, cambiar de nivel directamente para que se pueda jugar
@@ -85,6 +91,13 @@ namespace FlowFree
             if(Advertisement.isInitialized)
                 adsInterstitial.ShowAd();
             else if (lvlManager)
+                lvlManager.ChangeLevel(true);
+        }
+
+
+        public void OnInterstitialAdEnded()
+        {
+            if (lvlManager)
                 lvlManager.ChangeLevel(true);
         }
 

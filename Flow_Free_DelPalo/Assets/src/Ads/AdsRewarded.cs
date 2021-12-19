@@ -23,6 +23,12 @@ namespace FlowFree
         [SerializeField] Button showButton;
 
         /// <summary>
+        /// El AdsManager para avisar que ha terminado el anuncio
+        /// </summary>
+        [Tooltip("El script AdsManager del objeto que lo contiene en la escena")]
+        [SerializeField] AdsManager adManager;
+
+        /// <summary>
         /// El contador para que solo sume una pista
         /// </summary>
         int cont = 0;
@@ -92,15 +98,15 @@ namespace FlowFree
         }
 
         /// <summary>
-        /// Al acabar un anuncio, aniade una pista, solo lo hace cuando contador es igual a 1 
+        /// Al acabar un anuncio avisa al manager, solo lo hace cuando contador es igual a 1 
         /// para asegurarnos de que solo se aniade una pista y no varias
         /// </summary>
         /// <param name="placementId"></param>
         /// <param name="showCompletionState"></param>
         public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
         {
-            if (GameManager.getInstance() && cont == 1)
-                GameManager.getInstance().IncreaseHints(1);
+            if (cont == 1)
+                adManager.OnRewardedAdEnded();
             cont = 0;
         }
 

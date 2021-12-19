@@ -3391,6 +3391,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AdUnityId: Rewarded_Android
   showButton: {fileID: 7478015869271439552}
+  adManager: {fileID: 1657832529}
 --- !u!114 &1657832527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3404,7 +3405,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AdUnityId: Interstitial_Android
-  lvlManager: {fileID: 2011856597}
+  adManager: {fileID: 1657832529}
 --- !u!4 &1657832528
 Transform:
   m_ObjectHideFlags: 0
