@@ -25,3 +25,5 @@ MonoBehaviour:
     color: {r: 1, g: 0.5907618, b: 0, a: 1}
   - name: "9x9 - dif\xEDcil"
     color: {r: 1, g: 0.019191347, b: 0, a: 1}
+  blocked: 0
+  blockedLevelIndex: 150
