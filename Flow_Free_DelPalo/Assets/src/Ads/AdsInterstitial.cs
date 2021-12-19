@@ -14,7 +14,7 @@ namespace FlowFree
         /// <summary>
         /// Enlace al lvlManager, necesita poder comunicarle que ha acabado el anuncio
         /// </summary>
-        public LevelManager lvlManager;
+        [SerializeField] LevelManager lvlManager;
 
         /// <summary>
         /// Cargamos el tipo interstitial al empezar la escena
@@ -80,8 +80,5 @@ namespace FlowFree
                 lvlManager.ChangeLevel(true);
             Debug.Log("Anuncio Insterstital acabado"); 
         }
-
-
-
     }
 }

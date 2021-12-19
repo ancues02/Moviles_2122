@@ -35,10 +35,17 @@ namespace FlowFree
         /// </summary>
         [SerializeField] AdsBanner adsBanner;
 
+        /// <summary>
+        /// Enlace al lvlManager, necesita poder comunicarle que ha acabado el anuncio
+        /// </summary>
+        [SerializeField] LevelManager lvlManager;
+
+
         void Awake()
         {
             // Initialize Ads service
             Advertisement.Initialize(gameId, testMode, this);
+            
         }
 
         /// <summary>
@@ -64,15 +71,21 @@ namespace FlowFree
         /// </summary>
         public void ShowRewardedAd()
         {
-            adsRewarded.ShowAd();
+            if(Advertisement.isInitialized)
+                adsRewarded.ShowAd();
         }
 
         /// <summary>
-        /// Mostrar un anuncio de tipo Interstitial
+        /// Mostrar un anuncio de tipo Interstitial. Solo se llama al pasar de nivel
+        /// asi que si no se ha iniciado, cambiar de nivel directamente para que se pueda jugar
+        /// sin conexion a internet
         /// </summary>
         public void ShowInterstitialAd()
         {
-            adsInterstitial.ShowAd();
+            if(Advertisement.isInitialized)
+                adsInterstitial.ShowAd();
+            else if (lvlManager)
+                lvlManager.ChangeLevel(true);
         }
 
         /// <summary>
@@ -80,7 +93,8 @@ namespace FlowFree
         /// </summary>
         public void ShowBannerAd()
         {
-            adsBanner.ShowBannerAd();
+            if(Advertisement.isInitialized)
+                adsBanner.ShowBannerAd();
         }
     }
 }
